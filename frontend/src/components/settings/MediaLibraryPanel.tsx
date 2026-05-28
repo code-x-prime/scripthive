@@ -149,7 +149,7 @@ export const MediaLibraryPanel = () => {
   };
 
   const copyUrl = async (row: MediaFileRecord) => {
-    const full = `${window.location.origin}${row.url}`;
+    const full = row.url.startsWith("http") ? row.url : `${window.location.origin}${row.url}`;
     try {
       await navigator.clipboard.writeText(full);
       setCopiedId(row.id);
