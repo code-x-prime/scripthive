@@ -29,6 +29,7 @@ import { RoleManagePage } from "./pages/admin/RoleManagePage";
 import { UserManagePage } from "./pages/admin/UserManagePage";
 import { SettingsPage } from "./pages/admin/SettingsPage";
 import { ContactQueriesPage } from "./pages/admin/ContactQueriesPage";
+import { MediaPage } from "./pages/admin/MediaPage";
 import { SubmitPage } from "./pages/public/SubmitPage";
 import { SubmissionSuccessPage } from "./pages/public/SubmissionSuccessPage";
 import { TrackSubmissionPage } from "./pages/public/TrackSubmissionPage";
@@ -216,6 +217,14 @@ const App = () => (
 
             <Route path="archives" element={<Navigate to="/journals" replace />} />
 
+            <Route
+              path="media"
+              element={
+                <ProtectedRoute superAdminOnly>
+                  <MediaPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="reports"
               element={

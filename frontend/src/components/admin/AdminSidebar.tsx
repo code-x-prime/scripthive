@@ -23,7 +23,8 @@ import {
   Users,
   Wrench,
   XCircle,
-  MessageSquare
+  MessageSquare,
+  Image
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -89,7 +90,7 @@ const NAV: NavSection[] = [
   {
     section: "Reports",
     items: [{ label: "Reports", icon: BarChart3, to: "/admin/reports", perm: "reports" }]
-  }
+  },
 ];
 
 export const AdminSidebar = ({ onNavigate }: { onNavigate?: () => void }) => {
@@ -163,6 +164,7 @@ export const AdminSidebar = ({ onNavigate }: { onNavigate?: () => void }) => {
             {[
               { label: "Roles", icon: Users, to: "/admin/system/roles" },
               { label: "Users", icon: Users, to: "/admin/system/users" },
+              { label: "Media Library", icon: Image, to: "/admin/media" },
               { label: "Settings", icon: Settings, to: "/admin/system/settings" }
             ].map((item) => (
               <Link
