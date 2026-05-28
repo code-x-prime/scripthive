@@ -1,0 +1,49 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            set -e
+            cd /root/scripthive
+
+            echo ">>> Pulling latest code..."
+            git pull origin main
+
+            echo ">>> Installing backend dependencies..."
+            cd backend
+            npm install --omit=dev
+            npm run build
+            npx prisma generate
+
+            echo ">>> Restarting API..."
+            pm2 restart scripthive-api
+
+            echo ">>> Building frontend..."
+            cd ../frontend
+            npm install
+            npm run build
+
+            echo ">>> Deploying frontend..."
+            rm -rf /var/www/admin.scripthive.org/*
+            cp -r dist/* /var/www/admin.scripthive.org/
+
+            echo ">>> Installing client dependencies..."
+            cd ../client
+            npm install --omit=dev
+            pm2 restart scripthive-client
+
+            echo ">>> Deploy complete!"
