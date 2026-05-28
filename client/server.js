@@ -86,6 +86,16 @@ app.get('/submit', async (req, res) => {
 });
 app.get('/subscription', (req, res) => res.render('pages/subscription'));
 
+// Journal metadata
+const JOURNAL_META = {
+  SGJVSR: { abbr: 'SGJVSR', issn: '3048-6114', name: 'ScriptHive Global Journal of Vedic and Sanskrit Research' },
+  SGMRJ:  { abbr: 'SGMRJ',  issn: '3048-6122', name: 'ScriptHive Global Multidisciplinary Research Journal' },
+  SGJPLS: { abbr: 'SGJPLS', issn: '3048-6130', name: 'ScriptHive Global Journal of Physical and Life Sciences' },
+  SGJETR: { abbr: 'SGJETR', issn: '3048-6149', name: 'ScriptHive Global Journal of Engineering and Technology Research' },
+  SGJSSH: { abbr: 'SGJSSH', issn: '3048-6157', name: 'ScriptHive Global Journal of Social Sciences and Humanities' },
+  SGJASH: { abbr: 'SGJASH', issn: '3048-6165', name: 'ScriptHive Global Journal of Applied Science and Health' }
+};
+
 // Journals Routes — pass archive data + journalId for #archives section
 const JOURNAL_IDS_LIST = ['SGJASH','SGJETR','SGJPLS','SGJSSH','SGJVSR','SGMRJ'];
 JOURNAL_IDS_LIST.forEach(jid => {
@@ -97,7 +107,13 @@ JOURNAL_IDS_LIST.forEach(jid => {
   // /SGJVSR/archives dedicated route
   app.get(`/${jid}/archives`, async (req, res) => {
     const archive = await fetchArchive(jid);
-    res.render('journals/journal_archives', { archive, journalId: jid });
+    res.render('journals/journal_archives', { archive, journalId: jid, journal: JOURNAL_META[jid] });
+  });
+
+  // /SGJVSR/archives/:slug — specific issue
+  app.get(`/${jid}/archives/:slug`, async (req, res) => {
+    const archive = await fetchArchive(jid);
+    res.render('journals/journal_archives', { archive, journalId: jid, journal: JOURNAL_META[jid], activeSlug: req.params.slug });
   });
 });
 
