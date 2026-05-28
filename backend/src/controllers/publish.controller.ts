@@ -7,6 +7,7 @@ import { sendArticlePublishedEmail } from "../services/email.service.js";
 import { generateUniqueArticleSlug } from "../utils/uniqueArticleSlug.js";
 import { writeAuditLog } from "../utils/auditLog.js";
 import type { AuthRequest } from "../middlewares/auth.middleware.js";
+import { uploadToR2 } from "../utils/r2Upload.js";
 
 export const listVolumesForJournal = async (req: Request, res: Response): Promise<void> => {
   const journalId = typeof req.query.journalId === "string" ? req.query.journalId : undefined;
@@ -225,13 +226,11 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
 
     let pdfStored: string | null = null;
     if (req.file) {
-      const newName = `${submissionId}.pdf`;
-      const newPath = path.join(path.dirname(req.file.path), newName);
+      const r2Key = `articles/${submissionId}.pdf`;
       try {
-        fs.renameSync(req.file.path, newPath);
-        pdfStored = newPath.replace(/\\/g, "/").replace(/^.*uploads\//, "uploads/");
+        pdfStored = await uploadToR2(req.file.path, r2Key, "application/pdf");
       } catch {
-        pdfStored = req.file.path.replace(/\\/g, "/").replace(/^.*uploads\//, "uploads/");
+        pdfStored = req.file.path.replace(/\\/g, "/");
       }
     }
 

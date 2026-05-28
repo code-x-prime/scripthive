@@ -26,7 +26,13 @@ const envSchema = z.object({
   BACKEND_PUBLIC_URL: z.string().url().optional(),
   DOI_PREFIX: z.string().default("10.55662"),
   UPLOADS_DIR: z.string().default("./uploads"),
-  MAX_FILE_SIZE_MB: z.string().default("10")
+  MAX_FILE_SIZE_MB: z.string().default("10"),
+  R2_ENDPOINT: z.string().url().optional().default(""),
+  R2_ACCESS_KEY_ID: z.string().optional().default(""),
+  R2_SECRET_ACCESS_KEY: z.string().optional().default(""),
+  R2_BUCKET_NAME: z.string().optional().default("scripthive"),
+  R2_PUBLIC_URL: z.string().optional().default(""),
+  ADMIN_PANEL_URL: z.string().optional().default("")
 });
 
 export const env = envSchema.parse(process.env);

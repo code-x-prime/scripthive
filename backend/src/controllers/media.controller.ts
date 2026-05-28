@@ -3,7 +3,7 @@ import path from "path";
 import type { Response } from "express";
 import { prisma } from "../config/prisma.js";
 import type { AuthRequest } from "../middlewares/auth.middleware.js";
-import { mediaDirPath } from "../middlewares/mediaUpload.middleware.js";
+import { uploadToR2, deleteFromR2 } from "../utils/r2Upload.js";
 
 export const listMedia = async (_req: AuthRequest, res: Response): Promise<void> => {
   const rows = await prisma.mediaFile.findMany({
@@ -22,19 +22,27 @@ export const uploadMedia = async (req: AuthRequest, res: Response): Promise<void
 
   const adminId = req.admin?.adminId ?? null;
   const created = await Promise.all(
-    files.map((file) =>
-      prisma.mediaFile.create({
+    files.map(async (file) => {
+      const r2Key = `media/${Date.now()}_${file.filename}`;
+      let url: string;
+      try {
+        url = await uploadToR2(file.path, r2Key, file.mimetype);
+      } catch {
+        url = `/uploads/media/${file.filename}`;
+      }
+
+      return prisma.mediaFile.create({
         data: {
           originalName: file.originalname,
-          storedName: file.filename,
+          storedName: r2Key,
           mimeType: file.mimetype || "application/octet-stream",
           size: file.size,
-          url: `/uploads/media/${file.filename}`,
+          url,
           uploadedById: adminId
         },
         include: { uploadedBy: { select: { id: true, name: true } } }
-      })
-    )
+      });
+    })
   );
 
   res.status(201).json({
@@ -51,14 +59,12 @@ export const deleteMedia = async (req: AuthRequest, res: Response): Promise<void
     return;
   }
 
-  const abs = path.normalize(path.join(mediaDirPath, row.storedName));
-  if (!abs.startsWith(mediaDirPath)) {
-    res.status(403).json({ message: "Forbidden" });
-    return;
-  }
-
-  if (fs.existsSync(abs)) {
-    fs.unlinkSync(abs);
+  try {
+    await deleteFromR2(row.storedName);
+  } catch {
+    // file may not exist in R2, continue
+    const localPath = path.join(process.cwd(), "uploads", "media", path.basename(row.storedName));
+    if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
   }
 
   await prisma.mediaFile.delete({ where: { id } });

@@ -10,6 +10,7 @@ import {
 import { env } from "../config/env.js";
 import { logger } from "../utils/logger.js";
 import type { AuthorRequest } from "../middlewares/author.middleware.js";
+import { uploadToR2, deleteFromR2 } from "../utils/r2Upload.js";
 
 const submissionScope = (authorId: string, email: string) => ({
   OR: [{ authorUserId: authorId }, { authorEmail: email, authorUserId: null }]
@@ -99,11 +100,9 @@ export const createAuthorSubmission = async (req: AuthorRequest, res: Response):
   let manuscriptPath: string | null = null;
   if (req.file) {
     const ext = path.extname(req.file.originalname).toLowerCase() || ".pdf";
-    const newName = `${submissionId}${ext}`;
-    const newFilePath = path.join(path.dirname(req.file.path), newName);
+    const r2Key = `manuscripts/${submissionId}${ext}`;
     try {
-      fs.renameSync(req.file.path, newFilePath);
-      manuscriptPath = newFilePath.replace(/\\/g, "/");
+      manuscriptPath = await uploadToR2(req.file.path, r2Key);
     } catch {
       manuscriptPath = req.file.path.replace(/\\/g, "/");
     }
@@ -199,6 +198,21 @@ export const updateAuthorSubmission = async (req: AuthorRequest, res: Response):
     return;
   }
 
+  let newManuscriptPath: string | undefined;
+  if (req.file) {
+    const ext = path.extname(req.file.originalname).toLowerCase() || ".pdf";
+    const r2Key = `manuscripts/${id}${ext}`;
+    try {
+      if (existing.manuscriptPath?.startsWith("http")) {
+        const oldKey = existing.manuscriptPath.split(".r2.dev/")[1];
+        if (oldKey) await deleteFromR2(oldKey).catch(() => {});
+      }
+      newManuscriptPath = await uploadToR2(req.file.path, r2Key);
+    } catch {
+      newManuscriptPath = req.file.path.replace(/\\/g, "/");
+    }
+  }
+
   const updated = await prisma.submission.update({
     where: { id },
     data: {
@@ -209,20 +223,7 @@ export const updateAuthorSubmission = async (req: AuthorRequest, res: Response):
       country: data.country?.trim() || null,
       affiliations: data.affiliations?.trim() || null,
       articleType: data.articleType?.trim() || existing.articleType,
-      ...(req.file
-        ? (() => {
-            const ext = path.extname(req.file.originalname).toLowerCase() || ".pdf";
-            const newName = `${id}${ext}`;
-            const newFilePath = path.join(path.dirname(req.file.path), newName);
-            try {
-              if (existing.manuscriptPath && fs.existsSync(existing.manuscriptPath)) fs.unlinkSync(existing.manuscriptPath);
-              fs.renameSync(req.file.path, newFilePath);
-              return { manuscriptPath: newFilePath.replace(/\\/g, "/") };
-            } catch {
-              return { manuscriptPath: req.file.path.replace(/\\/g, "/") };
-            }
-          })()
-        : {})
+      ...(newManuscriptPath ? { manuscriptPath: newManuscriptPath } : {})
     },
     include: { journal: true, invoices: true, doiRecord: true }
   });
@@ -244,11 +245,16 @@ export const deleteAuthorSubmission = async (req: AuthorRequest, res: Response):
     return;
   }
 
-  if (existing.manuscriptPath && fs.existsSync(existing.manuscriptPath)) {
+  if (existing.manuscriptPath) {
     try {
-      fs.unlinkSync(existing.manuscriptPath);
+      if (existing.manuscriptPath.startsWith("http")) {
+        const oldKey = existing.manuscriptPath.split(".r2.dev/")[1];
+        if (oldKey) await deleteFromR2(oldKey);
+      } else if (fs.existsSync(existing.manuscriptPath)) {
+        fs.unlinkSync(existing.manuscriptPath);
+      }
     } catch {
-      // continue delete row even if file removal fails
+      // continue
     }
   }
 

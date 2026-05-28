@@ -16,6 +16,7 @@ import { env } from "../config/env.js";
 import { logger } from "../utils/logger.js";
 import { writeAuditLog } from "../utils/auditLog.js";
 import type { AuthRequest } from "../middlewares/auth.middleware.js";
+import { uploadToR2 } from "../utils/r2Upload.js";
 
 export const createSubmission = async (req: Request, res: Response): Promise<void> => {
   const count = await prisma.submission.count();
@@ -30,15 +31,12 @@ export const createSubmission = async (req: Request, res: Response): Promise<voi
 
   const submissionId = generateSubmissionId(new Date(), count + 1);
 
-  // rename uploaded file to submissionId before saving path
   let manuscriptPath: string | null = null;
   if (req.file) {
     const ext = path.extname(req.file.originalname).toLowerCase() || ".pdf";
-    const newName = `${submissionId}${ext}`;
-    const newPath = path.join(path.dirname(req.file.path), newName);
+    const r2Key = `manuscripts/${submissionId}${ext}`;
     try {
-      fs.renameSync(req.file.path, newPath);
-      manuscriptPath = newPath.replace(/\\/g, "/");
+      manuscriptPath = await uploadToR2(req.file.path, r2Key);
     } catch {
       manuscriptPath = req.file.path.replace(/\\/g, "/");
     }
@@ -298,12 +296,14 @@ export const uploadProductionFile = async (req: Request, res: Response): Promise
   const s = await prisma.submission.findUnique({ where: { id } });
   if (!s) { res.status(404).json({ message: "Submission not found" }); return; }
 
-  const ext = path.extname(req.file.originalname).toLowerCase() || path.extname(req.file.path) || ".pdf";
-  const newName = `${id}${ext}`;
-  const newPath = path.join(path.dirname(req.file.path), newName);
-  try { fs.renameSync(req.file.path, newPath); } catch { /* keep tmp name */ }
-  const finalPath = (fs.existsSync(newPath) ? newPath : req.file.path)
-    .replace(/\\/g, "/").replace(/^.*uploads\//, "uploads/");
+  const ext = path.extname(req.file.originalname).toLowerCase() || ".pdf";
+  const r2Key = `production/${id}${ext}`;
+  let finalPath: string;
+  try {
+    finalPath = await uploadToR2(req.file.path, r2Key);
+  } catch {
+    finalPath = req.file.path.replace(/\\/g, "/");
+  }
 
   await prisma.submission.update({
     where: { id },
