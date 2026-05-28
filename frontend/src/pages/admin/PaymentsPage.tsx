@@ -1,0 +1,473 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
+import { Mail, Send, Star, X } from "lucide-react";
+import { apiJson } from "@/services/api";
+import { paymentService } from "@/services/payment.service";
+import { apcAmountForCurrency } from "@/utils/apcAmounts";
+import type { Invoice, PaymentStats } from "@/types";
+import { StatusBadge } from "@/components/common/StatusBadge";
+import { usePermissions } from "@/hooks/usePermissions";
+
+function formatMoney(total: number, currency: string): string {
+  if (currency === "INR") return `₹${total.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+  return `$${total.toFixed(2)}`;
+}
+
+function formatDate(iso?: string | null): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+const STATUS_OPTIONS = ["Draft", "Pending", "Paid"] as const;
+
+function currencyFlag(currency: string): string {
+  if (currency === "INR") return "🇮🇳";
+  if (currency === "USD") return "🇺🇸";
+  if (currency === "EUR") return "🇪🇺";
+  if (currency === "GBP") return "🇬🇧";
+  return "💱";
+}
+
+export const PaymentsPage = () => {
+  const { pathname } = useLocation();
+  const isCompleted = pathname.includes("/completed");
+  const { hasPermission } = usePermissions();
+  const canWriteInvoice = hasPermission("invoices:write");
+
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<PaymentStats>({
+    totalRevenueUsd: 0,
+    totalRevenueInr: 0,
+    pendingCount: 0,
+    overdueCount: 0,
+    totalInvoices: 0
+  });
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [modalInvoice, setModalInvoice] = useState<Invoice | null>(null);
+  const [formCurrency, setFormCurrency] = useState("USD");
+  const [formTotal, setFormTotal] = useState("");
+  const [formDue, setFormDue] = useState("");
+  const [formStatus, setFormStatus] = useState("Draft");
+  const [saving, setSaving] = useState(false);
+  const [apcRates, setApcRates] = useState({ usd: 140, inr: 11500 });
+
+  // inline amount editing state: invoiceId -> draft value
+  const [editingAmount, setEditingAmount] = useState<Record<string, string>>({});
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await paymentService.listAdmin();
+      if (res.data.apc) setApcRates(res.data.apc);
+      setStats(res.data.stats);
+      setInvoices(res.data.invoices);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+      setStats({ totalRevenueUsd: 0, totalRevenueInr: 0, pendingCount: 0, overdueCount: 0, totalInvoices: 0 });
+      setInvoices([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      void load();
+    });
+  }, [load]);
+
+  const tableRows = useMemo(() => {
+    const filtered = isCompleted
+      ? invoices.filter((i) => i.status === "Paid")
+      : invoices.filter((i) => i.status === "Draft" || i.status === "Pending");
+    return [...filtered].sort((a, b) => (b.submission?.priority ? 1 : 0) - (a.submission?.priority ? 1 : 0));
+  }, [invoices, isCompleted]);
+
+  const onPriorityToggle = async (submissionId: string, current: boolean) => {
+    try {
+      await apiJson(`/submissions/${encodeURIComponent(submissionId)}/priority`, {
+        method: "PUT",
+        body: JSON.stringify({ priority: !current })
+      });
+      setInvoices((prev) =>
+        prev.map((inv) =>
+          inv.submissionId === submissionId && inv.submission
+            ? { ...inv, submission: { ...inv.submission, priority: !current } }
+            : inv
+        )
+      );
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Update failed");
+    }
+  };
+
+  // inline amount save on blur
+  const onAmountBlur = async (inv: Invoice) => {
+    const raw = editingAmount[inv.id];
+    if (raw === undefined) return;
+    const val = parseFloat(raw);
+    if (Number.isNaN(val) || val <= 0) {
+      toast.error("Invalid amount");
+      setEditingAmount((p) => { const n = { ...p }; delete n[inv.id]; return n; });
+      return;
+    }
+    if (val === inv.total) {
+      setEditingAmount((p) => { const n = { ...p }; delete n[inv.id]; return n; });
+      return;
+    }
+    try {
+      await apiJson(`/invoices/${encodeURIComponent(inv.id)}`, {
+        method: "PUT",
+        body: JSON.stringify({ total: val })
+      });
+      setInvoices((prev) => prev.map((i) => i.id === inv.id ? { ...i, total: val, subtotal: val } : i));
+      toast.success("Amount updated");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Update failed");
+    } finally {
+      setEditingAmount((p) => { const n = { ...p }; delete n[inv.id]; return n; });
+    }
+  };
+
+
+  const openModal = (inv: Invoice) => {
+    setModalInvoice(inv);
+    setFormCurrency(inv.currency || "USD");
+    setFormTotal(String(inv.total ?? ""));
+    setFormDue(inv.dueDate ? inv.dueDate.slice(0, 10) : "");
+    setFormStatus(inv.status);
+  };
+
+  const closeModal = () => setModalInvoice(null);
+
+  const onCurrencyChange = (currency: string) => {
+    setFormCurrency(currency);
+    setFormTotal(String(apcAmountForCurrency(currency, apcRates)));
+  };
+
+  const saveAndSend = async () => {
+    if (!modalInvoice) return;
+    const total = parseFloat(formTotal);
+    if (Number.isNaN(total) || total <= 0) { toast.error("Enter a valid amount"); return; }
+    setSaving(true);
+    try {
+      await apiJson(`/invoices/${encodeURIComponent(modalInvoice.id)}`, {
+        method: "PUT",
+        body: JSON.stringify({ total, currency: formCurrency, dueDate: formDue || null, status: formStatus })
+      });
+      await apiJson(`/invoices/${encodeURIComponent(modalInvoice.id)}/send-link`, { method: "POST" });
+      toast.success("Saved and payment link sent to author");
+      closeModal();
+      void load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const markPaidManual = async (invoiceId: string) => {
+    if (!window.confirm("Mark this invoice as paid manually? This will move the submission to Ready for Preparation.")) return;
+    try {
+      await apiJson(`/invoices/${encodeURIComponent(invoiceId)}/mark-paid`, { method: "POST" });
+      toast.success("Marked as paid — submission moved to production");
+      void load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to mark as paid");
+    }
+  };
+
+  const sendLink = async (inv: Invoice) => {
+    if (!canWriteInvoice) { toast.error("No permission to send payment links."); return; }
+    try {
+      await apiJson(`/invoices/${encodeURIComponent(inv.id)}/send-link`, { method: "POST" });
+      toast.success("Payment link sent");
+      void load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Send failed");
+    }
+  };
+
+  return (
+    <section className="space-y-6">
+      <div>
+        <h1 className="font-heading text-3xl text-gray-900">{isCompleted ? "Completed payments" : "Pending payments"}</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          {isCompleted ? "Paid invoices and settled APC records." : "Draft and pending invoices."}
+        </p>
+        <p className="mt-2 text-xs text-gray-500">
+          Current APC rates: ${apcRates.usd.toLocaleString("en-US")} (USD · PayPal) · ₹
+          {apcRates.inr.toLocaleString("en-IN")} (INR · Razorpay / SMEPay). Change in Settings → APC pricing.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="grid animate-pulse gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {[1, 2, 3, 4].map((k) => (
+            <div key={k} className="h-28 rounded-xl border border-gray-200 bg-white p-4">
+              <div className="h-4 w-24 rounded bg-gray-100" />
+              <div className="mt-4 h-8 w-32 rounded bg-gray-50" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Total revenue (USD)</p>
+            <p className="mt-2 font-mono text-2xl font-semibold text-green-700">${stats.totalRevenueUsd.toFixed(2)}</p>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Total revenue (INR)</p>
+            <p className="mt-2 font-mono text-2xl font-semibold text-green-700">
+              ₹{stats.totalRevenueInr.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+            </p>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              {isCompleted ? "Paid invoices" : "Pending (draft + sent)"}
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-gray-900">{isCompleted ? tableRows.length : stats.pendingCount}</p>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Total invoices</p>
+            <p className="mt-2 text-2xl font-semibold text-gray-900">{stats.totalInvoices}</p>
+          </div>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="animate-pulse space-y-3 rounded-xl border border-gray-200 bg-white p-4">
+          <div className="h-8 w-full rounded bg-gray-100" />
+          <div className="h-10 w-full rounded bg-gray-50" />
+          <div className="h-10 w-full rounded bg-gray-50" />
+        </div>
+      ) : tableRows.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-gray-200 bg-white py-12 text-center text-sm text-gray-500">
+          No invoices in this view.
+        </p>
+      ) : (
+        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+          <table className="min-w-[1000px] w-full border-collapse text-left text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="px-3 py-3"></th>
+                {isCompleted && <th className="px-3 py-3">Invoice ID</th>}
+                <th className="px-3 py-3">Submission ID</th>
+                <th className="px-3 py-3">Customer</th>
+                <th className="px-3 py-3">Amount</th>
+                <th className="px-3 py-3">Currency</th>
+                <th className="px-3 py-3">Date</th>
+                <th className="px-3 py-3">Status</th>
+                <th className="px-3 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableRows.map((inv) => (
+                <tr key={inv.id} className={`border-b border-gray-100 hover:bg-gray-50/80 ${inv.submission?.priority ? "bg-amber-50/40" : ""}`}>
+                  {/* star */}
+                  <td className="px-3 py-2">
+                    {inv.submissionId && (
+                      <button
+                        type="button"
+                        title={inv.submission?.priority ? "High priority — click to unmark" : "Mark as high priority"}
+                        onClick={() => void onPriorityToggle(inv.submissionId, inv.submission?.priority ?? false)}
+                        className="flex items-center justify-center"
+                      >
+                        <Star className={`h-4 w-4 transition-colors ${inv.submission?.priority ? "fill-amber-400 text-amber-400" : "text-gray-300 hover:text-amber-300"}`} />
+                      </button>
+                    )}
+                  </td>
+                  {isCompleted && <td className="whitespace-nowrap px-3 py-2 font-mono text-green-700">{inv.id}</td>}
+                  <td className="whitespace-nowrap px-3 py-2 font-mono text-gray-700">{inv.submissionId}</td>
+                  <td className="max-w-[200px] px-3 py-2">
+                    <p className="font-medium text-gray-900">{inv.customerName}</p>
+                    <p className="text-xs text-gray-500">{inv.customerEmail}</p>
+                  </td>
+                  {/* inline editable amount */}
+                  <td className="whitespace-nowrap px-3 py-2">
+                    {inv.status !== "Paid" && canWriteInvoice ? (
+                      <input
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={editingAmount[inv.id] ?? inv.total}
+                        onChange={(e) => setEditingAmount((p) => ({ ...p, [inv.id]: e.target.value }))}
+                        onBlur={() => void onAmountBlur(inv)}
+                        className="w-28 rounded border border-gray-200 px-2 py-1 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    ) : (
+                      <span className="font-medium text-gray-900">{formatMoney(inv.total, inv.currency)}</span>
+                    )}
+                    <span className="ml-1 text-xs text-gray-400">{inv.currency}</span>
+                  </td>
+                  {/* currency */}
+                  <td className="px-3 py-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base leading-none">{currencyFlag(inv.currency)}</span>
+                      <span className="text-xs font-semibold text-gray-700">{inv.currency}</span>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 text-gray-600">{formatDate(inv.createdAt)}</td>
+                  {/* status + tracking */}
+                  <td className="px-3 py-2">
+                    <StatusBadge status={inv.status} />
+                    {inv.status === "Draft" && (
+                      <p className="mt-0.5 text-xs text-slate-400">Not sent yet</p>
+                    )}
+                    {inv.status === "Pending" && (
+                      <p className="mt-0.5 text-xs text-amber-600">Link sent — awaiting payment</p>
+                    )}
+                    {inv.status === "Paid" && inv.paidAt && (
+                      <p className="mt-0.5 text-xs text-green-600">Paid {formatDate(inv.paidAt)}</p>
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2 text-right">
+                    <div className="flex justify-end gap-2">
+                      {inv.status === "Paid" ? (
+                        <span
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400"
+                          title="Receipt was emailed at payment"
+                        >
+                          <Mail className="h-4 w-4" />
+                        </span>
+                      ) : inv.status === "Draft" ? (
+                        /* Draft — send button */
+                        canWriteInvoice ? (
+                          <button
+                            type="button"
+                            title="Set amount & send payment link"
+                            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-green-600 px-3 text-xs font-semibold text-white hover:bg-green-700"
+                            onClick={() => openModal(inv)}
+                          >
+                            <Send className="h-3.5 w-3.5" />
+                            Send link
+                          </button>
+                        ) : null
+                      ) : (
+                        /* Pending — resend + manual mark paid */
+                        canWriteInvoice ? (
+                          <div className="flex gap-1.5">
+                            <button
+                              type="button"
+                              title="Resend payment link"
+                              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-xs font-medium text-amber-900 hover:bg-amber-100"
+                              onClick={() => void sendLink(inv)}
+                            >
+                              <Mail className="h-3.5 w-3.5" />
+                              Resend
+                            </button>
+                            <button
+                              type="button"
+                              title="Mark as paid manually (cash/offline)"
+                              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-green-300 bg-green-50 px-3 text-xs font-semibold text-green-800 hover:bg-green-100"
+                              onClick={() => void markPaidManual(inv.id)}
+                            >
+                              ✓ Mark Paid
+                            </button>
+                          </div>
+                        ) : null
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Modal — only "Save & send" */}
+      {modalInvoice ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl border border-gray-200 bg-white p-6 shadow-xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="font-heading text-xl text-gray-900">Send payment link</h2>
+                <p className="mt-0.5 font-mono text-sm text-gray-500">{modalInvoice.id}</p>
+                {modalInvoice.submission ? (
+                  <div className="mt-2 rounded-lg bg-gray-50 px-3 py-2">
+                    <p className="text-sm font-medium text-gray-800">{modalInvoice.submission.title}</p>
+                    <p className="text-xs text-gray-500">by {modalInvoice.customerName} · {modalInvoice.customerEmail}</p>
+                  </div>
+                ) : null}
+              </div>
+              <button
+                type="button"
+                className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
+                onClick={closeModal}
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mt-5 space-y-4">
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Currency
+                <select
+                  value={formCurrency}
+                  onChange={(e) => onCurrencyChange(e.target.value)}
+                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm"
+                >
+                  <option value="USD">🇺🇸 USD (PayPal) — ${apcRates.usd}</option>
+                  <option value="INR">🇮🇳 INR (Razorpay / SMEPay) — ₹{apcRates.inr.toLocaleString("en-IN")}</option>
+                </select>
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Amount (APC)
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={formTotal}
+                  onChange={(e) => setFormTotal(e.target.value)}
+                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Status
+                <select
+                  value={formStatus}
+                  onChange={(e) => setFormStatus(e.target.value)}
+                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm"
+                >
+                  {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Due date
+                <input
+                  type="date"
+                  value={formDue}
+                  onChange={(e) => setFormDue(e.target.value)}
+                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm"
+                />
+              </label>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => void saveAndSend()}
+                className="flex items-center gap-2 rounded-lg bg-green-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+              >
+                <Send className="h-4 w-4" />
+                {saving ? "Sending…" : "Save & send payment link"}
+              </button>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={closeModal}
+                className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
+};

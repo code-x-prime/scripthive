@@ -1,0 +1,38 @@
+import { Router } from "express";
+import { archiveRouter } from "./archive.routes.js";
+import { carouselRouter } from "./carousel.routes.js";
+import { contactRouter } from "./contact.routes.js";
+import { dashboardRouter } from "./dashboard.routes.js";
+import { doiRouter } from "./doi.routes.js";
+import { invoiceRouter } from "./invoice.routes.js";
+import { journalRouter } from "./journal.routes.js";
+import { paymentRouter } from "./payment.routes.js";
+import { productionRouter } from "./production.routes.js";
+import { publishRouter } from "./publish.routes.js";
+import { reportRouter } from "./report.routes.js";
+import { roleRouter } from "./role.routes.js";
+import { settingsRouter } from "./settings.routes.js";
+import { mediaRouter } from "./media.routes.js";
+import { authorRouter } from "./author.routes.js";
+import { submissionRouter } from "./submission.routes.js";
+import { userRouter } from "./user.routes.js";
+
+export const apiRouter = Router();
+
+apiRouter.use("/dashboard", dashboardRouter);
+apiRouter.use("/journals", journalRouter);
+apiRouter.use("/author", authorRouter);
+apiRouter.use("/submissions", submissionRouter);
+apiRouter.use("/invoices", invoiceRouter);
+apiRouter.use("/payments", paymentRouter);
+apiRouter.use("/doi", doiRouter);
+apiRouter.use("/publish", publishRouter);
+apiRouter.use("/production", productionRouter);
+apiRouter.use("/archive", archiveRouter);
+apiRouter.use("/reports", reportRouter);
+apiRouter.use("/roles", roleRouter);
+apiRouter.use("/users", userRouter);
+apiRouter.use("/settings", settingsRouter);
+apiRouter.use("/media", mediaRouter);
+apiRouter.use("/carousel", carouselRouter);
+apiRouter.use("/contact", contactRouter);

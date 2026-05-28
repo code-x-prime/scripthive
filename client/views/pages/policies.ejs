@@ -1,0 +1,684 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --navy: #0f172a;
+  --gold: #fbbf24;
+  --gold-light: #fef08a;
+  --bg-light: #f8fafc;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --brand-shield: #10b981;
+  --brand-danger: #ef4444;
+}
+
+.policies-page {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  background-color: var(--bg-light);
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+/* Base Headings */
+.policies-page h1, 
+.policies-page h2, 
+.policies-page h3, 
+.policies-page h4 {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Container */
+.pol-container {
+  max-width: 1400px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1;
+}
+
+/* Hero Section */
+.pol-hero {
+  background: var(--navy);
+  color: white;
+  padding: 140px 0 100px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 80vh;
+  overflow: hidden;
+}
+
+.hero-mesh {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.2) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(251, 191, 36, 0.15) 0%, transparent 50%);
+  animation: pulseMesh 10s infinite alternate;
+}
+@keyframes pulseMesh {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
+.pol-hero-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1;
+}
+.pol-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 16px; border-radius: 30px; font-size: 0.9rem; font-weight: 500;
+  color: var(--gold); margin-bottom: 24px; backdrop-filter: blur(10px);
+}
+.pol-title { font-size: 3.8rem; line-height: 1.1; font-weight: 800; margin-bottom: 24px; color: #fff; }
+.text-gradient { background: linear-gradient(to right, #fff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.pol-subtitle { font-size: 1.25rem; color: #94a3b8; line-height: 1.6; max-width: 90%; }
+
+/* Hero Visuals */
+.pol-hero-visual { position: relative; height: 500px; }
+.pol-float-card {
+  position: absolute; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px; padding: 24px; backdrop-filter: blur(12px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+.pol-shield {
+  width: 280px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;
+  text-align: center; border-color: rgba(16, 185, 129, 0.5);
+  animation: float-center 6s infinite ease-in-out;
+}
+.pol-shield i { font-size: 4rem; color: var(--brand-shield); text-shadow: 0 0 20px rgba(16, 185, 129, 0.5); margin-bottom: 16px; }
+.pol-doc-card {
+  width: 220px; top: 10%; right: 0; z-index: 1; animation: float-simple 7s infinite ease-in-out; animation-delay: -2s;
+}
+.pol-verify-card {
+  width: 240px; bottom: 10%; left: 0; z-index: 3; background: rgba(15, 23, 42, 0.8);
+  animation: float-simple 5s infinite ease-in-out; animation-delay: -4s;
+}
+
+@keyframes float-simple {
+  0% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-15px) translateX(5px); }
+  100% { transform: translateY(0) translateX(0); }
+}
+@keyframes float-center {
+  0% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-20px); }
+  100% { transform: translate(-50%, -50%) translateY(0); }
+}
+
+/* Layout */
+.pol-layout {
+  display: block; max-width: 900px; margin: 40px auto 0;
+}
+
+/* Policy Content Blocks */
+.pol-section { margin-bottom: 80px; scroll-margin-top: 100px; }
+.pol-block {
+  background: white; border: 1px solid var(--glass-border);
+  border-radius: 24px; padding: 40px; backdrop-filter: blur(10px);
+  transition: transform 0.3s, box-shadow 0.3s; position: relative; overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+}
+.pol-block:hover {
+  transform: translateY(-5px); box-shadow: 0 25px 60px rgba(0,0,0,0.1);
+  border-color: rgba(37,99,235,0.2);
+}
+.pol-block::before {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--gold));
+}
+
+.pol-header { display: flex; align-items: center; gap: 20px; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+.pol-icon {
+  width: 64px; height: 64px; border-radius: 16px;
+  background: rgba(37,99,235,0.05);
+  border: 1px solid rgba(37,99,235,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem; color: var(--primary); flex-shrink: 0;
+}
+.pol-header h2 { font-size: 2rem; font-weight: 800; color: var(--text-dark); margin: 0; line-height: 1.2; }
+
+/* Grid Layouts */
+.pol-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.pol-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+/* Lists and Text */
+.pol-prose h4 { font-size: 1.2rem; color: var(--text-dark); margin-top: 32px; margin-bottom: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.pol-prose p { font-size: 1.05rem; line-height: 1.7; color: var(--text-muted); margin-bottom: 24px; }
+.pol-list { list-style: none; padding: 0; margin: 0 0 24px 0; }
+.pol-list li { position: relative; padding-left: 32px; margin-bottom: 12px; color: var(--text-muted); line-height: 1.6; font-weight: 500; }
+.pol-list li::before {
+  content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  position: absolute; left: 0; top: 2px; color: var(--brand-shield); font-size: 0.9rem;
+}
+
+/* Custom Cards */
+.pol-sub-card {
+  background: var(--bg-light); border: 1px solid rgba(0,0,0,0.05);
+  padding: 24px; border-radius: 16px; transition: 0.3s;
+}
+.pol-sub-card:hover { background: white; border-color: var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+.pol-sub-card i { font-size: 1.5rem; color: var(--gold); margin-bottom: 16px; }
+.pol-sub-card h5 { font-size: 1.1rem; color: var(--text-dark); margin-bottom: 12px; font-weight: 700; }
+.pol-sub-card p { font-size: 0.95rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+/* Timeline workflow */
+.pol-workflow { display: flex; align-items: center; justify-content: space-between; position: relative; margin: 40px 0; }
+.pol-workflow::before {
+  content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 2px;
+  background: rgba(0,0,0,0.05); z-index: 1; transform: translateY(-50%);
+}
+.pol-step { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 12px; background: white; padding: 10px; border-radius: 12px; }
+.pol-step-num {
+  width: 40px; height: 40px; border-radius: 50%; background: white; border: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); box-shadow: 0 0 15px rgba(37,99,235,0.1);
+}
+.pol-step-text { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); text-align: center; }
+
+/* Highlight Boxes */
+.pol-alert {
+  background: rgba(239, 68, 68, 0.05);
+  border-left: 4px solid var(--brand-danger); padding: 20px 24px; border-radius: 0 12px 12px 0;
+  display: flex; align-items: center; gap: 16px; margin: 32px 0;
+}
+.pol-alert i { font-size: 1.8rem; color: var(--brand-danger); }
+.pol-alert p { margin: 0; color: var(--text-dark); font-size: 1.05rem; font-weight: 600; }
+
+.pol-highlight {
+  background: rgba(16, 185, 129, 0.05);
+  border-left: 4px solid var(--brand-shield); padding: 20px 24px; border-radius: 0 12px 12px 0;
+  display: flex; align-items: center; gap: 16px; margin: 32px 0;
+}
+.pol-highlight i { font-size: 1.8rem; color: var(--brand-shield); }
+.pol-highlight p { margin: 0; color: var(--text-dark); font-size: 1.05rem; font-weight: 600; }
+
+/* Final CTA Section */
+.pol-cta {
+  margin-top: 100px; position: relative;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: 30px; padding: 80px 40px; text-align: center; overflow: hidden;
+  box-shadow: 0 30px 60px rgba(37,99,235,0.2);
+}
+.pol-cta::before {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.1;
+}
+.pol-cta-content { position: relative; z-index: 2; }
+.pol-cta h2 { font-size: 3rem; color: #fff; margin-bottom: 24px; font-weight: 800; }
+.pol-cta p { font-size: 1.2rem; color: #e2e8f0; margin-bottom: 40px; max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+.pol-cta-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+.pol-btn {
+  padding: 16px 32px; border-radius: 50px; font-size: 1.1rem; font-weight: 700;
+  text-decoration: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px;
+}
+.pol-btn-primary { background: #fff; color: var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+.pol-btn-primary:hover { transform: translateY(-3px); background: var(--bg-light); }
+.pol-btn-outline { border: 2px solid rgba(255,255,255,0.3); color: #fff; }
+.pol-btn-outline:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+/* Responsive */
+@media (max-width: 992px) {
+  .pol-layout { grid-template-columns: 1fr; }
+  .pol-hero-grid { grid-template-columns: 1fr; text-align: center; }
+  .pol-hero-visual { display: none; }
+  .pol-title { font-size: 2.8rem; }
+  .pol-subtitle { margin: 0 auto; }
+  .pol-grid-2, .pol-grid-3 { grid-template-columns: 1fr; }
+  .pol-workflow { flex-direction: column; gap: 30px; align-items: flex-start; padding-left: 20px; }
+  .pol-workflow::before { width: 2px; height: 100%; top: 0; left: 40px; transform: none; }
+  .pol-step { flex-direction: row; text-align: left; background: transparent; }
+  .pol-header { flex-direction: column; text-align: center; gap: 16px; }
+}
+</style>
+
+<div class="policies-page">
+  <!-- Hero Section -->
+  <section class="pol-hero">
+    <div class="hero-mesh"></div>
+    <div class="container pol-container pol-hero-grid">
+      <div class="pol-hero-text gs-reveal">
+        <div class="pol-badge">
+          <i class="fa-solid fa-scroll"></i> Policies & Compliance
+        </div>
+        <h1 class="pol-title">
+          Comprehensive Policies &<br>
+          <span class="text-gradient">Publication Standards</span>
+        </h1>
+        <p class="pol-subtitle">
+          Guidelines, ethical standards, terms, and policies governing ScriptHive Publication services, journals, subscriptions, and publishing practices.
+        </p>
+      </div>
+      
+      <div class="pol-hero-visual gs-reveal">
+        <div class="pol-float-card pol-shield">
+          <i class="fa-solid fa-shield-halved"></i>
+          <h3 style="color:#fff; margin:0 0 8px; font-size:1.4rem; font-weight: 700;">100% Compliant</h3>
+          <p style="color:#cbd5e1; margin:0; font-size:0.9rem;">Global Publishing Standards</p>
+        </div>
+        
+        <div class="pol-float-card pol-doc-card">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+            <i class="fa-solid fa-file-contract" style="color:var(--gold); font-size:1.5rem;"></i>
+            <span style="color:#fff; font-weight:700;">Ethics Policy</span>
+          </div>
+          <div style="height:6px; background:rgba(255,255,255,0.2); border-radius:3px; margin-bottom:10px; width:100%;"></div>
+          <div style="height:6px; background:rgba(255,255,255,0.2); border-radius:3px; margin-bottom:10px; width:80%;"></div>
+          <div style="height:6px; background:rgba(255,255,255,0.2); border-radius:3px; width:60%;"></div>
+        </div>
+        
+        <div class="pol-float-card pol-verify-card">
+          <div style="display:flex; align-items:center; gap:16px;">
+            <div style="width:40px; height:40px; border-radius:50%; background:white; display:flex; align-items:center; justify-content:center;">
+              <i class="fa-solid fa-check" style="color:var(--primary);"></i>
+            </div>
+            <div>
+              <div style="color:#fff; font-weight:700; font-size:1rem;">Verified</div>
+              <div style="color:#cbd5e1; font-size:0.8rem;">DOI & ISSN</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Layout Container -->
+  <div class="container pol-container pol-layout">
+    
+    <!-- Main Content -->
+    <main class="pol-content">
+      
+      <!-- 1. Privacy Policy -->
+      <section id="privacy" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon"><i class="fa-solid fa-user-shield"></i></div>
+            <h2>1. Privacy Policy</h2>
+          </div>
+          <div class="pol-prose">
+            <p>ScriptHive Publication respects the privacy of authors, reviewers, editors, subscribers, institutions, and website visitors. This Privacy Policy explains how we collect, use, store, and protect user information associated with our publishing and academic services.</p>
+            
+            <div class="pol-grid-2">
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-database"></i>
+                <h5>Information We Collect</h5>
+                <ul class="pol-list">
+                  <li>Author & reviewer details</li>
+                  <li>Institutional affiliations</li>
+                  <li>Manuscript & submission data</li>
+                  <li>Payment & transaction info</li>
+                </ul>
+              </div>
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-server" style="color: var(--primary);"></i>
+                <h5>Use of Information</h5>
+                <ul class="pol-list">
+                  <li>Manuscript processing</li>
+                  <li>Peer review management</li>
+                  <li>DOI & ISSN services</li>
+                  <li>Author communication</li>
+                </ul>
+              </div>
+            </div>
+
+            <h4><i class="fa-solid fa-lock" style="color:var(--primary);"></i> Data Protection & Third-Party Services</h4>
+            <p>We implement reasonable administrative and technical safeguards to protect user information. We may use third-party services such as payment gateways, DOI agencies, and hosting providers who process limited data necessary for operational purposes. Users may request access, correction, or deletion of personal data at any time.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Refund & Cancellation Policy -->
+      <section id="refund" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon" style="color:var(--gold); background:rgba(251,191,36,0.1); border-color:rgba(251,191,36,0.3);"><i class="fa-solid fa-money-bill-transfer"></i></div>
+            <h2>2. Refund & Cancellation Policy</h2>
+          </div>
+          <div class="pol-prose">
+            <div class="pol-alert">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              <p>APC or publication-related charges are generally non-refundable once editorial or peer review processing has commenced.</p>
+            </div>
+            
+            <h4><i class="fa-solid fa-file-invoice-dollar" style="color: var(--gold);"></i> Article Processing Charges (APC)</h4>
+            <p>Refund requests may only be considered under exceptional circumstances at the sole discretion of ScriptHive Publication. Publication charges remain non-refundable even if a manuscript is rejected after editorial evaluation.</p>
+
+            <div class="pol-grid-2" style="margin-top:24px;">
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-calendar-xmark" style="color:var(--brand-danger);"></i>
+                <h5>Subscription Cancellation</h5>
+                <p>Subscription services may be cancelled before renewal. No partial refund shall be provided for unused subscription periods.</p>
+              </div>
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-money-bill-wave" style="color:var(--brand-shield);"></i>
+                <h5>Duplicate Payments</h5>
+                <p>Verified duplicate transactions shall be immediately refunded after our internal verification process.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Publication Ethics Policy -->
+      <section id="ethics" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon" style="color:var(--brand-shield); background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.3);"><i class="fa-solid fa-scale-balanced"></i></div>
+            <h2>3. Publication Ethics Policy</h2>
+          </div>
+          <div class="pol-prose">
+            <p>ScriptHive Publication is committed to maintaining the highest ethical standards and academic integrity in all scholarly publishing activities.</p>
+            
+            <div class="pol-grid-3">
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-pen-nib" style="color: var(--primary);"></i>
+                <h5>Authors</h5>
+                <ul class="pol-list">
+                  <li>Submit authentic work</li>
+                  <li>Acknowledge references</li>
+                  <li>Avoid duplicate submission</li>
+                  <li>Disclose conflicts</li>
+                </ul>
+              </div>
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-glasses"></i>
+                <h5>Reviewers</h5>
+                <ul class="pol-list">
+                  <li>Maintain confidentiality</li>
+                  <li>Provide unbiased reviews</li>
+                  <li>Declare conflicts</li>
+                  <li>Do not misuse data</li>
+                </ul>
+              </div>
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-user-tie" style="color: var(--brand-shield);"></i>
+                <h5>Editors</h5>
+                <ul class="pol-list">
+                  <li>Fair editorial decisions</li>
+                  <li>Maintain confidentiality</li>
+                  <li>Prevent unethical practices</li>
+                  <li>Take corrective actions</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Peer Review Policy -->
+      <section id="review" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon"><i class="fa-solid fa-user-check"></i></div>
+            <h2>4. Peer Review Policy</h2>
+          </div>
+          <div class="pol-prose">
+            <p>All submitted manuscripts undergo rigorous editorial evaluation and a double-blind peer review prior to publication to ensure quality and validity.</p>
+            
+            <div class="pol-workflow" style="margin-top:40px; margin-bottom:40px;">
+              <div class="pol-step">
+                <div class="pol-step-num">1</div>
+                <div class="pol-step-text">Editorial<br>Screening</div>
+              </div>
+              <div class="pol-step">
+                <div class="pol-step-num">2</div>
+                <div class="pol-step-text">Double-Blind<br>Review</div>
+              </div>
+              <div class="pol-step">
+                <div class="pol-step-num">3</div>
+                <div class="pol-step-text">Reviewer<br>Recommendations</div>
+              </div>
+              <div class="pol-step">
+                <div class="pol-step-num">4</div>
+                <div class="pol-step-text">Final<br>Decision</div>
+              </div>
+            </div>
+
+            <h4><i class="fa-solid fa-gavel" style="color:var(--gold);"></i> Decision Outcomes</h4>
+            <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:16px;">
+              <span style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:var(--text-dark); font-weight:600; padding:8px 16px; border-radius:20px;"><i class="fa-solid fa-check" style="color:var(--brand-shield);"></i> Accept</span>
+              <span style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); color:var(--text-dark); font-weight:600; padding:8px 16px; border-radius:20px;"><i class="fa-solid fa-pen" style="color:var(--primary);"></i> Minor Revision</span>
+              <span style="background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.3); color:var(--text-dark); font-weight:600; padding:8px 16px; border-radius:20px;"><i class="fa-solid fa-wrench" style="color:var(--gold);"></i> Major Revision</span>
+              <span style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:var(--text-dark); font-weight:600; padding:8px 16px; border-radius:20px;"><i class="fa-solid fa-xmark" style="color:var(--brand-danger);"></i> Reject</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Open Access Policy -->
+      <section id="openaccess" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon" style="color:var(--gold); background:rgba(251,191,36,0.1); border-color:rgba(251,191,36,0.3);"><i class="fa-solid fa-lock-open"></i></div>
+            <h2>5. Open Access Policy</h2>
+          </div>
+          <div class="pol-prose">
+            <p>ScriptHive Publication supports the global dissemination of academic knowledge through open-access publishing practices wherever applicable.</p>
+            
+            <div class="pol-grid-2">
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-globe" style="color: var(--primary);"></i>
+                <h5>Reader Rights</h5>
+                <ul class="pol-list">
+                  <li>Free access to published content</li>
+                  <li>Read and download articles anytime</li>
+                  <li>Share and cite research for academic purposes</li>
+                </ul>
+              </div>
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-ban" style="color:var(--brand-danger);"></i>
+                <h5>Restrictions</h5>
+                <p>Commercial reuse, distribution, or reproduction without prior written permission from ScriptHive Publication is strictly prohibited unless otherwise stated under a specific Creative Commons license.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Copyright & Licensing Policy -->
+      <section id="copyright" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon"><i class="fa-solid fa-copyright"></i></div>
+            <h2>6. Copyright & Licensing Policy</h2>
+          </div>
+          <div class="pol-prose">
+            <p>Authors generally retain copyright of their published work unless otherwise agreed in writing. By publishing with ScriptHive Publication:</p>
+            <ul class="pol-list">
+              <li>Authors grant publication, distribution, and archiving rights to ScriptHive.</li>
+              <li>Authors confirm the originality of the submitted content.</li>
+              <li>Authors remain solely responsible for obtaining permissions related to any third-party materials or data included in the manuscript.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Plagiarism Policy -->
+      <section id="plagiarism" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon" style="color:var(--brand-danger); background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3);"><i class="fa-solid fa-copy"></i></div>
+            <h2>7. Plagiarism Policy</h2>
+          </div>
+          <div class="pol-prose">
+            <div class="pol-alert">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <p>Strict Anti-Plagiarism Standards: Similarity Index must remain below 15%.</p>
+            </div>
+            <p>ScriptHive Publication maintains strict anti-plagiarism standards to preserve academic integrity. Submitted manuscripts undergo plagiarism screening using premium checking tools prior to editorial review.</p>
+            
+            <h4><i class="fa-solid fa-gavel"></i> Consequences of Misconduct</h4>
+            <ul class="pol-list">
+              <li>Immediate rejection of manuscript.</li>
+              <li>Retraction of the article if already published.</li>
+              <li>Restriction or ban on future submissions by the authors.</li>
+              <li>Notification to affiliated institutions or funding bodies if deemed necessary.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Retraction & Correction Policy -->
+      <section id="retraction" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon" style="color:var(--gold); background:rgba(251,191,36,0.1); border-color:rgba(251,191,36,0.3);"><i class="fa-solid fa-rotate-left"></i></div>
+            <h2>8. Retraction & Correction Policy</h2>
+          </div>
+          <div class="pol-prose">
+            <p>To maintain the integrity of the scholarly record, published articles may be corrected or retracted in specific cases.</p>
+            
+            <div class="pol-grid-2">
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-eraser" style="color: var(--brand-danger);"></i>
+                <h5>Conditions for Retraction</h5>
+                <ul class="pol-list">
+                  <li>Major scientific or factual errors</li>
+                  <li>Ethical misconduct or plagiarism</li>
+                  <li>Fabricated or manipulated data</li>
+                  <li>Duplicate publication</li>
+                </ul>
+              </div>
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-file-pen" style="color: var(--primary);"></i>
+                <h5>Correction Notices</h5>
+                <p>Retraction or correction notices shall remain permanently linked to the original scholarly publication record to ensure transparency for future researchers.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. Shipping & Delivery Policy -->
+      <section id="shipping" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon" style="color:var(--brand-shield); background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.3);"><i class="fa-solid fa-truck-fast"></i></div>
+            <h2>9. Shipping & Delivery Policy</h2>
+          </div>
+          <div class="pol-prose">
+            <p>This policy applies to printed journals, hard copy certificates, author copies, and other physical publication materials.</p>
+            
+            <div class="pol-grid-2" style="margin-top:24px;">
+              <div class="pol-sub-card">
+                <i class="fa-regular fa-clock" style="color: var(--primary);"></i>
+                <h5>Delivery Timeline</h5>
+                <p>Orders are generally processed and dispatched within <strong>7–21 working days</strong> depending on printing schedules and the delivery location.</p>
+              </div>
+              <div class="pol-sub-card">
+                <i class="fa-solid fa-route" style="color: var(--gold);"></i>
+                <h5>Delivery Delays</h5>
+                <p>Delivery timelines may vary due to courier delays, international customs procedures, or unforeseen logistical issues beyond our control.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. Disclaimer Policy -->
+      <section id="disclaimer" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon" style="color:var(--brand-danger); background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h2>10. Disclaimer Policy</h2>
+          </div>
+          <div class="pol-prose">
+            <p>The opinions, findings, and conclusions expressed in published articles are solely those of the respective authors and do not necessarily reflect the views of ScriptHive Publication.</p>
+            <ul class="pol-list">
+              <li>We do not guarantee the absolute completeness or accuracy of published content.</li>
+              <li>We shall not be liable for any direct or indirect damages resulting from the use of published materials.</li>
+              <li>We reserve the right to make editorial decisions regarding the publication, correction, or removal of content at any time.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11. Subscription Policy -->
+      <section id="subscription" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+            <h2>11. Subscription Policy</h2>
+          </div>
+          <div class="pol-prose">
+            <p>Subscription services provided by ScriptHive Publication may include journal access, institutional subscriptions, email alerts, archive access, and library integration services.</p>
+            
+            <div class="pol-highlight">
+              <i class="fa-solid fa-circle-check"></i>
+              <p>Subscriptions are non-transferable, valid only for the subscribed period, and subject to standard renewal conditions.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12. Terms & Conditions -->
+      <section id="terms" class="pol-section gs-reveal-up">
+        <div class="pol-block">
+          <div class="pol-header">
+            <div class="pol-icon" style="color:var(--gold); background:rgba(251,191,36,0.1); border-color:rgba(251,191,36,0.3);"><i class="fa-solid fa-file-signature"></i></div>
+            <h2>12. Terms & Conditions</h2>
+          </div>
+          <div class="pol-prose">
+            <p>By using the website and services of ScriptHive Publication, users agree to the following terms:</p>
+            <ul class="pol-list">
+              <li>Comply with all publication and ethical standards.</li>
+              <li>Use website services and APIs lawfully.</li>
+              <li>Avoid unauthorized reproduction, data scraping, or misuse of content.</li>
+              <li>Respect the intellectual property rights of authors and the publisher.</li>
+            </ul>
+            <p style="margin-top:24px;"><em>ScriptHive Publication reserves the right to modify these policies, suspend services, or restrict access where necessary without prior notice.</em></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="pol-cta gs-reveal">
+        <div class="pol-cta-content">
+          <h2>Need Clarification About Our Policies?</h2>
+          <p>Contact ScriptHive Publication for assistance regarding publication ethics, submissions, subscriptions, or compliance policies. Our editorial desk is always ready to help.</p>
+          <div class="pol-cta-buttons">
+            <a href="mailto:info@scripthive.org" class="pol-btn pol-btn-primary">
+              <i class="fa-solid fa-phone"></i> Contact Us
+            </a>
+            <a href="/submit" class="pol-btn pol-btn-outline">
+              <i class="fa-solid fa-paper-plane"></i> Submit Paper
+            </a>
+            <a href="/guidelines" class="pol-btn pol-btn-outline">
+              <i class="fa-solid fa-scroll"></i> Publication Guidelines
+            </a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Animation & Logic Scripts -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Reveal animations
+    gsap.utils.toArray('.gs-reveal').forEach(function(elem) {
+      gsap.from(elem, {
+        scrollTrigger: { trigger: elem, start: "top 85%" },
+        y: 50, opacity: 0, duration: 1, ease: "power3.out"
+      });
+    });
+
+    gsap.utils.toArray('.gs-reveal-up').forEach(function(elem) {
+      gsap.from(elem, {
+        scrollTrigger: { trigger: elem, start: "top 85%" },
+        y: 30, opacity: 0, duration: 0.8, ease: "power2.out"
+      });
+    });
+  });
+</script>
+
+<%- include('../partials/footer') %>

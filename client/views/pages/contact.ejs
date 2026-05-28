@@ -1,0 +1,217 @@
+<%- include('../partials/header') %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  .contact-page { background: #f8fafc; min-height: 100vh; font-family: 'Inter', sans-serif; padding-top: 80px; }
+
+  .contact-hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; padding: 60px 20px 50px; text-align: center; }
+  .contact-hero h1 { font-family: 'Outfit', sans-serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; margin-bottom: 12px; }
+  .contact-hero p { color: rgba(255,255,255,0.75); font-size: 1rem; max-width: 480px; margin: 0 auto; }
+
+  .contact-body { max-width: 1000px; margin: 0 auto; padding: 48px 20px; display: grid; grid-template-columns: 1fr 380px; gap: 32px; }
+  @media(max-width:768px){ .contact-body { grid-template-columns:1fr; } }
+
+  /* Form card */
+  .form-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 36px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .form-card h2 { font-family: 'Outfit',sans-serif; font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+  .form-card p.sub { color: #64748b; font-size: 0.9rem; margin-bottom: 28px; }
+
+  .field { margin-bottom: 20px; }
+  .field label { display: block; font-size: 0.78rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 7px; }
+  .field label span { color: #ef4444; }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 10px;
+    font-size: 0.95rem; font-family: 'Inter',sans-serif; color: #0f172a; background: #fff;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+  .field textarea { resize: vertical; min-height: 120px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:500px){ .field-row { grid-template-columns:1fr; } }
+
+  .submit-btn { width: 100%; padding: 14px; background: linear-gradient(135deg,#1d4ed8,#2563eb); color: #fff; font-weight: 700; font-size: 1rem; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(37,99,235,0.3); }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* Info sidebar */
+  .info-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .info-card h3 { font-family:'Outfit',sans-serif; font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
+  .info-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+  .info-row:last-child { margin-bottom: 0; }
+  .info-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+  .info-text { font-size: 0.88rem; color: #475569; line-height: 1.5; }
+  .info-text strong { color: #0f172a; display: block; font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+
+  /* Success / Error */
+  .result-box { display: none; border-radius: 12px; padding: 20px 24px; margin-top: 20px; }
+  .result-box.success { background: #f0fdf4; border: 1.5px solid #86efac; }
+  .result-box.error   { background: #fff1f2; border: 1.5px solid #fca5a5; }
+  .result-box .qid { font-family: monospace; font-size: 1.2rem; font-weight: 800; color: #15803d; margin: 6px 0; }
+  .result-box.error .qid { color: #dc2626; font-size: 0.9rem; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<div class="contact-page">
+  <div class="contact-hero">
+    <h1>Get in Touch</h1>
+    <p>Have a question? Our editorial team responds within 24–48 business hours.</p>
+  </div>
+
+  <div class="contact-body">
+    <!-- Form -->
+    <div class="form-card">
+      <h2>Send us a Message</h2>
+      <p class="sub">Fill in the details below and we'll get back to you shortly.</p>
+
+      <form id="contact-form" novalidate>
+        <div class="field-row">
+          <div class="field">
+            <label>Full Name <span>*</span></label>
+            <input type="text" name="name" id="c-name" placeholder="Your full name" required>
+          </div>
+          <div class="field">
+            <label>Email Address <span>*</span></label>
+            <input type="email" name="email" id="c-email" placeholder="your@email.com" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Phone Number</label>
+            <input type="tel" name="phone" id="c-phone" placeholder="+91 98765 43210">
+          </div>
+          <div class="field">
+            <label>Subject <span>*</span></label>
+            <select name="subject" id="c-subject" required>
+              <option value="" disabled selected>Select a subject</option>
+              <option value="Manuscript Submission Inquiry">Manuscript Submission Inquiry</option>
+              <option value="Review Status Update">Review Status Update</option>
+              <option value="Payment & Invoice">Payment &amp; Invoice</option>
+              <option value="DOI & Certificate">DOI &amp; Certificate</option>
+              <option value="Editorial Board">Editorial Board</option>
+              <option value="General Inquiry">General Inquiry</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Message <span>*</span></label>
+          <textarea name="message" id="c-message" placeholder="Describe your query in detail..." required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">
+          <i class="fa-solid fa-paper-plane"></i> Send Message
+        </button>
+      </form>
+
+      <!-- Success -->
+      <div class="result-box success" id="success-box">
+        <div style="font-weight:700;color:#15803d;font-size:1rem;margin-bottom:4px;">✅ Message sent successfully!</div>
+        <div class="qid" id="query-id-display"></div>
+        <div style="font-size:0.85rem;color:#166534;margin-top:6px;">Save this reference ID. We'll reply to your email within 24–48 business hours.</div>
+      </div>
+
+      <!-- Error -->
+      <div class="result-box error" id="error-box">
+        <div style="font-weight:700;color:#dc2626;margin-bottom:4px;">❌ Failed to send</div>
+        <div class="qid" id="error-msg-display"></div>
+      </div>
+    </div>
+
+    <!-- Info sidebar -->
+    <aside>
+      <div class="info-card">
+        <h3>Contact Information</h3>
+        <div class="info-row">
+          <div class="info-icon" style="background:#eff6ff;color:#2563eb;"><i class="fa-solid fa-envelope"></i></div>
+          <div class="info-text"><strong>Email</strong>info@scripthive.org</div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon" style="background:#f0fdf4;color:#16a34a;"><i class="fa-brands fa-whatsapp"></i></div>
+          <div class="info-text"><strong>WhatsApp</strong>Available on request</div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon" style="background:#fef9c3;color:#ca8a04;"><i class="fa-solid fa-clock"></i></div>
+          <div class="info-text"><strong>Response Time</strong>24–48 business hours</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>Quick Links</h3>
+        <div class="info-row">
+          <div class="info-icon" style="background:#faf5ff;color:#7c3aed;"><i class="fa-solid fa-paper-plane"></i></div>
+          <div class="info-text"><a href="/submit" style="color:#2563eb;font-weight:600;text-decoration:none;">Submit a Manuscript</a><br/><span style="font-size:0.8rem;color:#94a3b8;">Start your submission here</span></div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon" style="background:#f0fdf4;color:#16a34a;"><i class="fa-solid fa-book-open"></i></div>
+          <div class="info-text"><a href="/guidelines" style="color:#2563eb;font-weight:600;text-decoration:none;">Author Guidelines</a><br/><span style="font-size:0.8rem;color:#94a3b8;">Formatting & submission rules</span></div>
+        </div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,#1e40af,#2563eb);border-radius:14px;padding:24px;color:#fff;text-align:center;">
+        <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:8px;">Ready to Publish?</div>
+        <p style="font-size:0.85rem;color:rgba(255,255,255,0.8);margin-bottom:16px;">Join thousands of researchers published in our ISSN-supported journals.</p>
+        <a href="/submit" style="display:inline-block;background:#fbbf24;color:#1e3a8a;font-weight:700;font-size:0.85rem;padding:10px 20px;border-radius:8px;text-decoration:none;">Submit Paper →</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+document.getElementById('contact-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  const successBox = document.getElementById('success-box');
+  const errorBox   = document.getElementById('error-box');
+  successBox.style.display = 'none';
+  errorBox.style.display   = 'none';
+
+  const name    = document.getElementById('c-name').value.trim();
+  const email   = document.getElementById('c-email').value.trim();
+  const phone   = document.getElementById('c-phone').value.trim();
+  const subject = document.getElementById('c-subject').value;
+  const message = document.getElementById('c-message').value.trim();
+
+  if (!name || !email || !subject || !message) {
+    errorBox.style.display = 'block';
+    document.getElementById('error-msg-display').textContent = 'Please fill in all required fields.';
+    return;
+  }
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRe.test(email)) {
+    errorBox.style.display = 'block';
+    document.getElementById('error-msg-display').textContent = 'Please enter a valid email address.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Sending…';
+
+  try {
+    const res = await fetch('/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, phone, subject, message })
+    });
+    const data = await res.json();
+    if (res.ok && data.status === 'success') {
+      successBox.style.display = 'block';
+      document.getElementById('query-id-display').textContent = 'Reference ID: ' + data.query_id;
+      e.target.reset();
+    } else {
+      throw new Error(data.message || 'Something went wrong.');
+    }
+  } catch(err) {
+    errorBox.style.display = 'block';
+    document.getElementById('error-msg-display').textContent = err.message || 'Network error. Please try again.';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
+  }
+});
+</script>
+
+<%- include('../partials/footer') %>

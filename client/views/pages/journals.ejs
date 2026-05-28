@@ -1,0 +1,585 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --navy: #0f172a;
+  --gold: #fbbf24;
+  --gold-light: #fef08a;
+  --bg-light: #f8fafc;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --brand-shield: #10b981;
+  --brand-danger: #ef4444;
+}
+
+.journals-page {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  background-color: var(--bg-light);
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+/* Headings */
+.journals-page h1, 
+.journals-page h2, 
+.journals-page h3, 
+.journals-page h4 {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Hero Section matched to contact.ejs & submit.ejs */
+.jl-hero {
+  background: var(--navy);
+  color: white;
+  padding: 150px 20px 100px;
+  position: relative;
+  overflow: hidden;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero-mesh {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.2) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(251, 191, 36, 0.15) 0%, transparent 50%);
+  animation: pulseMesh 10s infinite alternate;
+}
+
+@keyframes pulseMesh {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
+.jl-hero-content {
+  max-width: 1300px; margin: 0 auto;
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 50px; align-items: center;
+}
+
+.jl-breadcrumb { font-size: 0.9rem; color: #94a3b8; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.jl-breadcrumb a { color: #cbd5e1; text-decoration: none; }
+.jl-breadcrumb a:hover { color: var(--gold); }
+
+.jl-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  padding: 8px 16px; border-radius: 30px; font-size: 0.9rem; margin-bottom: 20px;
+  backdrop-filter: blur(10px); color: var(--gold); font-weight: 500;
+}
+
+.jl-hero h1 { font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 24px; background: linear-gradient(to right, #fff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.jl-hero p { font-size: 1.2rem; color: #94a3b8; line-height: 1.6; margin-bottom: 40px; max-width: 90%; }
+
+/* Hero Visuals */
+.hero-visual { position: relative; height: 450px; perspective: 1000px; }
+.floating-bubble {
+  position: absolute; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  padding: 20px; border-radius: 16px; backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  display: flex; align-items: center; gap: 15px;
+}
+.fb-1 { top: 20px; right: 20px; animation: floatCard 6s infinite alternate ease-in-out; }
+.fb-2 { bottom: 80px; left: 0; background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(30,64,175,0.4)); animation: floatCard 5s infinite alternate-reverse ease-in-out; }
+.fb-3 { top: 220px; right: -20px; border-color: var(--gold); animation: floatCard 7s infinite alternate ease-in-out; }
+.fb-icon { background: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--primary); }
+
+@keyframes floatCard {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-20px); }
+}
+
+/* Container */
+.jl-container { max-width: 1400px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* Grid 5 for Trust Indicators */
+.jl-trust-section { margin-top: -50px; position: relative; z-index: 10; margin-bottom: 80px; }
+.jl-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+.jl-trust-card {
+  background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
+  border-radius: 20px; padding: 24px 20px; text-align: center;
+  transition: 0.3s; position: relative; overflow: hidden; box-shadow: var(--glass-shadow);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.jl-trust-card:hover { transform: translateY(-5px); border-color: rgba(37,99,235,0.3); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
+.jl-trust-card i { font-size: 2rem; color: var(--primary); }
+.jl-trust-card span { color: var(--text-dark); font-size: 0.95rem; font-weight: 700; }
+
+/* Section Headers */
+.jl-section-header { text-align: center; margin-bottom: 60px; }
+.jl-section-header h2 { font-size: 2.8rem; font-weight: 800; color: var(--text-dark); margin-bottom: 16px; }
+.jl-section-header p { font-size: 1.15rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+/* 3-Column Journal Card Layout */
+.jl-card {
+  display: grid; grid-template-columns: 260px 1fr 300px;
+  background: white; border-radius: 24px; border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.05); margin-bottom: 40px; overflow: hidden;
+  transition: 0.3s;
+}
+.jl-card:hover { transform: translateY(-5px); box-shadow: 0 25px 60px rgba(0,0,0,0.1); border-color: rgba(37,99,235,0.2); }
+
+/* Left Sidebar (ISSN & Identity) */
+.jl-card-left { padding: 40px 32px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+.jl-card-left::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.1; z-index: 0; }
+.jl-card-left > * { position: relative; z-index: 1; }
+.jl-card-abbr { font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 800; color: white; margin-bottom: 4px; line-height: 1.1; }
+.jl-card-freq { font-size: 0.85rem; color: rgba(255,255,255,0.8); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 20px; display: inline-block; margin-top: 12px; }
+.jl-card-issn-label { font-size: 0.75rem; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; margin-top: 40px; }
+.jl-card-issn { font-size: 0.95rem; color: white; font-weight: 700; line-height: 1.6; }
+
+/* Vibrant Gradients for left side */
+.bg-grad-1 { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+.bg-grad-2 { background: linear-gradient(135deg, #065f46, #10b981); }
+.bg-grad-3 { background: linear-gradient(135deg, #4c1d95, #8b5cf6); }
+.bg-grad-4 { background: linear-gradient(135deg, #b45309, #f59e0b); }
+.bg-grad-5 { background: linear-gradient(135deg, #9f1239, #f43f5e); }
+.bg-grad-6 { background: linear-gradient(135deg, #0f766e, #14b8a6); }
+
+/* Main Content Center */
+.jl-card-center { padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+.jl-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 16px; flex-wrap: wrap; }
+.jl-card-header > div:first-child { flex: 1; min-width: 0; }
+.jl-card-title { font-size: 1.6rem; font-weight: 800; color: var(--text-dark); margin: 0 0 12px 0; line-height: 1.3; word-break: break-word; }
+
+.jl-badge-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.jl-mini-badge {
+  background: white; border: 1px solid rgba(0,0,0,0.05); padding: 6px 14px;
+  border-radius: 20px; font-size: 0.8rem; font-weight: 700; color: var(--text-dark);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: inline-flex; align-items: center; gap: 6px;
+}
+.jl-mini-badge i { color: var(--primary); }
+
+.jl-card-desc { color: var(--text-muted); line-height: 1.7; font-size: 1rem; margin: 0 0 24px 0; }
+.jl-topics { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.jl-topic-tag { background: rgba(37,99,235,0.05); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; border: 1px solid rgba(37,99,235,0.1); }
+
+.jl-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.jl-btn { padding: 12px 24px; border-radius: 12px; font-size: 0.95rem; font-weight: 700; text-decoration: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.jl-btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; box-shadow: 0 10px 20px rgba(37,99,235,0.2); }
+.jl-btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(37,99,235,0.3); }
+.jl-btn-outline { background: white; border: 1px solid #cbd5e1; color: var(--text-dark); }
+.jl-btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--bg-light); }
+
+/* Right Info Panel */
+.jl-card-right { background: var(--bg-light); border-left: 1px solid rgba(0,0,0,0.05); padding: 40px 32px; display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+.jl-info-item { display: flex; align-items: center; gap: 14px; background: white; padding: 16px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 5px 15px rgba(0,0,0,0.02); transition: 0.3s; }
+.jl-info-item:hover { transform: translateX(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(37,99,235,0.1); }
+.jl-info-item i { color: var(--primary); font-size: 1.4rem; width: 24px; text-align: center; }
+.jl-info-item span { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); }
+.jl-info-item .info-sub { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+/* CTA Section */
+.jl-cta {
+  margin-top: 100px; position: relative;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: 32px; padding: 100px 40px; text-align: center; overflow: hidden;
+  box-shadow: 0 30px 60px rgba(37,99,235,0.2);
+}
+.jl-cta::before {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.1;
+}
+.jl-cta-content { position: relative; z-index: 2; }
+.jl-cta h2 { font-size: 3.5rem; color: #fff; margin-bottom: 24px; font-weight: 800; line-height: 1.1; }
+.jl-cta p { font-size: 1.25rem; color: #e2e8f0; margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+.jl-cta-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+.jl-btn-white { background: white; color: var(--primary); padding: 18px 36px; border-radius: 50px; font-size: 1.1rem; font-weight: 800; text-decoration: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+.jl-btn-white:hover { transform: translateY(-3px); background: var(--bg-light); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+.jl-btn-white-outline { border: 2px solid rgba(255,255,255,0.3); color: white; padding: 18px 36px; border-radius: 50px; font-size: 1.1rem; font-weight: 800; text-decoration: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; }
+.jl-btn-white-outline:hover { background: rgba(255,255,255,0.1); border-color: white; }
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .jl-card { grid-template-columns: 240px 1fr; }
+  .jl-card-right { display: none; /* Hide 3rd column on smaller tablets to keep layout clean */ }
+}
+@media (max-width: 992px) {
+  .jl-hero-content { grid-template-columns: 1fr; text-align: center; }
+  .hero-visual { display: none; }
+  .jl-hero h1 { font-size: 3rem; }
+  .jl-breadcrumb { justify-content: center; }
+  .jl-grid-5 { grid-template-columns: repeat(3, 1fr); }
+  .jl-card { grid-template-columns: 1fr; }
+  .jl-card-left { padding: 30px; min-height: auto; flex-direction: row; align-items: center; }
+  .jl-card-freq { margin-top: 0; margin-left: 12px; }
+  .jl-card-issn-label { margin-top: 0; }
+  .jl-card-issn { text-align: right; }
+  .jl-card-center { padding: 30px; }
+}
+@media (max-width: 768px) {
+  .jl-grid-5 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 576px) {
+  .jl-card-left { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .jl-card-freq { margin-left: 0; margin-top: 8px; }
+  .jl-card-issn { text-align: left; }
+  .jl-cta h2 { font-size: 2.2rem; }
+}
+</style>
+
+<div class="journals-page">
+  
+  <!-- HERO SECTION -->
+  <section class="jl-hero">
+    <div class="hero-mesh"></div>
+    <div class="jl-hero-content gs-reveal">
+      <div class="jl-hero-text">
+        <div class="jl-breadcrumb">
+          <a href="/">Home</a> <span>›</span> Journals
+        </div>
+        <div class="jl-badge">
+          <i class="fa-solid fa-book-open"></i> Global Journal Portfolio
+        </div>
+        <h1>Discover Our<br><span class="text-gradient">International Journals</span></h1>
+        <p>Six peer-reviewed, open-access, ISSN-supported international journals across diverse academic disciplines dedicated to publishing high-quality original research.</p>
+      </div>
+      
+      <div class="hero-visual">
+        <div class="floating-bubble fb-1">
+          <div class="fb-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <div>
+            <div style="font-weight:700;color:white;">High Impact</div>
+            <div style="font-size:0.8rem;color:#cbd5e1;">Global Analytics</div>
+          </div>
+        </div>
+        <div class="floating-bubble fb-2">
+          <div class="fb-icon" style="color:#10b981;"><i class="fa-solid fa-barcode"></i></div>
+          <div>
+            <div style="font-weight:700;color:white;">ISSN Verified</div>
+            <div style="font-size:0.8rem;color:#cbd5e1;">International Standard</div>
+          </div>
+        </div>
+        <div class="floating-bubble fb-3">
+          <div class="fb-icon" style="color:var(--gold);"><i class="fa-solid fa-lock-open"></i></div>
+          <div>
+            <div style="font-weight:700;color:white;">Open Access</div>
+            <div style="font-size:0.8rem;color:#cbd5e1;">100% Free to Read</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST INDICATORS -->
+  <div class="container jl-container">
+    <div class="jl-trust-section gs-reveal-up">
+      <div class="jl-grid-5">
+        <div class="jl-trust-card"><i class="fa-solid fa-lock-open" style="color:var(--primary);"></i> <span>Open Access</span></div>
+        <div class="jl-trust-card"><i class="fa-solid fa-certificate" style="color:var(--brand-shield);"></i> <span>ISSN Registered</span></div>
+        <div class="jl-trust-card"><i class="fa-solid fa-microscope" style="color:var(--gold);"></i> <span>Peer Reviewed</span></div>
+        <div class="jl-trust-card"><i class="fa-solid fa-calendar-check" style="color:#8b5cf6;"></i> <span>Quarterly Published</span></div>
+        <div class="jl-trust-card"><i class="fa-solid fa-bolt" style="color:#f43f5e;"></i> <span>7–15 Day Review</span></div>
+      </div>
+    </div>
+
+    <!-- JOURNAL SHOWCASE -->
+    <div class="jl-section-header gs-reveal-up">
+      <h2>Our Journal Collection</h2>
+      <p>Explore specialized journals covering diverse academic disciplines, managed by expert editorial boards.</p>
+    </div>
+
+    <!-- Journal 1: SGJVSR -->
+    <div class="jl-card gs-reveal-up">
+      <div class="jl-card-left bg-grad-1">
+        <div>
+          <div class="jl-card-abbr">SGJVSR</div>
+          <div class="jl-card-freq">Quarterly Journal</div>
+        </div>
+        <div>
+          <div class="jl-card-issn-label">ISSN (Print & Online)</div>
+          <div class="jl-card-issn">XXXX-XXXX (P)<br>XXXX-XXXX (O)</div>
+        </div>
+      </div>
+      
+      <div class="jl-card-center">
+        <div class="jl-badge-group">
+          <div class="jl-mini-badge"><i class="fa-solid fa-lock-open"></i> Open Access</div>
+          <div class="jl-mini-badge"><i class="fa-solid fa-microscope" style="color:var(--brand-shield);"></i> Peer Reviewed</div>
+        </div>
+        <h2 class="jl-card-title">ScriptHive Global Journal of Vedic and Sanskrit Research</h2>
+        <div class="jl-topics">
+          <span class="jl-topic-tag">Vedic Studies</span>
+          <span class="jl-topic-tag">Sanskrit Literature</span>
+          <span class="jl-topic-tag">Indology</span>
+          <span class="jl-topic-tag">Ancient Philosophy</span>
+          <span class="jl-topic-tag">Classical Linguistics</span>
+        </div>
+        <p class="jl-card-desc">SGJVSR is dedicated to scholarly research in Vedic studies, Sanskrit language and literature, ancient Indian philosophy, Indology, classical linguistics, and related disciplines. It serves as a premier platform for academics and researchers preserving and advancing the study of India's rich intellectual heritage.</p>
+        <div class="jl-actions">
+          <a href="/SGJVSR" class="jl-btn jl-btn-primary">View Journal <i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/SGJVSR" class="jl-btn jl-btn-outline"><i class="fa-solid fa-bullseye"></i> Aim & Scope</a>
+          <a href="/submit" class="jl-btn jl-btn-outline"><i class="fa-solid fa-paper-plane"></i> Submit Paper</a>
+        </div>
+      </div>
+
+      <div class="jl-card-right">
+        <div class="jl-info-item"><i class="fa-solid fa-globe"></i> <div><span>Global Reach</span><span class="info-sub">International Readership</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-user-secret" style="color:var(--brand-shield);"></i> <div><span>Double-Blind</span><span class="info-sub">Strict Peer Review</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-bolt" style="color:var(--gold);"></i> <div><span>Fast Review</span><span class="info-sub">7-15 Working Days</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-scale-balanced" style="color:#8b5cf6;"></i> <div><span>Ethical Publishing</span><span class="info-sub">COPE Guidelines</span></div></div>
+      </div>
+    </div>
+
+    <!-- Journal 2: SGMRJ -->
+    <div class="jl-card gs-reveal-up">
+      <div class="jl-card-left bg-grad-2">
+        <div>
+          <div class="jl-card-abbr">SGMRJ</div>
+          <div class="jl-card-freq">Quarterly Journal</div>
+        </div>
+        <div>
+          <div class="jl-card-issn-label">ISSN (Print & Online)</div>
+          <div class="jl-card-issn">XXXX-XXXX (P)<br>XXXX-XXXX (O)</div>
+        </div>
+      </div>
+      
+      <div class="jl-card-center">
+        <div class="jl-badge-group">
+          <div class="jl-mini-badge"><i class="fa-solid fa-lock-open"></i> Open Access</div>
+          <div class="jl-mini-badge"><i class="fa-solid fa-microscope" style="color:var(--brand-shield);"></i> Peer Reviewed</div>
+        </div>
+        <h2 class="jl-card-title">ScriptHive Global Multidisciplinary Research Journal</h2>
+        <div class="jl-topics">
+          <span class="jl-topic-tag">Sciences</span>
+          <span class="jl-topic-tag">Humanities</span>
+          <span class="jl-topic-tag">Technology</span>
+          <span class="jl-topic-tag">Education</span>
+          <span class="jl-topic-tag">Management</span>
+        </div>
+        <p class="jl-card-desc">SGMRJ is an interdisciplinary research journal that welcomes original contributions from all academic fields. It serves as a bridge between diverse domains, fostering cross-disciplinary dialogue and innovative research methodologies. Ideal for researchers whose work spans multiple disciplines or addresses interconnected societal challenges.</p>
+        <div class="jl-actions">
+          <a href="/SGMRJ" class="jl-btn jl-btn-primary">View Journal <i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/SGMRJ" class="jl-btn jl-btn-outline"><i class="fa-solid fa-bullseye"></i> Aim & Scope</a>
+          <a href="/submit" class="jl-btn jl-btn-outline"><i class="fa-solid fa-paper-plane"></i> Submit Paper</a>
+        </div>
+      </div>
+
+      <div class="jl-card-right">
+        <div class="jl-info-item"><i class="fa-solid fa-globe"></i> <div><span>Global Reach</span><span class="info-sub">International Readership</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-user-secret" style="color:var(--brand-shield);"></i> <div><span>Double-Blind</span><span class="info-sub">Strict Peer Review</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-bolt" style="color:var(--gold);"></i> <div><span>Fast Review</span><span class="info-sub">7-15 Working Days</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-scale-balanced" style="color:#8b5cf6;"></i> <div><span>Ethical Publishing</span><span class="info-sub">COPE Guidelines</span></div></div>
+      </div>
+    </div>
+
+    <!-- Journal 3: SGJPLS -->
+    <div class="jl-card gs-reveal-up">
+      <div class="jl-card-left bg-grad-3">
+        <div>
+          <div class="jl-card-abbr">SGJPLS</div>
+          <div class="jl-card-freq">Quarterly Journal</div>
+        </div>
+        <div>
+          <div class="jl-card-issn-label">ISSN (Print & Online)</div>
+          <div class="jl-card-issn">XXXX-XXXX (P)<br>XXXX-XXXX (O)</div>
+        </div>
+      </div>
+      
+      <div class="jl-card-center">
+        <div class="jl-badge-group">
+          <div class="jl-mini-badge"><i class="fa-solid fa-lock-open"></i> Open Access</div>
+          <div class="jl-mini-badge"><i class="fa-solid fa-microscope" style="color:var(--brand-shield);"></i> Peer Reviewed</div>
+        </div>
+        <h2 class="jl-card-title">ScriptHive Global Journal of Physical and Life Sciences</h2>
+        <div class="jl-topics">
+          <span class="jl-topic-tag">Physics</span>
+          <span class="jl-topic-tag">Chemistry</span>
+          <span class="jl-topic-tag">Biology</span>
+          <span class="jl-topic-tag">Environmental Science</span>
+          <span class="jl-topic-tag">Mathematics</span>
+        </div>
+        <p class="jl-card-desc">SGJPLS publishes original research in physics, chemistry, biology, botany, zoology, microbiology, environmental science, mathematics, statistics, and related fields. The journal is committed to advancing fundamental and applied scientific knowledge, supporting breakthrough discoveries, and fostering evidence-based understanding of the natural world.</p>
+        <div class="jl-actions">
+          <a href="/SGJPLS" class="jl-btn jl-btn-primary">View Journal <i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/SGJPLS" class="jl-btn jl-btn-outline"><i class="fa-solid fa-bullseye"></i> Aim & Scope</a>
+          <a href="/submit" class="jl-btn jl-btn-outline"><i class="fa-solid fa-paper-plane"></i> Submit Paper</a>
+        </div>
+      </div>
+
+      <div class="jl-card-right">
+        <div class="jl-info-item"><i class="fa-solid fa-globe"></i> <div><span>Global Reach</span><span class="info-sub">International Readership</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-user-secret" style="color:var(--brand-shield);"></i> <div><span>Double-Blind</span><span class="info-sub">Strict Peer Review</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-bolt" style="color:var(--gold);"></i> <div><span>Fast Review</span><span class="info-sub">7-15 Working Days</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-scale-balanced" style="color:#8b5cf6;"></i> <div><span>Ethical Publishing</span><span class="info-sub">COPE Guidelines</span></div></div>
+      </div>
+    </div>
+
+    <!-- Journal 4: SGJETR -->
+    <div class="jl-card gs-reveal-up">
+      <div class="jl-card-left bg-grad-4">
+        <div>
+          <div class="jl-card-abbr">SGJETR</div>
+          <div class="jl-card-freq">Quarterly Journal</div>
+        </div>
+        <div>
+          <div class="jl-card-issn-label">ISSN (Print & Online)</div>
+          <div class="jl-card-issn">XXXX-XXXX (P)<br>XXXX-XXXX (O)</div>
+        </div>
+      </div>
+      
+      <div class="jl-card-center">
+        <div class="jl-badge-group">
+          <div class="jl-mini-badge"><i class="fa-solid fa-lock-open"></i> Open Access</div>
+          <div class="jl-mini-badge"><i class="fa-solid fa-microscope" style="color:var(--brand-shield);"></i> Peer Reviewed</div>
+        </div>
+        <h2 class="jl-card-title">ScriptHive Global Journal of Engineering and Technology Research</h2>
+        <div class="jl-topics">
+          <span class="jl-topic-tag">Engineering</span>
+          <span class="jl-topic-tag">Artificial Intelligence</span>
+          <span class="jl-topic-tag">Computer Science</span>
+          <span class="jl-topic-tag">Information Technology</span>
+        </div>
+        <p class="jl-card-desc">SGJETR covers civil, mechanical, electrical, electronics, computer science, information technology, artificial intelligence, and emerging engineering disciplines. The journal provides a platform for engineers, technologists, and innovators to share research that advances technological solutions to contemporary challenges.</p>
+        <div class="jl-actions">
+          <a href="/SGJETR" class="jl-btn jl-btn-primary">View Journal <i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/SGJETR" class="jl-btn jl-btn-outline"><i class="fa-solid fa-bullseye"></i> Aim & Scope</a>
+          <a href="/submit" class="jl-btn jl-btn-outline"><i class="fa-solid fa-paper-plane"></i> Submit Paper</a>
+        </div>
+      </div>
+
+      <div class="jl-card-right">
+        <div class="jl-info-item"><i class="fa-solid fa-globe"></i> <div><span>Global Reach</span><span class="info-sub">International Readership</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-user-secret" style="color:var(--brand-shield);"></i> <div><span>Double-Blind</span><span class="info-sub">Strict Peer Review</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-bolt" style="color:var(--gold);"></i> <div><span>Fast Review</span><span class="info-sub">7-15 Working Days</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-scale-balanced" style="color:#8b5cf6;"></i> <div><span>Ethical Publishing</span><span class="info-sub">COPE Guidelines</span></div></div>
+      </div>
+    </div>
+
+    <!-- Journal 5: SGJSSH -->
+    <div class="jl-card gs-reveal-up">
+      <div class="jl-card-left bg-grad-5">
+        <div>
+          <div class="jl-card-abbr">SGJSSH</div>
+          <div class="jl-card-freq">Quarterly Journal</div>
+        </div>
+        <div>
+          <div class="jl-card-issn-label">ISSN (Print & Online)</div>
+          <div class="jl-card-issn">XXXX-XXXX (P)<br>XXXX-XXXX (O)</div>
+        </div>
+      </div>
+      
+      <div class="jl-card-center">
+        <div class="jl-badge-group">
+          <div class="jl-mini-badge"><i class="fa-solid fa-lock-open"></i> Open Access</div>
+          <div class="jl-mini-badge"><i class="fa-solid fa-microscope" style="color:var(--brand-shield);"></i> Peer Reviewed</div>
+        </div>
+        <h2 class="jl-card-title">ScriptHive Global Journal of Social Sciences and Humanities</h2>
+        <div class="jl-topics">
+          <span class="jl-topic-tag">Sociology</span>
+          <span class="jl-topic-tag">History</span>
+          <span class="jl-topic-tag">Economics</span>
+          <span class="jl-topic-tag">Law</span>
+          <span class="jl-topic-tag">Anthropology</span>
+        </div>
+        <p class="jl-card-desc">SGJSSH explores sociology, history, political science, economics, literature, anthropology, cultural studies, geography, law, philosophy, and related disciplines. The journal champions critical social thought, humanistic inquiry, and research that deepens our understanding of society, culture, and human experience.</p>
+        <div class="jl-actions">
+          <a href="/SGJSSH" class="jl-btn jl-btn-primary">View Journal <i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/SGJSSH" class="jl-btn jl-btn-outline"><i class="fa-solid fa-bullseye"></i> Aim & Scope</a>
+          <a href="/submit" class="jl-btn jl-btn-outline"><i class="fa-solid fa-paper-plane"></i> Submit Paper</a>
+        </div>
+      </div>
+
+      <div class="jl-card-right">
+        <div class="jl-info-item"><i class="fa-solid fa-globe"></i> <div><span>Global Reach</span><span class="info-sub">International Readership</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-user-secret" style="color:var(--brand-shield);"></i> <div><span>Double-Blind</span><span class="info-sub">Strict Peer Review</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-bolt" style="color:var(--gold);"></i> <div><span>Fast Review</span><span class="info-sub">7-15 Working Days</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-scale-balanced" style="color:#8b5cf6;"></i> <div><span>Ethical Publishing</span><span class="info-sub">COPE Guidelines</span></div></div>
+      </div>
+    </div>
+
+    <!-- Journal 6: SGJASH -->
+    <div class="jl-card gs-reveal-up">
+      <div class="jl-card-left bg-grad-6">
+        <div>
+          <div class="jl-card-abbr">SGJASH</div>
+          <div class="jl-card-freq">Quarterly Journal</div>
+        </div>
+        <div>
+          <div class="jl-card-issn-label">ISSN (Print & Online)</div>
+          <div class="jl-card-issn">XXXX-XXXX (P)<br>XXXX-XXXX (O)</div>
+        </div>
+      </div>
+      
+      <div class="jl-card-center">
+        <div class="jl-badge-group">
+          <div class="jl-mini-badge"><i class="fa-solid fa-lock-open"></i> Open Access</div>
+          <div class="jl-mini-badge"><i class="fa-solid fa-microscope" style="color:var(--brand-shield);"></i> Peer Reviewed</div>
+        </div>
+        <h2 class="jl-card-title">ScriptHive Global Journal of Applied Science and Health</h2>
+        <div class="jl-topics">
+          <span class="jl-topic-tag">Applied Sciences</span>
+          <span class="jl-topic-tag">Public Health</span>
+          <span class="jl-topic-tag">Nursing</span>
+          <span class="jl-topic-tag">Pharmacy</span>
+          <span class="jl-topic-tag">Medical Research</span>
+        </div>
+        <p class="jl-card-desc">SGJASH focuses on applied sciences, public health, nursing, pharmacy, nutrition, medical research, and health management. The journal is dedicated to bridging the gap between scientific research and real-world health applications, supporting healthcare professionals, applied researchers, and public health practitioners in sharing evidence-based knowledge.</p>
+        <div class="jl-actions">
+          <a href="/SGJASH" class="jl-btn jl-btn-primary">View Journal <i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/SGJASH" class="jl-btn jl-btn-outline"><i class="fa-solid fa-bullseye"></i> Aim & Scope</a>
+          <a href="/submit" class="jl-btn jl-btn-outline"><i class="fa-solid fa-paper-plane"></i> Submit Paper</a>
+        </div>
+      </div>
+
+      <div class="jl-card-right">
+        <div class="jl-info-item"><i class="fa-solid fa-globe"></i> <div><span>Global Reach</span><span class="info-sub">International Readership</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-user-secret" style="color:var(--brand-shield);"></i> <div><span>Double-Blind</span><span class="info-sub">Strict Peer Review</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-bolt" style="color:var(--gold);"></i> <div><span>Fast Review</span><span class="info-sub">7-15 Working Days</span></div></div>
+        <div class="jl-info-item"><i class="fa-solid fa-scale-balanced" style="color:#8b5cf6;"></i> <div><span>Ethical Publishing</span><span class="info-sub">COPE Guidelines</span></div></div>
+      </div>
+    </div>
+
+    <!-- CTA Section -->
+    <section class="jl-cta gs-reveal">
+      <div class="jl-cta-content">
+        <h2>Ready to Submit Your Research?</h2>
+        <p>All ScriptHive journals welcome original submissions year-round. Publish your research with global visibility and peer-reviewed credibility.</p>
+        <div class="jl-cta-buttons">
+          <a href="/submit" class="jl-btn-white">
+            <i class="fa-solid fa-paper-plane"></i> Submit Your Paper
+          </a>
+          <a href="/guidelines" class="jl-btn-white-outline">
+            <i class="fa-solid fa-scroll"></i> Author Guidelines
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Animation & Logic Scripts -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Reveal animations
+    gsap.utils.toArray('.gs-reveal').forEach(function(elem) {
+      gsap.from(elem, {
+        scrollTrigger: { trigger: elem, start: "top 85%" },
+        y: 50, opacity: 0, duration: 1, ease: "power3.out"
+      });
+    });
+
+    gsap.utils.toArray('.gs-reveal-up').forEach(function(elem) {
+      gsap.from(elem, {
+        scrollTrigger: { trigger: elem, start: "top 85%" },
+        y: 30, opacity: 0, duration: 0.8, ease: "power2.out"
+      });
+    });
+  });
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,98 @@
+<!-- ARCHIVES SECTION -->
+<section id="archives" class="c-section gs-reveal-up">
+  <div class="section-label"><i class="fa-solid fa-box-archive"></i> Archives</div>
+  <h2 class="section-title">Published Issues</h2>
+
+  <%
+    const archiveData = typeof archive !== 'undefined' ? archive : [];
+    const journalAbbr = typeof journalId !== 'undefined' ? journalId : 'SGJVSR';
+    const issueList = [];
+    archiveData.forEach(function(vol) {
+      (vol.issues || []).forEach(function(iss) {
+        (iss.parts || []).forEach(function(part) {
+          if ((part.articles || []).length > 0) {
+            const pl = (part.name || 'A').toLowerCase();
+            issueList.push({ vol, iss, part, pl, articles: part.articles });
+          }
+        });
+      });
+    });
+    issueList.sort(function(a,b){
+      if (b.vol.year !== a.vol.year) return b.vol.year - a.vol.year;
+      if (b.vol.number !== a.vol.number) return b.vol.number - a.vol.number;
+      if (b.iss.number !== a.iss.number) return b.iss.number - a.iss.number;
+      return b.part.name.localeCompare(a.part.name);
+    });
+    const backendBase = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+  %>
+
+  <% if (issueList.length === 0) { %>
+    <div style="text-align:center;padding:48px 20px;color:#94a3b8;background:#f8fafc;border-radius:12px;border:1px dashed #e2e8f0;">
+      <p style="font-size:2rem;margin-bottom:8px;">📄</p>
+      <p style="font-size:1rem;font-weight:600;">No published articles yet.</p>
+      <p style="font-size:0.88rem;margin-top:4px;">Check back soon.</p>
+    </div>
+  <% } else { %>
+    <% issueList.forEach(function(item) { %>
+      <%
+        const issLabel = 'Vol. ' + item.vol.number + ', Issue ' + item.iss.number +
+          (item.part.name !== 'A' ? ' Part ' + item.part.name : '') +
+          ' (' + item.vol.year + ')' +
+          (item.iss.period ? ' — ' + item.iss.period : '');
+      %>
+      <div style="margin-bottom:36px;">
+        <div style="font-size:1.1rem;font-weight:800;text-align:center;color:#0f172a;margin-bottom:5px;padding:10px 0;"><%= issLabel %></div>
+        <div style="height:3px;background:linear-gradient(90deg,#dc2626,#b91c1c);max-width:180px;margin:0 auto 20px;border-radius:2px;"></div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.9rem;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+            <thead>
+              <tr style="background:#f1f5f9;">
+                <th style="padding:10px 12px;text-align:center;font-size:0.75rem;color:#64748b;text-transform:uppercase;letter-spacing:0.04em;width:52px;border-bottom:1px solid #e2e8f0;">S. No.</th>
+                <th style="padding:10px 12px;text-align:left;font-size:0.75rem;color:#64748b;text-transform:uppercase;letter-spacing:0.04em;border-bottom:1px solid #e2e8f0;">Title and Authors Name</th>
+                <th style="padding:10px 12px;text-align:center;font-size:0.75rem;color:#64748b;text-transform:uppercase;letter-spacing:0.04em;width:100px;border-bottom:1px solid #e2e8f0;">Country</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% item.articles.forEach(function(art, idx) {
+                const ps = art.pageStart, pe = art.pageEnd;
+                const pageRange = (ps && pe) ? (String(ps).padStart(2,'0') + '-' + String(pe).padStart(2,'0')) : '';
+                const citation = journalAbbr + '; ' + item.vol.year + '; ' + item.vol.number + '(' + item.iss.number + item.pl + '):' + pageRange;
+                const pdfUrl = art.pdfPublicPath ? (backendBase + '/' + art.pdfPublicPath.replace(/^uploads\//, 'uploads/')) : null;
+              %>
+              <tr style="border-bottom:1px solid #f1f5f9;">
+                <td style="padding:14px 12px;text-align:center;font-weight:700;color:#64748b;vertical-align:top;"><%= idx+1 %></td>
+                <td style="padding:14px 12px;vertical-align:top;">
+                  <div style="font-weight:700;color:#0f172a;line-height:1.45;margin-bottom:4px;"><%= art.title %></div>
+                  <div style="color:#374151;font-size:0.86rem;margin-bottom:4px;"><%= art.authorName %><%= art.coAuthors ? ', ' + art.coAuthors : '' %></div>
+                  <% if (art.doiRecord && art.doiRecord.doi) { %>
+                  <div style="margin-bottom:3px;"><a href="https://www.doi.org/<%= art.doiRecord.doi %>" target="_blank" rel="noopener" style="color:#2563eb;font-size:0.83rem;text-decoration:none;">DOI: https://www.doi.org/<%= art.doiRecord.doi %></a></div>
+                  <% } %>
+                  <div style="color:#6b7280;font-size:0.8rem;margin-bottom:6px;"><%= citation %></div>
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:0.8rem;color:#6b7280;">
+                    <% if (art.slug) { %><a href="/article/<%= art.slug %>" style="color:#2563eb;font-weight:600;text-decoration:none;" onclick="trackView('<%= art.id %>')">Abstract</a><span style="color:#cbd5e1;">|</span><% } %>
+                    <% if (pdfUrl) { %><a href="<%= pdfUrl %>" target="_blank" rel="noopener" style="color:#2563eb;font-weight:600;text-decoration:none;" onclick="trackDownload('<%= art.id %>')">Download</a><span style="color:#cbd5e1;">|</span><% } %>
+                    <span><%= art.viewCount||0 %> Views</span><span style="color:#cbd5e1;">|</span><span><%= art.downloadCount||0 %> Downloads</span>
+                  </div>
+                </td>
+                <td style="padding:14px 12px;text-align:center;color:#475569;font-size:0.85rem;vertical-align:top;"><%= art.country||'India' %></td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% }); %>
+  <% } %>
+</section>
+
+<script>
+(function() {
+  const API = '<%= (process.env.SCRIPTHIVE_API_URL || "http://localhost:3001") %>';
+  window.trackView = function(id) {
+    fetch(API + '/api/archive/view/' + encodeURIComponent(id), { method: 'POST' }).catch(function(){});
+  };
+  window.trackDownload = function(id) {
+    fetch(API + '/api/archive/download/' + encodeURIComponent(id), { method: 'POST' }).catch(function(){});
+  };
+})();
+</script>

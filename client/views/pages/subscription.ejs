@@ -1,0 +1,1033 @@
+<%- include('../partials/header') %>
+
+    <!-- Add FontAwesome and GSAP -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --gold: #fbbf24;
+            --gold-light: #fef08a;
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        body {
+            background-color: var(--bg-light);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero-pricing {
+            position: relative;
+            background: var(--bg-dark);
+            color: white;
+            padding: 120px 20px 80px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-bg-blobs {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.6;
+            border-radius: 50%;
+            animation: float 10s infinite alternate ease-in-out;
+        }
+
+        .blob-1 {
+            background: #3b82f6;
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: -100px;
+        }
+
+        .blob-2 {
+            background: #8b5cf6;
+            width: 300px;
+            height: 300px;
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            background: #fbbf24;
+            width: 250px;
+            height: 250px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(50px, 50px) scale(1.1);
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .hero-badge {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-pricing h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero-pricing p {
+            font-size: 1.25rem;
+            color: #cbd5e1;
+            margin-bottom: 50px;
+        }
+
+        .counters {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .counter-item {
+            text-align: center;
+        }
+
+        .counter-val {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--gold);
+            margin-bottom: 5px;
+        }
+
+        .counter-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Toggle */
+        .pricing-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: -40px auto 60px;
+            position: relative;
+            z-index: 10;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            width: fit-content;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .toggle-label.active {
+            color: var(--text-dark);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--primary);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--gold);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        .save-badge {
+            position: absolute;
+            right: -90px;
+            top: -15px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            transform: rotate(10deg);
+        }
+
+        /* Pricing Cards */
+        .pricing-section {
+            padding: 40px 20px 100px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        .pricing-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px 30px;
+            box-shadow: var(--glass-shadow);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+
+        .pricing-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .pricing-card.standard {
+            border: 2px solid var(--primary);
+            background: white;
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        .pricing-card.standard .card-badge {
+            background: var(--primary);
+            color: white;
+        }
+
+        .pricing-card.standard:hover {
+            transform: translateY(-15px) scale(1.07);
+        }
+
+        .pricing-card.premium {
+            border: 2px solid var(--gold);
+            background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+        }
+
+        .pricing-card.premium .card-badge {
+            background: var(--gold);
+            color: #78350f;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .card-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+
+        .card-price {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .card-price span.currency {
+            font-size: 1.5rem;
+            margin-top: 10px;
+            margin-right: 5px;
+        }
+
+        .card-features {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0;
+            flex-grow: 1;
+        }
+
+        .card-features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .card-features li i {
+            color: #10b981;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .card-features li.disabled {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .card-features li.disabled i {
+            color: #cbd5e1;
+        }
+
+        .highlight-box {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid var(--gold);
+            color: #b45309;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-card {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn-basic {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+        }
+
+        .btn-basic:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-standard {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-standard:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, var(--gold) 0%, #f59e0b 100%);
+            color: #78350f;
+            box-shadow: 0 10px 20px rgba(251, 191, 36, 0.3);
+        }
+
+        .btn-premium:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        /* Bonus Section */
+        .bonus-section {
+            background: var(--bg-dark);
+            color: white;
+            padding: 80px 20px;
+            position: relative;
+        }
+
+        .bonus-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .bonus-title {
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: var(--gold);
+        }
+
+        .bonus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .bonus-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-align: left;
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        .bonus-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .bonus-card i {
+            font-size: 1.5rem;
+            color: #3b82f6;
+        }
+
+        /* Add-ons Section */
+        .addons-section {
+            padding: 100px 20px;
+            background: var(--bg-light);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .addons-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .addon-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .addon-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .addon-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: inline-block;
+            padding: 15px;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 15px;
+        }
+
+        .addon-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .addon-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .addon-highlight {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(251, 191, 36, 0.2);
+            color: #b45309;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .btn-addon {
+            display: inline-block;
+            padding: 8px 16px;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .addon-card:hover .btn-addon {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Trust Section */
+        .trust-section {
+            padding: 80px 20px;
+            background: white;
+            text-align: center;
+        }
+
+        .trust-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1000px;
+            margin: 40px auto 0;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            padding: 15px 25px;
+            border-radius: 12px;
+        }
+
+        .trust-item i {
+            color: #10b981;
+            font-size: 1.2rem;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            padding: 100px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .final-cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .final-cta h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .final-cta p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary);
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .btn-white:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-outline-white {
+            border: 2px solid white;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .btn-outline-white:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .hero-pricing h1 {
+                font-size: 2.2rem;
+            }
+
+            .pricing-card.standard {
+                transform: none;
+            }
+
+            .pricing-card.standard:hover {
+                transform: translateY(-10px);
+            }
+
+            .counters {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+
+    <!-- HERO SECTION ABOVE PRICING -->
+    <section class="hero-pricing">
+        <div class="hero-bg-blobs">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badges">
+                <div class="hero-badge"><i class="fa-solid fa-hourglass-half"></i> Limited Period Offer</div>
+                <div class="hero-badge"><i class="fa-solid fa-rocket"></i> Trusted by Researchers</div>
+                <div class="hero-badge"><i class="fa-solid fa-globe"></i> International Publication Support</div>
+                <div class="hero-badge"><i class="fa-solid fa-file-signature"></i> DOI & Certificate Included</div>
+            </div>
+            <h1>Flexible Publishing Plans for Modern Researchers</h1>
+            <p>Choose the perfect publishing experience tailored for your academic research journey — transparent
+                pricing, premium support, and global visibility.</p>
+
+            <div class="counters">
+                                <div class="counter-item">
+                    <div class="counter-val" data-target="10000">0</div>
+                    <div class="counter-label">Researchers</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-val" data-target="99">0</div>
+                    <div class="counter-label">Satisfaction %</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-val" data-target="24">0</div>
+                    <div class="counter-label">Support</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PLAN COMPARISON TOGGLE -->
+    <div class="pricing-toggle">
+        <span class="toggle-label active" id="label-monthly">One-Time</span>
+        <label class="switch">
+            <input type="checkbox" id="pricingToggle">
+            <span class="slider"></span>
+        </label>
+        <span class="toggle-label" id="label-yearly">Monthly</span>
+        <div class="save-badge">Save up to 40%</div>
+    </div>
+
+    <!-- SUBSCRIPTION PLAN SECTION -->
+    <section class="pricing-section">
+        <div class="pricing-grid">
+
+            <!-- BASIC PLAN -->
+            <div class="pricing-card gs-reveal">
+                <div class="card-badge">Starter Access</div>
+                <h3 class="card-title">Basic Plan</h3>
+                <p class="card-subtitle">Perfect for first-time researchers</p>
+                <div class="card-price"><span class="currency">₹</span><span class="price-val" data-monthly="0"
+                        data-yearly="0">0</span></div>
+
+                <ul class="card-features">
+                    <li><i class="fa-solid fa-check"></i> Publish 1 paper only</li>
+                    <li><i class="fa-solid fa-check"></i> Any 1 journal access</li>
+                    <li><i class="fa-solid fa-check"></i> Standard email support</li>
+                    <li><i class="fa-solid fa-check"></i> Basic author assistance</li>
+                    <li><i class="fa-solid fa-check"></i> Download E-certificate</li>
+                    <li><i class="fa-solid fa-check"></i> Article submission confirmation</li>
+                    <li><i class="fa-solid fa-check"></i> Manuscript tracking ID</li>
+                    <li><i class="fa-solid fa-check"></i> Secure file upload</li>
+                    <li><i class="fa-solid fa-check"></i> Peer review eligibility</li>
+                    <li class="disabled"><i class="fa-solid fa-lock"></i> Fast review</li>
+                    <li class="disabled"><i class="fa-solid fa-lock"></i> DOI priority</li>
+                    <li class="disabled"><i class="fa-solid fa-lock"></i> Analytics dashboard</li>
+                    <li class="disabled"><i class="fa-solid fa-lock"></i> Hard copy support</li>
+                    <li class="disabled"><i class="fa-solid fa-lock"></i> WhatsApp support</li>
+                    <li class="disabled"><i class="fa-solid fa-lock"></i> Featured paper promotion</li>
+                </ul>
+                <a href="/submit" class="btn-card btn-basic">Start Publishing Free <i class="fa-solid fa-arrow-right"
+                        style="margin-left: 5px;"></i></a>
+            </div>
+
+            <!-- STANDARD PLAN -->
+            <div class="pricing-card standard gs-reveal">
+                <div class="card-badge">⭐ Recommended</div>
+                <h3 class="card-title">Standard Plan</h3>
+                <p class="card-subtitle">Best for active researchers</p>
+                <div class="card-price"><span class="currency">₹</span><span class="price-val" data-monthly="1200"
+                        data-yearly="3299">3,299</span></div>
+
+                <div class="highlight-box">🔥 Save 35% compared to individual publishing</div>
+
+                <ul class="card-features">
+                    <li><i class="fa-solid fa-check"></i> Publish up to 3 papers</li>
+                    <li><i class="fa-solid fa-check"></i> Multiple journals access</li>
+                    <li><i class="fa-solid fa-check"></i> DOI included</li>
+                    <li><i class="fa-solid fa-check"></i> Faster review priority</li>
+                    <li><i class="fa-solid fa-check"></i> Email notifications</li>
+                    <li><i class="fa-solid fa-check"></i> Author dashboard access</li>
+                    <li><i class="fa-solid fa-check"></i> Real-time paper tracking</li>
+                    <li><i class="fa-solid fa-check"></i> Article status timeline</li>
+                    <li><i class="fa-solid fa-check"></i> Download certificate</li>
+                    <li><i class="fa-solid fa-check"></i> Paper analytics</li>
+                    <li><i class="fa-solid fa-check"></i> Reviewer comments access</li>
+                    <li><i class="fa-solid fa-check"></i> Revision support</li>
+                    <li><i class="fa-solid fa-check"></i> Optional hard copy</li>
+                </ul>
+                <a href="/submit" class="btn-card btn-standard">Choose Standard</a>
+            </div>
+
+            <!-- PREMIUM PLAN -->
+            <div class="pricing-card premium gs-reveal">
+                <div class="card-badge">🏆 Best Value</div>
+                <h3 class="card-title">Premium Plan</h3>
+                <p class="card-subtitle">For institutions & serious authors</p>
+                <div class="card-price"><span class="currency">₹</span><span class="price-val" data-monthly="2000"
+                        data-yearly="5999">5,999</span></div>
+
+                <div class="highlight-box" style="background: rgba(255,255,255,0.5); border-color:#d97706">🌟 Most
+                    chosen by professional researchers</div>
+
+                <ul class="card-features">
+                    <li><i class="fa-solid fa-check"></i> Publish up to 6 papers</li>
+                    <li><i class="fa-solid fa-check"></i> Access all journals</li>
+                    <li><i class="fa-solid fa-check"></i> Fast-track peer review</li>
+                    <li><i class="fa-solid fa-check"></i> VIP support (WhatsApp + Call)</li>
+                    <li><i class="fa-solid fa-check"></i> Priority DOI activation</li>
+                    <li><i class="fa-solid fa-check"></i> Full author dashboard</li>
+                    <li><i class="fa-solid fa-check"></i> Paper analytics & downloads</li>
+                    <li><i class="fa-solid fa-check"></i> Certificate soft + hard copy</li>
+                    <li><i class="fa-solid fa-check"></i> Journal hard copy included</li>
+                    <li><i class="fa-solid fa-check"></i> Featured paper promotion</li>
+                    <li><i class="fa-solid fa-check"></i> Homepage visibility</li>
+                    <li><i class="fa-solid fa-check"></i> Indexing support assistance</li>
+                    <li><i class="fa-solid fa-check"></i> Premium editorial guidance</li>
+                    <li><i class="fa-solid fa-check"></i> Dedicated support manager</li>
+                    <li><i class="fa-solid fa-check"></i> Early publication scheduling</li>
+                </ul>
+                <a href="/submit" class="btn-card btn-premium">Go Premium</a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- BONUS SECTION -->
+    <section class="bonus-section gs-reveal-up">
+        <div class="bonus-container">
+            <h2 class="bonus-title">🎉 Included in Paid Plans</h2>
+            <div class="bonus-grid">
+                <div class="bonus-card"><i class="fa-solid fa-fingerprint"></i> DOI metadata registration</div>
+                <div class="bonus-card"><i class="fa-solid fa-table-columns"></i> Manuscript tracking portal</div>
+                <div class="bonus-card"><i class="fa-solid fa-users-gear"></i> Editorial workflow support</div>
+                <div class="bonus-card"><i class="fa-solid fa-shield-check"></i> Publication verification</div>
+                <div class="bonus-card"><i class="fa-solid fa-qrcode"></i> QR-based certificates</div>
+                <div class="bonus-card"><i class="fa-solid fa-envelope-open-text"></i> Email notifications</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ADD-ON SERVICES SECTION -->
+    <section class="addons-section">
+        <div class="section-header gs-reveal-up">
+            <h2>Customize Your Publishing Experience</h2>
+            <p>Enhance visibility, speed, and recognition with premium add-on services.</p>
+        </div>
+
+        <div class="addons-grid">
+            <div class="addon-card gs-reveal">
+                <i class="fa-solid fa-link addon-icon"></i>
+                <h3 class="addon-title">DOI Assignment</h3>
+                <p class="addon-desc">Assign a permanent Digital Object Identifier for global paper identification and
+                    citation.</p>
+                <a href="#" class="btn-addon">Add DOI</a>
+            </div>
+
+            <div class="addon-card gs-reveal">
+                <div class="addon-highlight">⚡ Fast-track lane</div>
+                <i class="fa-solid fa-bolt addon-icon"></i>
+                <h3 class="addon-title">Fast Review</h3>
+                <p class="addon-desc">Priority peer-review workflow for faster editorial decisions.</p>
+                <a href="#" class="btn-addon">Add Fast Review</a>
+            </div>
+
+            <div class="addon-card gs-reveal">
+                <i class="fa-solid fa-file-pdf addon-icon"></i>
+                <h3 class="addon-title">Certificate Soft Copy</h3>
+                <p class="addon-desc">Downloadable digital certificate with DOI QR verification.</p>
+                <a href="#" class="btn-addon">Add Certificate</a>
+            </div>
+
+            <div class="addon-card gs-reveal">
+                <div class="addon-highlight">🚚 Speed Post Included</div>
+                <i class="fa-solid fa-award addon-icon"></i>
+                <h3 class="addon-title">Certificate Hard Copy</h3>
+                <p class="addon-desc">Printed premium certificate delivered to your address.</p>
+                <a href="#" class="btn-addon">Add Hard Copy</a>
+            </div>
+
+            <div class="addon-card gs-reveal">
+                <div class="addon-highlight">🔥 High Visibility</div>
+                <i class="fa-solid fa-star addon-icon"></i>
+                <h3 class="addon-title">Featured Paper</h3>
+                <p class="addon-desc">Promote your article on the homepage for maximum visibility and readership.</p>
+                <a href="#" class="btn-addon">Add Promotion</a>
+            </div>
+
+            <div class="addon-card gs-reveal">
+                <div class="addon-highlight">📦 Printed & Bound Edition</div>
+                <i class="fa-solid fa-book addon-icon"></i>
+                <h3 class="addon-title">Paper Hard Copy</h3>
+                <p class="addon-desc">Receive a professionally printed journal issue containing your published paper.
+                </p>
+                <a href="#" class="btn-addon">Add Book Copy</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRUST SECTION -->
+    <section class="trust-section gs-reveal-up">
+        <h2>Why Researchers Choose ScriptHive</h2>
+        <div class="trust-grid">
+            <div class="trust-item"><i class="fa-solid fa-circle-check"></i> Transparent pricing</div>
+            <div class="trust-item"><i class="fa-solid fa-lock"></i> Secure submission system</div>
+            <div class="trust-item"><i class="fa-solid fa-globe"></i> International editorial support</div>
+            <div class="trust-item"><i class="fa-solid fa-link"></i> DOI-enabled publishing</div>
+            <div class="trust-item"><i class="fa-solid fa-bolt"></i> Fast communication</div>
+            <div class="trust-item"><i class="fa-solid fa-shield-halved"></i> Academic integrity checks</div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA SECTION -->
+    <section class="final-cta">
+        <div class="final-cta-content gs-reveal-up">
+            <h2>Ready to Publish Your Research?</h2>
+            <p>Join thousands of researchers publishing with ScriptHive journals.</p>
+            <div class="cta-buttons">
+                <a href="/submit" class="btn-white">Submit Paper</a>
+                <a href="/journals" class="btn-outline-white">Explore Journals</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // GSAP Animations
+        document.addEventListener("DOMContentLoaded", (event) => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Reveal animations
+            gsap.utils.toArray('.gs-reveal').forEach(function (elem) {
+                gsap.from(elem, {
+                    scrollTrigger: { trigger: elem, start: "top 85%" },
+                    y: 50, opacity: 0, duration: 1, ease: "power3.out"
+                });
+            });
+
+            gsap.utils.toArray('.gs-reveal-up').forEach(function (elem) {
+                gsap.from(elem, {
+                    scrollTrigger: { trigger: elem, start: "top 85%" },
+                    y: 30, opacity: 0, duration: 0.8, ease: "power2.out"
+                });
+            });
+
+            // Counters animation
+            const counters = document.querySelectorAll('.counter-val');
+            counters.forEach(counter => {
+                gsap.to(counter, {
+                    scrollTrigger: { trigger: counter, start: "top 90%" },
+                    innerHTML: counter.getAttribute('data-target'),
+                    duration: 2,
+                    snap: { innerHTML: 1 },
+                    onUpdate: function () {
+                        let val = Math.round(this.targets()[0].innerHTML);
+                        if (counter.getAttribute('data-target') == 10000) {
+                            counter.innerHTML = val.toLocaleString('en-IN') + "+";
+                        } else if (counter.getAttribute('data-target') == 99) {
+                            counter.innerHTML = val + "%";
+                        } else if (counter.getAttribute('data-target') == 24) {
+                            counter.innerHTML = val + "/7";
+                        } else {
+                            counter.innerHTML = val + "+";
+                        }
+                    }
+                });
+            });
+
+            // Toggle logic
+            const toggle = document.getElementById('pricingToggle');
+            const prices = document.querySelectorAll('.price-val');
+            const lblMonthly = document.getElementById('label-yearly');
+            const lblYearly = document.getElementById('label-monthly');
+
+            toggle.addEventListener('change', (e) => {
+                const isMonthly = e.target.checked;
+
+                if (isMonthly) {
+                    lblMonthly.classList.add('active');
+                    lblYearly.classList.remove('active');
+                } else {
+                    lblYearly.classList.add('active');
+                    lblMonthly.classList.remove('active');
+                }
+
+                prices.forEach(price => {
+                    gsap.to(price, {
+                        opacity: 0,
+                        y: -10,
+                        duration: 0.2,
+                        onComplete: () => {
+                            price.innerText = isMonthly ? price.getAttribute('data-monthly') : price.getAttribute('data-yearly');
+                            let val = parseInt(price.innerText.replace(/,/g, ''));
+                            if (val > 0) price.innerText = val.toLocaleString('en-IN');
+                            gsap.to(price, { opacity: 1, y: 0, duration: 0.2 });
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+    <%- include('../partials/footer') %>

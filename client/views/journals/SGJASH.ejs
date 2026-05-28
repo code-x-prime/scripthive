@@ -1,0 +1,2641 @@
+﻿<%- include('../partials/header') %>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --navy: #0f172a;
+      --gold: #fbbf24;
+      --gold-light: #fef08a;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.5);
+      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+      --brand-shield: #10b981;
+      --brand-danger: #ef4444;
+    }
+
+    .journal-page {
+      font-family: 'Inter', sans-serif;
+      color: var(--text-dark);
+      background-color: var(--bg-light);
+      position: relative;
+      overflow-x: hidden;
+      padding-bottom: 80px;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Buttons */
+    .j-btn {
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .j-btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+    }
+
+    .j-btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3);
+      color: white;
+    }
+
+    .j-btn-white {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .j-btn-white:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      color: var(--primary);
+    }
+
+    .j-btn-outline {
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .j-btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: white;
+      color: white;
+    }
+
+    .j-btn-outline-dark {
+      background: white;
+      border: 1px solid #cbd5e1;
+      color: var(--text-dark);
+    }
+
+    .j-btn-outline-dark:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--bg-light);
+    }
+
+    /* HERO SECTION */
+    .j-hero {
+      background: var(--navy);
+      color: white;
+      padding: 160px 0 120px;
+      position: relative;
+      overflow: hidden;
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-mesh {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      background: radial-gradient(circle at 10% 40%, rgba(37, 99, 235, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 90% 80%, rgba(251, 191, 36, 0.15) 0%, transparent 60%);
+      animation: pulseMesh 10s infinite alternate;
+    }
+
+    @keyframes pulseMesh {
+      0% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .j-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      background: linear-gradient(to right, #fff, #cbd5e1);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-abbr {
+      font-size: 2rem;
+      color: var(--gold-light);
+      font-weight: 700;
+      margin-bottom: 24px;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .hero-issn {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+      font-family: monospace;
+      font-size: 1.1rem;
+      color: #94a3b8;
+    }
+
+    .hero-issn span {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hero-tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+      align-items: center;
+    }
+
+    .hero-tag {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    /* Hero Visual right side */
+    .hero-visual {
+      position: relative;
+      height: 500px;
+      perspective: 1000px;
+    }
+
+    .floating-cover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotateY(-15deg);
+      width: 320px;
+      height: 420px;
+      border-radius: 8px;
+      box-shadow: -20px 20px 50px rgba(0, 0, 0, 0.5), inset 2px 0 10px rgba(255, 255, 255, 0.2);
+      border-left: 6px solid #fff;
+      overflow: hidden;
+      animation: floatBook 6s infinite alternate ease-in-out;
+      z-index: 2;
+    }
+
+    .floating-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      border-radius: 2px;
+    }
+
+    .float-badge {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+      color: white;
+      font-weight: 600;
+      z-index: 3;
+    }
+
+    .fb-1 {
+      top: 40px;
+      right: 0;
+      animation: floatObj 5s infinite alternate ease-in-out;
+    }
+
+    .fb-2 {
+      bottom: 60px;
+      left: -20px;
+      animation: floatObj 7s infinite alternate-reverse ease-in-out;
+      border-color: var(--brand-shield);
+    }
+
+    .fb-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    @keyframes floatBook {
+      0% {
+        transform: translate(-50%, -50%) rotateY(-15deg) translateY(0);
+      }
+
+      100% {
+        transform: translate(-50%, -50%) rotateY(-15deg) translateY(-20px);
+      }
+    }
+
+    @keyframes floatObj {
+      0% {
+        transform: translateY(0);
+      }
+
+      100% {
+        transform: translateY(-15px);
+      }
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+      margin-top: -50px;
+      position: relative;
+      z-index: 10;
+      margin-bottom: 60px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .stat-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: var(--glass-shadow);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: 0 15px 30px rgba(37, 99, 235, 0.1);
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      background: rgba(37, 99, 235, 0.1);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .stat-info h4 {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .stat-info p {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    /* STICKY NAV */
+    .j-nav {
+      position: sticky;
+      top: 80px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 2px 8px rgba(44, 95, 138, 0.08);
+      padding: 0;
+      margin-bottom: 60px;
+      transition: box-shadow 0.35s ease, border-bottom-color 0.35s ease;
+    }
+
+    /* Frozen / fully-sticky state */
+    .j-nav.is-stuck {
+      box-shadow: 0 6px 32px rgba(37, 99, 235, 0.18), 0 2px 10px rgba(0, 0, 0, 0.1);
+      border-bottom-color: rgba(37, 99, 235, 0.2);
+    }
+
+    .j-nav-list {
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .j-nav-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .j-nav-list li {
+      flex-shrink: 0;
+    }
+
+    .j-nav-list a {
+      display: block;
+      padding: 16px 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: 0.15s ease;
+    }
+
+    .j-nav-list a:hover {
+      color: var(--primary);
+      background: var(--bg-light);
+    }
+
+    .j-nav-list a.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      font-weight: 600;
+      background: rgba(37, 99, 235, 0.04);
+    }
+
+    /* MAIN CONTENT SPLIT */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 40px;
+      margin-bottom: 100px;
+    }
+
+    .main-col {
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+    }
+
+    /* Content Sections */
+    .c-section h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .c-section h2 i {
+      color: var(--primary);
+      font-size: 1.6rem;
+    }
+
+    .c-box {
+      background: white;
+      border-radius: 24px;
+      padding: 40px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .c-box::before {
+      content: '\f5d2';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      right: -20px;
+      bottom: -20px;
+      font-size: 12rem;
+      color: rgba(0, 0, 0, 0.02);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .c-box p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .c-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.1));
+      border-left: 4px solid var(--primary);
+      padding: 20px 24px;
+      border-radius: 0 12px 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .highlight-box i {
+      font-size: 1.8rem;
+      color: var(--primary);
+    }
+
+    .highlight-box p {
+      margin: 0 !important;
+      color: var(--text-dark);
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    /* Aim & Scope Grid */
+    .scope-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-top: 30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .scope-card {
+      background: var(--bg-light);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transition: 0.3s;
+    }
+
+    .scope-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .scope-card i {
+      font-size: 1.5rem;
+      color: var(--gold);
+    }
+
+    .scope-card span {
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    /* Editorial Board preview */
+    .editor-preview {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: var(--bg-light);
+      padding: 20px;
+      border-radius: 16px;
+      margin-top: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .editor-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+    }
+
+    .editor-info h4 {
+      font-size: 1.2rem;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+
+    .editor-info p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* RIGHT SIDEBAR */
+    .sidebar-box {
+      background: white;
+      border-radius: 24px;
+      padding: 32px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.04);
+      position: sticky;
+      top: 100px;
+    }
+
+    .sb-header {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+    }
+
+    .sb-header h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .sb-header p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .sb-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .sb-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+
+    .sb-item-label {
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sb-item-label i {
+      color: var(--primary);
+      width: 16px;
+      text-align: center;
+    }
+
+    .sb-item-val {
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .sb-item-val.green {
+      color: var(--brand-shield);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 2px 10px;
+      border-radius: 12px;
+    }
+
+    .sb-badges {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .sb-badge {
+      background: var(--bg-light);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 12px 10px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .sb-badge i {
+      font-size: 1.4rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .sb-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sb-actions .j-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* TRUST SECTION */
+    .trust-section {
+      margin-bottom: 100px;
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 20px;
+    }
+
+    .trust-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px 16px;
+      text-align: center;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+      transition: 0.3s;
+    }
+
+    .trust-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--gold);
+      box-shadow: 0 10px 20px rgba(251, 191, 36, 0.1);
+    }
+
+    .trust-card i {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .trust-card h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    /* FINAL CTA */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border-radius: 32px;
+      padding: 80px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(37, 99, 235, 0.2);
+      margin-bottom: 100px;
+      color: white;
+    }
+
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://www.transparenttextures.com/patterns/cubes.png');
+      opacity: 0.1;
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .cta-content h2 {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .cta-content p {
+      font-size: 1.2rem;
+      color: #e2e8f0;
+      max-width: 700px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .hero-visual {
+        display: none;
+      }
+
+      .hero-tags,
+      .hero-issn {
+        justify-content: center;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar-box {
+        position: static;
+        margin-top: 40px;
+      }
+
+      .trust-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.8rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .scope-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .trust-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .cta-content h2 {
+        font-size: 2.2rem;
+      }
+
+      .sb-badges {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ==========================================
+       APPLY FOR EDITORIAL BOARD PREMIUM UI
+       ========================================== */
+
+    /* Headings Flex wrapper */
+    .editorial-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 24px;
+    }
+
+    /* Premium Apply Button CTA */
+    .btn-apply-board {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+      color: #ffffff;
+      padding: 12px 26px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 12px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2), 
+                  0 0 0 1px rgba(251, 191, 36, 0.15) inset;
+      z-index: 1;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .btn-apply-board i {
+      transition: transform 0.3s ease;
+    }
+
+    .btn-apply-board::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(251, 191, 36, 0.3) 0%, transparent 70%);
+      opacity: 0;
+      z-index: -1;
+      transition: opacity 0.4s ease;
+    }
+
+    .btn-apply-board::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -150%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.25), 
+        transparent
+      );
+      transform: skewX(-20deg);
+      transition: none;
+    }
+
+    .btn-apply-board:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4), 
+                  0 0 20px rgba(251, 191, 36, 0.3),
+                  0 0 0 1.5px rgba(251, 191, 36, 0.4) inset;
+      color: #ffffff;
+    }
+
+    .btn-apply-board:hover::before {
+      opacity: 1;
+    }
+
+    .btn-apply-board:hover::after {
+      left: 150%;
+      transition: all 0.8s ease-in-out;
+    }
+
+    .btn-apply-board:hover i {
+      transform: rotate(15deg) scale(1.1);
+    }
+
+    .btn-apply-board:active {
+      transform: translateY(-1px) scale(0.98);
+      box-shadow: 0 6px 15px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Secondary inline CTA */
+    .btn-apply-board-inline {
+      background: linear-gradient(135deg, var(--bg-light) 0%, rgba(37, 99, 235, 0.05) 100%);
+      color: var(--primary);
+      border: 1.5px dashed rgba(37, 99, 235, 0.4);
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .btn-apply-board-inline:hover {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      border-color: transparent;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+    }
+
+    /* Modal Styling */
+    .glass-modal-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1050;
+      overflow-x: hidden;
+      overflow-y: auto;
+      outline: 0;
+      perspective: 1200px;
+    }
+
+    .glass-modal-container.show {
+      display: block;
+    }
+
+    /* Custom Backdrop Overrides */
+    .glass-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(15px);
+      z-index: 1040;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    .glass-backdrop.show {
+      opacity: 1;
+    }
+
+    .glass-modal-dialog {
+      position: relative;
+      width: auto;
+      margin: 1.75rem auto;
+      pointer-events: none;
+      max-width: 800px;
+      z-index: 1050;
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .glass-modal-container.show .glass-modal-dialog {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+
+    /* Beautiful Dark Glassmorphic Card */
+    .glass-modal-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      pointer-events: auto;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      outline: 0;
+      color: #f8fafc;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 
+                  0 0 50px rgba(37, 99, 235, 0.15), 
+                  0 0 30px rgba(251, 191, 36, 0.05) inset;
+      overflow: hidden;
+    }
+
+    /* Interactive Mouse Follow Glow Inside Modal */
+    .modal-glow-point {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(251, 191, 36, 0.04) 50%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      transform: translate(-50%, -50%);
+      left: -500px;
+      top: -500px;
+      transition: width 0.3s, height 0.3s;
+    }
+
+    /* Particle Background Behind Form */
+    #modal-particles-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.45;
+    }
+
+    .glass-modal-content > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Modal Close Button */
+    .btn-glass-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .btn-glass-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #ffffff;
+      transform: rotate(90deg);
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Modal Header Details */
+    .glass-modal-header {
+      padding: 40px 40px 10px 40px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .modal-title-brand {
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 900;
+      margin: 0 0 12px 0;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      background: linear-gradient(135deg, #ffffff 30%, #3b82f6 70%, #2563eb 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .modal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .glass-modal-header h3 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      margin: 0 0 10px 0;
+      color: #ffffff;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .glass-modal-header p {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      max-width: 600px;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Modal Body Content */
+    .glass-modal-body {
+      padding: 20px 40px 40px 40px;
+    }
+
+    /* Input Styling system */
+    .eb-form-section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-top: 10px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .glass-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+      margin-bottom: 30px;
+    }
+
+    .glass-form-group {
+      position: relative;
+    }
+
+    .glass-form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .glass-input-icon {
+      position: absolute;
+      left: 18px;
+      top: 17px;
+      color: #64748b;
+      font-size: 1.05rem;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .glass-input {
+      width: 100%;
+      padding: 15px 20px 15px 48px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      color: #f8fafc;
+      outline: none;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: inherit;
+    }
+
+    .glass-input::placeholder {
+      color: transparent;
+    }
+
+    .glass-label {
+      position: absolute;
+      left: 48px;
+      top: 15px;
+      color: #64748b;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+      font-weight: 500;
+      background: transparent;
+    }
+
+    /* Floating label animations */
+    .glass-input:focus ~ .glass-label,
+    .glass-input:not(:placeholder-shown) ~ .glass-label {
+      top: -10px;
+      left: 15px;
+      font-size: 0.8rem;
+      background: #0f172a;
+      padding: 0 8px;
+      color: #fbbf24;
+      font-weight: 700;
+      border-radius: 4px;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .glass-input:focus {
+      border-color: #2563eb;
+      background: rgba(37, 99, 235, 0.05);
+      box-shadow: 0 0 16px rgba(37, 99, 235, 0.25),
+                  0 0 0 1px #2563eb;
+    }
+
+    .glass-input:focus ~ .glass-input-icon {
+      color: #2563eb;
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    /* Upload Styling System */
+    .upload-container {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 24px;
+      margin-bottom: 35px;
+    }
+
+    /* Resume Dropzone */
+    .glass-dropzone {
+      background: rgba(255, 255, 255, 0.02);
+      border: 2px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.35s ease;
+    }
+
+    .glass-dropzone:hover,
+    .glass-dropzone.dragover {
+      border-color: #fbbf24;
+      background: rgba(251, 191, 36, 0.04);
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.1);
+    }
+
+    .glass-dropzone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .dropzone-icon {
+      font-size: 2.2rem;
+      color: #3b82f6;
+      margin-bottom: 12px;
+      transition: transform 0.3s ease;
+    }
+
+    .glass-dropzone:hover .dropzone-icon {
+      transform: translateY(-5px) scale(1.05);
+      color: #fbbf24;
+    }
+
+    .glass-dropzone h5 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin: 0 0 6px 0;
+    }
+
+    .glass-dropzone p {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin: 0;
+    }
+
+    .uploaded-file-details {
+      margin-top: 12px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      color: #10b981;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    /* Photo Upload System */
+    .photo-upload-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1.5px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .photo-preview-wrapper {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .photo-preview-wrapper i {
+      font-size: 2.2rem;
+      color: #475569;
+      transition: color 0.3s ease;
+    }
+
+    .photo-preview-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .photo-upload-box:hover .photo-preview-wrapper {
+      border-color: #3b82f6;
+      box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+    }
+
+    .photo-upload-box:hover .photo-preview-wrapper i {
+      color: #3b82f6;
+    }
+
+    .btn-photo-select {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .btn-photo-select input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .btn-photo-select:hover {
+      background: #3b82f6;
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Submit CTA & Actions */
+    .glass-form-actions {
+      border-top: 1.5px solid rgba(255, 255, 255, 0.05);
+      padding-top: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .btn-submit-app {
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      color: white;
+      border: none;
+      width: 100%;
+      max-width: 380px;
+      padding: 16px 30px;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+      position: relative;
+      overflow: hidden;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .btn-submit-app::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -150%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: skewX(-20deg);
+    }
+
+    .btn-submit-app:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-submit-app:hover::after {
+      left: 150%;
+      transition: all 0.8s ease-in-out;
+    }
+
+    .btn-submit-app:active {
+      transform: translateY(0);
+    }
+
+    /* Trust Elements */
+    .modal-trust-badges {
+      display: flex;
+      justify-content: center;
+      gap: 16px 20px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .modal-trust-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1.5px solid rgba(255, 255, 255, 0.05);
+      padding: 6px 12px;
+      border-radius: 30px;
+    }
+
+    .modal-trust-badge i {
+      color: #10b981;
+    }
+
+    /* Success Overlay Screens */
+    .modal-status-screen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.95) 100%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .modal-status-screen.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Satisfying Animated Checkmark */
+    .success-checkmark-wrapper {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.1);
+      border: 2px solid rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+    }
+
+    .success-checkmark-wrapper i {
+      font-size: 2.8rem;
+      color: #10b981;
+      transform: scale(0);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s;
+    }
+
+    .modal-status-screen.show .success-checkmark-wrapper i {
+      transform: scale(1);
+    }
+
+    .success-badge {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #10b981;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    .modal-status-screen h3 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: white;
+      margin: 0 0 12px 0;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .modal-status-screen p {
+      font-size: 1rem;
+      color: #cbd5e1;
+      max-width: 500px;
+      margin: 0 0 30px 0;
+      line-height: 1.6;
+    }
+
+    .modal-ref-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 0.95rem;
+      font-family: monospace;
+      color: #fbbf24;
+      margin-bottom: 30px;
+    }
+
+    .modal-ref-box span {
+      color: #94a3b8;
+    }
+
+    .btn-status-done {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      padding: 12px 30px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-status-done:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+    }
+
+    /* Loading Spinner Animation */
+    .spinner-border-glass {
+      width: 1.3rem;
+      height: 1.3rem;
+      border: 0.18em solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spinner-border-anim .75s linear infinite;
+      display: none;
+    }
+
+    @keyframes spinner-border-anim {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Error Shake Animations */
+    @keyframes shake-anim {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .shake-error {
+      animation: shake-anim 0.5s ease-in-out;
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.25) !important;
+    }
+
+    /* Fade / slide animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive adjustments for Form UI */
+    @media (max-width: 768px) {
+      .glass-form-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+      .upload-container {
+        grid-template-columns: 1fr;
+      }
+      .glass-modal-header {
+        padding: 30px 24px 10px 24px;
+      }
+      .glass-modal-body {
+        padding: 20px 24px 30px 24px;
+      }
+      .editorial-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .btn-apply-board {
+        width: 100%;
+        justify-content: center;
+      }
+      .btn-glass-close {
+        top: 15px;
+        right: 15px;
+      }
+    }
+  </style>
+
+  <div class="journal-page">
+    <!-- HERO SECTION -->
+    <section class="j-hero" id="home">
+      <div class="hero-mesh"></div>
+      <div class="container hero-grid gs-reveal">
+        <div class="hero-text">
+          <div class="j-badge"><i class="fa-solid fa-star"></i> ScriptHive Journal</div>
+          <h1 class="hero-title">ScriptHive Global Journal of Applied Science and Health</h1>
+          <div class="hero-abbr">(SGJASH)</div>
+          <div class="hero-issn">
+            <span>ISSN: XXXX-XXXX (Print)</span>
+            <span>ISSN: XXXX-XXXX (Online)</span>
+          </div>
+          <div class="hero-tags">
+            <div class="hero-tag"><i class="fa-solid fa-microscope" style="color:var(--brand-shield);"></i> Peer-Reviewed</div>
+            <div class="hero-tag"><i class="fa-solid fa-lock-open" style="color:var(--gold);"></i> Open Access</div>
+            <div class="hero-tag"><i class="fa-regular fa-calendar-check" style="color:#8b5cf6;"></i> Quarterly</div>
+            <div class="hero-tag"><i class="fa-solid fa-globe" style="color:#3b82f6;"></i> International</div>
+          </div>
+          <div style="display:flex; gap:16px; flex-wrap:wrap;">
+            <a href="/submit?journal=SGJASH" class="j-btn j-btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Paper</a>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="floating-cover">
+            <img src="/images/SGJASH Cover Page.png" alt="SGJASH Cover Page" loading="eager">
+          </div>
+          <div class="float-badge fb-1">
+            <div class="fb-icon" style="color:var(--primary);"><i class="fa-solid fa-fingerprint"></i></div>
+            <div>DOI<br><span style="font-size:0.75rem;font-weight:400;color:rgba(255,255,255,0.7);">Supported</span></div>
+          </div>
+          <div class="float-badge fb-2">
+            <div class="fb-icon" style="color:var(--brand-shield);"><i class="fa-solid fa-certificate"></i></div>
+            <div>ISSN<br><span style="font-size:0.75rem;font-weight:400;color:rgba(255,255,255,0.7);">Verified</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK STATS -->
+    <div class="container">
+      <div class="stats-bar gs-reveal-up">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-regular fa-calendar-days"></i></div>
+            <div class="stat-info">
+              <h4>Frequency</h4>
+              <p>Quarterly</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="color:var(--gold); background:rgba(251,191,36,0.1);"><i class="fa-solid fa-bolt"></i></div>
+            <div class="stat-info">
+              <h4>Review Time</h4>
+              <p>7-15 Days</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="color:var(--brand-shield); background:rgba(16,185,129,0.1);"><i class="fa-solid fa-lock-open"></i></div>
+            <div class="stat-info">
+              <h4>Access</h4>
+              <p>Open Access</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="color:#8b5cf6; background:rgba(139,92,246,0.1);"><i class="fa-solid fa-barcode"></i></div>
+            <div class="stat-info">
+              <h4>ISSN</h4>
+              <p>Print & Online</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STICKY NAV -->
+    <nav class="j-nav gs-reveal-up">
+      <div class="container">
+        <ul class="j-nav-list">
+          <li><a href="#about" class="active">About</a></li>
+          <li><a href="#scope">Aim & Scope</a></li>
+          <li><a href="#editorial">Editorial Board</a></li>
+          <li><a href="/guidelines">Author Guidelines</a></li>
+          <li><a href="#ethics">Publication Ethics</a></li>
+          <li><a href="#archives">Archives</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- MAIN GRID CONTAINER -->
+    <div class="container">
+      <div class="content-grid">
+        <!-- MAIN COLUMN -->
+        <div class="main-col">
+          <!-- About Section -->
+          <section id="about" class="c-section gs-reveal-up">
+            <h2><i class="fa-solid fa-circle-info"></i> About The Journal</h2>
+            <div class="c-box">
+              <p>The <strong>ScriptHive Global Journal of Applied Science and Health (SGJASH)</strong> is a peer-reviewed, open-access international journal dedicated to publishing clinical, experimental, and practical research across all branches of applied science, nursing, public health, pharmacy, and healthcare systems. The journal serves as a high-quality global registry for scientists, clinicians, healthcare practitioners, and academics to share original research and technical reviews.</p>
+              <p>SGJASH values research that has direct practical implications for health policy, nursing care, pharmaceutical development, or public safety. By removing all paywalls, the journal ensures that critical medical and healthcare breakthroughs are immediately available to health institutions and clinical settings worldwide.</p>
+              <p>Our global review committee and board of editors ensure strict adherence to research integrity, patient privacy, and clinical guidelines. A double-blind review process ensures objective validation of all manuscripts.</p>
+              <div class="highlight-box">
+                <i class="fa-solid fa-shield-check"></i>
+                <p>Double-Blind Peer Review + 100% Open Access Publishing</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Aim & Scope -->
+          <section id="scope" class="c-section gs-reveal-up">
+            <h2><i class="fa-solid fa-bullseye"></i> Aim & Scope</h2>
+            <div class="c-box">
+              <p>SGJASH aims to bridge the gap between scientific theories and clinical or health applications by publishing original, peer-reviewed research that guides clinical workflows, healthcare policy, and drug delivery optimization.</p>
+              
+              <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--text-dark); margin-top: 30px; margin-bottom: 20px;">Subject Areas Include:</h3>
+              <div class="scope-grid">
+                <div class="scope-card"><i class="fa-solid fa-house-medical"></i> <span>Public Health & Epidem.</span></div>
+                <div class="scope-card"><i class="fa-solid fa-user-nurse"></i> <span>Nursing & Allied Health</span></div>
+                <div class="scope-card"><i class="fa-solid fa-pills"></i> <span>Pharmacology & Pharmacy</span></div>
+                <div class="scope-card"><i class="fa-solid fa-helmet-safety"></i> <span>Env. Health & Occ. Safety</span></div>
+                <div class="scope-card"><i class="fa-solid fa-apple-whole"></i> <span>Nutrition & Food Science</span></div>
+                <div class="scope-card"><i class="fa-solid fa-hospital"></i> <span>Clinical Medicine</span></div>
+                <div class="scope-card"><i class="fa-solid fa-file-invoice-dollar"></i> <span>Health Policy & Econ.</span></div>
+                <div class="scope-card"><i class="fa-solid fa-heart-pulse"></i> <span>Biomedical & Med Tech</span></div>
+                <div class="scope-card"><i class="fa-solid fa-microscope"></i> <span>Microbiology & Toxicol.</span></div>
+                <div class="scope-card"><i class="fa-solid fa-person-running"></i> <span>Sports Science & Therapy</span></div>
+                <div class="scope-card"><i class="fa-solid fa-brain"></i> <span>Mental Health Nursing</span></div>
+                <div class="scope-card"><i class="fa-solid fa-laptop-medical"></i> <span>Health Informatics</span></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Editorial Board -->
+          <section id="editorial" class="c-section gs-reveal-up">
+            <div class="editorial-header">
+              <h2 style="margin:0;"><i class="fa-solid fa-users"></i> Editorial Board</h2>
+              <button class="btn-apply-board" data-bs-toggle="modal" data-bs-target="#applyBoardModal">
+                <i class="fa-solid fa-users-gear"></i> Editorial Board Registration
+              </button>
+            </div>
+            <div class="c-box">
+              <p>Our journal is guided by an esteemed international editorial board comprised of experts and scholars from leading academic institutions worldwide.</p>
+              
+              <div class="editor-preview">
+                <div class="editor-img"><i class="fa-solid fa-user-tie"></i></div>
+                <div class="editor-info">
+                  <h4>Editor-in-Chief</h4>
+                  <p><strong>To be announced</strong><br>Professor / Domain Expert<br>[ScriptHive International Board]</p>
+                </div>
+              </div>
+
+              <div class="editor-preview" style="margin-top: 16px;">
+                <div class="editor-img" style="background:#475569;"><i class="fa-solid fa-user-gear"></i></div>
+                <div class="editor-info">
+                  <h4>Managing Editor</h4>
+                  <p><strong>Managing Editor</strong><br>ScriptHive Publication<br>Academic &amp; Operations Team</p>
+                </div>
+              </div>
+
+              <div style="margin-top: 24px; padding: 18px; border-radius: 12px; background: var(--bg-light); border: 1px dashed rgba(37, 99, 235, 0.25); text-align: center;">
+                <p style="font-size: 0.95rem; margin: 0 0 12px 0;">Are you an experienced researcher or academician interested in joining our review or editorial board?</p>
+                <button class="btn-apply-board-inline" data-bs-toggle="modal" data-bs-target="#applyBoardModal">
+                  <i class="fa-solid fa-user-plus"></i> Apply to Join Editorial Board
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- EDITORIAL BOARD APPLICATION MODAL -->
+          <div class="glass-modal-container" id="applyBoardModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="glass-backdrop" id="modalBackdrop"></div>
+            <div class="glass-modal-dialog" role="document">
+              <div class="glass-modal-content">
+                <div class="modal-glow-point" id="modalGlowPoint"></div>
+                <canvas id="modal-particles-canvas"></canvas>
+                <button type="button" class="btn-glass-close" id="btnCloseModal" aria-label="Close">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <!-- HEADER -->
+                <div class="glass-modal-header">
+                  <div class="modal-badge"><i class="fa-solid fa-feather-pointed"></i> Join ScriptHive Academic Network</div>
+                  <h2 class="modal-title-brand">Editorial Board Application</h2>
+                  <h3>Academic Credentials Registry</h3>
+                  <p>Submit your academic profile, CV, and professional photo to join the double-blind peer-review board of our international journal index.</p>
+                </div>
+
+                <!-- BODY -->
+                <div class="glass-modal-body">
+                  <form id="editorialApplyForm" enctype="multipart/form-data">
+                    <input type="hidden" name="journalName" id="ebJournalName" value="ScriptHive Global Journal of Applied Science and Health (SGJASH)">
+                    
+                    <div class="eb-form-section-title">
+                      <i class="fa-solid fa-user"></i>
+                      <span>1. Personal & Academic Profile</span>
+                    </div>
+                    
+                    <div class="glass-form-grid">
+                      <div class="glass-form-group">
+                        <i class="fa-solid fa-user-tie glass-input-icon"></i>
+                        <input type="text" class="glass-input" id="ebFullName" name="fullName" placeholder="Full Name (with Title)" required>
+                        <label for="ebFullName" class="glass-label">Full Name (with Title) *</label>
+                      </div>
+                      
+                      <div class="glass-form-group">
+                        <i class="fa-solid fa-envelope glass-input-icon"></i>
+                        <input type="email" class="glass-input" id="ebEmail" name="email" placeholder="Academic Email Address" required>
+                        <label for="ebEmail" class="glass-label">Academic Email Address *</label>
+                      </div>
+                      
+                      <div class="glass-form-group">
+                        <i class="fa-solid fa-phone glass-input-icon"></i>
+                        <input type="tel" class="glass-input" id="ebPhoneNum" name="phone" placeholder="Phone Number (with Code)" required>
+                        <label for="ebPhoneNum" class="glass-label">Phone Number (with Code) *</label>
+                      </div>
+                      
+                      <div class="glass-form-group">
+                        <i class="fa-solid fa-building-columns glass-input-icon"></i>
+                        <input type="text" class="glass-input" id="ebInstitution" name="institution" placeholder="University / Institution" required>
+                        <label for="ebInstitution" class="glass-label">University / Institution *</label>
+                      </div>
+                      
+                      <div class="glass-form-group">
+                        <i class="fa-solid fa-graduation-cap glass-input-icon"></i>
+                        <input type="text" class="glass-input" id="ebDesignation" name="designation" placeholder="Designation / Academic Rank" required>
+                        <label for="ebDesignation" class="glass-label">Designation / Academic Rank *</label>
+                      </div>
+                      
+                      <div class="glass-form-group">
+                        <i class="fa-solid fa-flask glass-input-icon"></i>
+                        <input type="text" class="glass-input" id="ebSpecialization" name="specialization" placeholder="Area of Specialization" required>
+                        <label for="ebSpecialization" class="glass-label">Area of Specialization *</label>
+                      </div>
+                      
+                      <div class="glass-form-group full-width">
+                        <i class="fa-solid fa-magnifying-glass glass-input-icon"></i>
+                        <input type="text" class="glass-input" id="ebResearchKeywords" name="researchKeywords" placeholder="Research Keywords (comma separated)" required>
+                        <label for="ebResearchKeywords" class="glass-label">Research Keywords (comma separated) *</label>
+                      </div>
+                    </div>
+                    
+                    <div class="eb-form-section-title">
+                      <i class="fa-solid fa-cloud-arrow-up"></i>
+                      <span>2. Academic Documents Registry</span>
+                    </div>
+                    
+                    <div class="upload-container">
+                      <div class="glass-dropzone" id="resumeDropzone">
+                        <div class="dropzone-icon"><i class="fa-solid fa-file-pdf"></i></div>
+                        <h5>Upload CV / Resume *</h5>
+                        <p>Drag and drop or click to browse</p>
+                        <p style="font-size:0.7rem; color:#64748b; margin-top:2px;">PDF, DOC, DOCX — Max 10MB</p>
+                        <input type="file" id="ebResume" name="resume" accept=".pdf,.doc,.docx" required>
+                        
+                        <div class="uploaded-file-details" id="resumeFileDetails">
+                          <i class="fa-solid fa-circle-check"></i>
+                          <span id="resumeFileName">Selected File</span>
+                        </div>
+                      </div>
+                      
+                      <div class="photo-upload-box">
+                        <div class="photo-preview-wrapper" id="photoPreviewWrapper">
+                          <i class="fa-solid fa-camera"></i>
+                          <img src="" alt="Candidate Photo" class="photo-preview-image" id="photoPreviewImage">
+                        </div>
+                        <button type="button" class="btn-photo-select">
+                          <i class="fa-solid fa-image"></i> Select Photo *
+                          <input type="file" id="ebPhoto" name="photo" accept=".jpg,.jpeg,.png" required>
+                        </button>
+                        <p style="font-size:0.75rem; color:#64748b; margin:0;">PNG, JPG — Max 4MB</p>
+                      </div>
+                    </div>
+                    
+                    <div class="glass-form-actions">
+                      <button type="submit" class="btn-submit-app" id="btnSubmitApp">
+                        <span>🚀 Submit Application</span>
+                        <span class="spinner-border-glass"></span>
+                      </button>
+                      
+                      <div class="modal-trust-badges">
+                        <div class="modal-trust-badge"><i class="fa-solid fa-circle-check"></i> International Editorial Platform</div>
+                        <div class="modal-trust-badge"><i class="fa-solid fa-circle-check"></i> Peer-Reviewed Journals</div>
+                        <div class="modal-trust-badge"><i class="fa-solid fa-circle-check"></i> Academic Integrity</div>
+                        <div class="modal-trust-badge"><i class="fa-solid fa-circle-check"></i> Professional Recognition</div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                
+                <!-- SUCCESS STATUS SCREEN -->
+                <div class="modal-status-screen" id="successScreen">
+                  <div class="success-checkmark-wrapper">
+                    <i class="fa-solid fa-circle-check"></i>
+                  </div>
+                  <div class="success-badge">Application Submitted Successfully</div>
+                  <h3>Thank You, Professor!</h3>
+                  <p>Your application to join the international academic editorial network of ScriptHive Publication has been received. Our review committee will evaluate your credentials and reply within 7–10 working days.</p>
+                  <div class="modal-ref-box">
+                    <span>Reference ID:</span> <strong id="successQueryId">EBA-XXXXX</strong>
+                  </div>
+                  <button type="button" class="btn-status-done" id="btnSuccessDone">Close Window</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Publication Ethics -->
+          <section id="ethics" class="c-section gs-reveal-up">
+            <h2><i class="fa-solid fa-scale-balanced"></i> Publication Ethics</h2>
+            <div class="c-box">
+
+              <!-- Plagiarism Policy -->
+              <div style="margin-bottom: 36px; position: relative; z-index: 1;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                  <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fa-solid fa-shield-halved" style="color: #ef4444; font-size: 1.2rem;"></i>
+                  </div>
+                  <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 0;">Plagiarism Policy</h3>
+                </div>
+                <p style="margin-bottom: 10px;">All submitted manuscripts are screened for plagiarism using industry-standard detection tools. A similarity index above <strong style="color: var(--text-dark);">15%</strong> results in immediate rejection without review.</p>
+                <p style="margin-bottom: 0;">All forms of plagiarism — including self-plagiarism — are strictly prohibited and constitute grounds for permanent disqualification.</p>
+              </div>
+
+              <hr style="border: none; border-top: 1px solid rgba(0,0,0,0.06); margin-bottom: 32px;">
+
+              <!-- Peer Review -->
+              <div style="margin-bottom: 36px; position: relative; z-index: 1;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                  <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fa-solid fa-user-secret" style="color: var(--primary); font-size: 1.2rem;"></i>
+                  </div>
+                  <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 0;">Peer Review</h3>
+                </div>
+                <p style="margin-bottom: 12px;">SGJASH employs a rigorous <strong style="color: var(--text-dark);">double-blind peer review</strong> process conducted by at least two independent subject-matter experts.</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                  <span style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: #065f46; padding: 5px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Accept</span>
+                  <span style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.15); color: var(--primary); padding: 5px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-pen" style="color: var(--primary);"></i> Minor Revision</span>
+                  <span style="background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.25); color: #92400e; padding: 5px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-pen-to-square" style="color: var(--gold);"></i> Major Revision</span>
+                  <span style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.15); color: #991b1b; padding: 5px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Reject</span>
+                </div>
+              </div>
+
+              <hr style="border: none; border-top: 1px solid rgba(0,0,0,0.06); margin-bottom: 32px;">
+
+              <!-- Author Responsibilities -->
+              <div style="position: relative; z-index: 1;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                  <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fa-solid fa-user-pen" style="color: var(--brand-shield); font-size: 1.2rem;"></i>
+                  </div>
+                  <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 0;">Author Responsibilities</h3>
+                </div>
+                <p style="margin-bottom: 16px;">Authors submitting to SGJASH must adhere to the following ethical obligations:</p>
+                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                  <li style="display: flex; align-items: flex-start; gap: 12px; font-size: 1rem; color: var(--text-muted); line-height: 1.6;">
+                    <i class="fa-solid fa-circle-check" style="color: var(--brand-shield); margin-top: 3px; flex-shrink: 0;"></i>
+                    Originality and non-duplication of submission across journals.
+                  </li>
+                  <li style="display: flex; align-items: flex-start; gap: 12px; font-size: 1rem; color: var(--text-muted); line-height: 1.6;">
+                    <i class="fa-solid fa-circle-check" style="color: var(--brand-shield); margin-top: 3px; flex-shrink: 0;"></i>
+                    Accurate declaration of all contributing authors and their specific contributions.
+                  </li>
+                  <li style="display: flex; align-items: flex-start; gap: 12px; font-size: 1rem; color: var(--text-muted); line-height: 1.6;">
+                    <i class="fa-solid fa-circle-check" style="color: var(--brand-shield); margin-top: 3px; flex-shrink: 0;"></i>
+                    Full disclosure of any conflicts of interest relevant to the research.
+                  </li>
+                  <li style="display: flex; align-items: flex-start; gap: 12px; font-size: 1rem; color: var(--text-muted); line-height: 1.6;">
+                    <i class="fa-solid fa-circle-check" style="color: var(--brand-shield); margin-top: 3px; flex-shrink: 0;"></i>
+                    Declaration of all required ethical approvals for human or animal studies.
+                  </li>
+                </ul>
+              </div>
+
+              <div class="highlight-box" style="margin-top: 32px;">
+                <i class="fa-solid fa-gavel"></i>
+                <p>SGJASH strictly adheres to COPE (Committee on Publication Ethics) guidelines for all editorial decisions.</p>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- Archives Section -->
+          <section id="archives" class="c-section gs-reveal-up">
+            <h2><i class="fa-solid fa-box-archive"></i> Archives</h2>
+            <div class="c-box">
+              <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--text-dark); margin-bottom: 20px;">Volume 1 (2024–2025)</h3>
+              <div class="archives-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                <div class="archive-card" style="background: var(--bg-light); border: 1px solid rgba(0,0,0,0.05); padding: 20px; border-radius: 16px; transition: 0.3s;">
+                  <h4 style="font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 8px;">Issue 1 (Part A)</h4>
+                  <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 500;">January 2025</p>
+                  <span class="badge" style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.15); color: var(--primary); padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; display: inline-block;">Papers to be listed upon publication</span>
+                </div>
+                <div class="archive-card" style="background: var(--bg-light); border: 1px solid rgba(0,0,0,0.05); padding: 20px; border-radius: 16px; transition: 0.3s;">
+                  <h4 style="font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 8px;">Issue 2 (Part B)</h4>
+                  <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 500;">April 2025</p>
+                  <span class="badge" style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.15); color: var(--primary); padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; display: inline-block;">Papers to be listed upon publication</span>
+                </div>
+                <div class="archive-card" style="background: var(--bg-light); border: 1px solid rgba(0,0,0,0.05); padding: 20px; border-radius: 16px; transition: 0.3s;">
+                  <h4 style="font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 8px;">Issue 3 (Part C)</h4>
+                  <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 500;">July 2025</p>
+                  <span class="badge" style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.15); color: var(--primary); padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; display: inline-block;">Papers to be listed upon publication</span>
+                </div>
+                <div class="archive-card" style="background: var(--bg-light); border: 1px solid rgba(0,0,0,0.05); padding: 20px; border-radius: 16px; transition: 0.3s;">
+                  <h4 style="font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 8px;">Issue 4 (Part D)</h4>
+                  <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 500;">October 2025</p>
+                  <span class="badge" style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.15); color: var(--primary); padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; display: inline-block;">Papers to be listed upon publication</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <%- include('../partials/journal_archives_section') %>
+
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div class="sidebar-col">
+          <div class="sidebar-box gs-reveal">
+            <div class="sb-header">
+              <h3>Journal Info</h3>
+              <p>SGJASH</p>
+            </div>
+
+            <div class="sb-list">
+              <div class="sb-item">
+                <span class="sb-item-label"><i class="fa-solid fa-print"></i> ISSN (Print)</span>
+                <span class="sb-item-val">XXXX-XXXX</span>
+              </div>
+              <div class="sb-item">
+                <span class="sb-item-label"><i class="fa-solid fa-wifi"></i> ISSN (Online)</span>
+                <span class="sb-item-val">XXXX-XXXX</span>
+              </div>
+              <div class="sb-item">
+                <span class="sb-item-label"><i class="fa-solid fa-calendar-days"></i> Frequency</span>
+                <span class="sb-item-val">Quarterly</span>
+              </div>
+              <div class="sb-item">
+                <span class="sb-item-label"><i class="fa-solid fa-lock-open"></i> Access</span>
+                <span class="sb-item-val green">Open Access</span>
+              </div>
+              <div class="sb-item">
+                <span class="sb-item-label"><i class="fa-solid fa-user-secret"></i> Review</span>
+                <span class="sb-item-val">Double Blind</span>
+              </div>
+            </div>
+
+            <div class="sb-badges">
+              <div class="sb-badge"><i class="fa-solid fa-certificate" style="color:var(--brand-shield);"></i> ISSN Verified</div>
+              <div class="sb-badge"><i class="fa-solid fa-fingerprint" style="color:var(--primary);"></i> DOI Support</div>
+              <div class="sb-badge"><i class="fa-solid fa-scale-balanced" style="color:var(--gold);"></i> COPE Ethics</div>
+              <div class="sb-badge"><i class="fa-solid fa-box-archive" style="color:#8b5cf6;"></i> Archived</div>
+            </div>
+
+            <div class="sb-actions">
+              <a href="/submit?journal=SGJASH" class="j-btn j-btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Paper</a>
+              <a href="/guidelines" class="j-btn j-btn-outline-dark"><i class="fa-solid fa-scroll"></i> Author Guidelines</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRUST INDICATORS -->
+      <div class="trust-section gs-reveal-up">
+        <div class="trust-grid">
+          <div class="trust-card"><i class="fa-solid fa-receipt"></i>
+            <h4>ISSN Registered</h4>
+          </div>
+          <div class="trust-card"><i class="fa-solid fa-microscope" style="color:var(--brand-shield);"></i>
+            <h4>Peer Reviewed</h4>
+          </div>
+          <div class="trust-card"><i class="fa-solid fa-scale-balanced" style="color:var(--gold);"></i>
+            <h4>Ethical Publishing</h4>
+          </div>
+          <div class="trust-card"><i class="fa-solid fa-lock-open" style="color:#8b5cf6;"></i>
+            <h4>Open Access</h4>
+          </div>
+          <div class="trust-card"><i class="fa-solid fa-fingerprint" style="color:#ec4899;"></i>
+            <h4>DOI Supported</h4>
+          </div>
+          <div class="trust-card"><i class="fa-solid fa-calendar-check" style="color:#14b8a6;"></i>
+            <h4>Quarterly Pub.</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINAL CTA -->
+      <div class="cta-banner gs-reveal">
+        <div class="cta-content">
+          <h2>Ready to Publish Your Research?</h2>
+          <p>Submit your manuscript to SGJASH and share your applied science and health findings with the global academic community. Fast, transparent, and rigorous peer review guaranteed.</p>
+          <div class="cta-buttons">
+            <a href="/submit?journal=SGJASH" class="j-btn j-btn-white"><i class="fa-solid fa-file-arrow-up"></i> Submit Paper</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Reveal animations
+      gsap.utils.toArray('.gs-reveal').forEach(function (elem) {
+        gsap.from(elem, {
+          scrollTrigger: { trigger: elem, start: "top 85%" },
+          y: 50, opacity: 0, duration: 1, ease: "power3.out"
+        });
+      });
+
+      gsap.utils.toArray('.gs-reveal-up').forEach(function (elem) {
+        gsap.from(elem, {
+          scrollTrigger: { trigger: elem, start: "top 85%" },
+          y: 30, opacity: 0, duration: 0.8, ease: "power2.out"
+        });
+      });
+
+      // Smart Sticky Nav: Freeze → Unfreeze + Re-animate
+      (function () {
+        var jNav = document.querySelector('.j-nav');
+        if (!jNav) return;
+
+        var sentinel = document.createElement('div');
+        sentinel.setAttribute('aria-hidden', 'true');
+        sentinel.style.cssText = 'height:1px;width:100%;pointer-events:none;visibility:hidden;';
+        jNav.parentNode.insertBefore(sentinel, jNav);
+
+        var hasPassedOnce = false;
+
+        var navObserver = new IntersectionObserver(function (entries) {
+          var entry = entries[0];
+          var aboveViewport = entry.boundingClientRect.top < 0;
+
+          if (!entry.isIntersecting && aboveViewport) {
+            jNav.classList.add('is-stuck');
+            hasPassedOnce = true;
+          } else if (entry.isIntersecting && hasPassedOnce) {
+            jNav.classList.remove('is-stuck');
+            gsap.killTweensOf(jNav);
+            gsap.fromTo(jNav,
+              { y: 30, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' }
+            );
+          }
+        }, {
+          threshold: 0,
+          rootMargin: '-80px 0px 0px 0px'
+        });
+
+        navObserver.observe(sentinel);
+
+        window.addEventListener('pagehide', function () {
+          navObserver.disconnect();
+        }, { once: true });
+      })();
+
+      // Simple sticky nav highlighting
+      const sections = document.querySelectorAll('.c-section');
+      const navLinks = document.querySelectorAll('.j-nav-list a');
+
+      window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          if (pageYOffset >= sectionTop - 150) {
+            current = section.getAttribute('id');
+          }
+        });
+
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href').includes(current) && current !== '') {
+            link.classList.add('active');
+          }
+        });
+      });
+
+      // APPLY FOR EDITORIAL BOARD MODAL CONTROLLER & ANIMATIONS
+      (function() {
+        const modal = document.getElementById('applyBoardModal');
+        const backdrop = document.getElementById('modalBackdrop');
+        const dialog = modal.querySelector('.glass-modal-dialog');
+        const openButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#applyBoardModal"]');
+        const closeButton = document.getElementById('btnCloseModal');
+        const successCloseButton = document.getElementById('btnSuccessDone');
+        
+        let particleAnimationId = null;
+
+        function openModal() {
+          modal.classList.add('show');
+          backdrop.classList.add('show');
+          document.body.style.overflow = 'hidden';
+
+          gsap.fromTo(dialog, 
+            { scale: 0.82, rotateX: 12, rotateY: -5, y: 60, opacity: 0 },
+            { scale: 1, rotateX: 0, rotateY: 0, y: 0, opacity: 1, duration: 0.65, ease: "back.out(1.2)", clearProps: "transform" }
+          );
+
+          gsap.fromTo(backdrop,
+            { opacity: 0 },
+            { opacity: 1, duration: 0.4 }
+          );
+
+          startParticles();
+        }
+
+        function closeModal() {
+          gsap.to(dialog, {
+            scale: 0.85,
+            rotateX: -8,
+            y: 40,
+            opacity: 0,
+            duration: 0.35,
+            ease: "power2.in",
+            onComplete: () => {
+              modal.classList.remove('show');
+              document.body.style.overflow = '';
+              stopParticles();
+              
+              const successScreen = document.getElementById('successScreen');
+              if (successScreen.classList.contains('show')) {
+                successScreen.classList.remove('show');
+                document.getElementById('editorialApplyForm').reset();
+                
+                document.getElementById('resumeFileDetails').style.display = 'none';
+                document.getElementById('resumeDropzone').style.borderColor = '';
+                document.getElementById('photoPreviewImage').style.display = 'none';
+                document.getElementById('photoPreviewImage').src = '';
+                document.getElementById('photoPreviewWrapper').querySelector('i').style.display = 'block';
+              }
+            }
+          });
+
+          gsap.to(backdrop, {
+            opacity: 0,
+            duration: 0.3,
+            onComplete: () => {
+              backdrop.classList.remove('show');
+            }
+          });
+        }
+
+        openButtons.forEach(btn => btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          openModal();
+        }));
+
+        closeButton.addEventListener('click', closeModal);
+        successCloseButton.addEventListener('click', closeModal);
+        backdrop.addEventListener('click', closeModal);
+
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && modal.classList.contains('show')) {
+            closeModal();
+          }
+        });
+
+        const glowPoint = document.getElementById('modalGlowPoint');
+        const modalContent = modal.querySelector('.glass-modal-content');
+        
+        modalContent.addEventListener('mousemove', (e) => {
+          const rect = modalContent.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          gsap.to(glowPoint, {
+            left: x,
+            top: y,
+            duration: 0.25,
+            ease: "power1.out"
+          });
+        });
+
+        const canvas = document.getElementById('modal-particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function resizeCanvas() {
+          canvas.width = modalContent.clientWidth;
+          canvas.height = modalContent.clientHeight;
+        }
+
+        class Particle {
+          constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.radius = Math.random() * 2 + 1;
+            this.vx = (Math.random() - 0.5) * 0.4;
+            this.vy = (Math.random() - 0.5) * 0.4;
+            this.color = Math.random() > 0.6 ? 'rgba(251, 191, 36, 0.25)' : 'rgba(37, 99, 235, 0.2)';
+          }
+
+          update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+          }
+
+          draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+          }
+        }
+
+        function startParticles() {
+          resizeCanvas();
+          particles = [];
+          for (let i = 0; i < 40; i++) {
+            particles.push(new Particle());
+          }
+          animateParticles();
+        }
+
+        function stopParticles() {
+          if (particleAnimationId) {
+            cancelAnimationFrame(particleAnimationId);
+            particleAnimationId = null;
+          }
+        }
+
+        function animateParticles() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
+          particles.forEach(p => {
+            p.update();
+            p.draw();
+          });
+
+          for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+              const dx = particles[i].x - particles[j].x;
+              const dy = particles[i].y - particles[j].y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 80) {
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.05 * (1 - dist/80)})`;
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+              }
+            }
+          }
+
+          particleAnimationId = requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+          if (modal.classList.contains('show')) {
+            resizeCanvas();
+          }
+        });
+
+        const resumeDropzone = document.getElementById('resumeDropzone');
+        const resumeInput = document.getElementById('ebResume');
+        const resumeFileDetails = document.getElementById('resumeFileDetails');
+        const resumeFileName = document.getElementById('resumeFileName');
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+          resumeDropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            resumeDropzone.classList.add('dragover');
+          }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+          resumeDropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            resumeDropzone.classList.remove('dragover');
+          }, false);
+        });
+
+        resumeDropzone.addEventListener('drop', (e) => {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          if (files.length) {
+            resumeInput.files = files;
+            handleResumeSelect(files[0]);
+          }
+        });
+
+        resumeDropzone.addEventListener('click', () => {
+          resumeInput.click();
+        });
+
+        resumeInput.addEventListener('change', (e) => {
+          if (resumeInput.files.length) {
+            handleResumeSelect(resumeInput.files[0]);
+          }
+        });
+
+        function handleResumeSelect(file) {
+          const validTypes = ['.pdf', '.doc', '.docx'];
+          const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+          
+          if (!validTypes.includes(fileExtension)) {
+            shakeElement(resumeDropzone);
+            alert('Invalid file format. Please upload PDF, DOC, or DOCX only.');
+            resumeInput.value = '';
+            resumeFileDetails.style.display = 'none';
+            return;
+          }
+
+          if (file.size > 10 * 1024 * 1024) {
+            shakeElement(resumeDropzone);
+            alert('File exceeds 10MB limit.');
+            resumeInput.value = '';
+            resumeFileDetails.style.display = 'none';
+            return;
+          }
+
+          resumeFileName.textContent = `${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+          resumeFileDetails.style.display = 'flex';
+          
+          gsap.fromTo(resumeFileDetails, 
+            { scale: 0.9, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.3 }
+          );
+        }
+
+        const photoInput = document.getElementById('ebPhoto');
+        const photoPreviewImage = document.getElementById('photoPreviewImage');
+        const photoPreviewWrapper = document.getElementById('photoPreviewWrapper');
+        const cameraIcon = photoPreviewWrapper.querySelector('i');
+
+        photoInput.addEventListener('change', () => {
+          if (photoInput.files.length) {
+            const file = photoInput.files[0];
+            const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            
+            if (!validTypes.includes(file.type)) {
+              shakeElement(photoPreviewWrapper.parentElement);
+              alert('Please select a valid image file (JPG, JPEG, PNG).');
+              photoInput.value = '';
+              return;
+            }
+
+            if (file.size > 4 * 1024 * 1024) {
+              shakeElement(photoPreviewWrapper.parentElement);
+              alert('Image exceeds 4MB limit.');
+              photoInput.value = '';
+              return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              photoPreviewImage.src = e.target.result;
+              photoPreviewImage.style.display = 'block';
+              cameraIcon.style.display = 'none';
+
+              gsap.fromTo(photoPreviewImage,
+                { scale: 0.7, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.5)" }
+              );
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        function shakeElement(element) {
+          element.classList.add('shake-error');
+          setTimeout(() => element.classList.remove('shake-error'), 600);
+        }
+
+        const form = document.getElementById('editorialApplyForm');
+        const btnSubmit = document.getElementById('btnSubmitApp');
+        const btnSpinner = btnSubmit.querySelector('.spinner-border-glass');
+
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+
+          let hasErrors = false;
+
+          const requiredInputs = form.querySelectorAll('.glass-input[required]');
+          requiredInputs.forEach(input => {
+            if (!input.value.trim()) {
+              shakeElement(input);
+              hasErrors = true;
+            } else if (input.type === 'email') {
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              if (!emailRegex.test(input.value)) {
+                shakeElement(input);
+                hasErrors = true;
+              }
+            }
+          });
+
+          if (!resumeInput.files.length) {
+            shakeElement(resumeDropzone);
+            hasErrors = true;
+          }
+          if (!photoInput.files.length) {
+            shakeElement(photoPreviewWrapper.parentElement);
+            hasErrors = true;
+          }
+
+          if (hasErrors) return;
+
+          btnSubmit.setAttribute('disabled', 'true');
+          btnSpinner.style.display = 'inline-block';
+          btnSubmit.querySelector('span').textContent = 'Uploading Assets...';
+
+          const formData = new FormData(form);
+
+          fetch('/api/editorial-board/apply', {
+            method: 'POST',
+            body: formData
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === 'success') {
+              document.getElementById('successQueryId').textContent = data.application_id;
+              
+              const successScreen = document.getElementById('successScreen');
+              successScreen.classList.add('show');
+              
+              gsap.fromTo(successScreen.querySelector('.success-checkmark-wrapper'),
+                { scale: 0.3, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.5)" }
+              );
+            } else {
+              alert(data.message || 'There was an issue processing your submission. Please try again.');
+            }
+          })
+          .catch(err => {
+            console.error('AJAX Error:', err);
+            alert('A connection error occurred. Please verify your internet and try again.');
+          })
+          .finally(() => {
+            btnSubmit.removeAttribute('disabled');
+            btnSpinner.style.display = 'none';
+            btnSubmit.querySelector('span').textContent = '🚀 Submit Application';
+          });
+        });
+      })();
+    });
+  </script>
+
+<%- include('../partials/footer') %>

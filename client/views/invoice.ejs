@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice | ScriptHive Publication</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00838F;
+            --primary-dark: #006064;
+            --secondary: #00BCD4;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-dark);
+            line-height: 1.5;
+            background-color: #f1f5f9;
+            padding: 40px 20px;
+        }
+
+        .invoice-container {
+            max-width: 850px;
+            margin: 0 auto;
+            background-color: var(--white);
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative Accent */
+        .invoice-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-dark), var(--secondary));
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 50px;
+        }
+
+        .brand-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-wrapper img {
+            height: 50px;
+            width: auto;
+        }
+
+        .company-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .company-details {
+            font-size: 13px;
+            color: var(--text-muted);
+            max-width: 250px;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .invoice-meta {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        .invoice-meta span {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Billing Section */
+        .billing-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .bill-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        .bill-to h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .bill-to p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Manuscript Details Section */
+        .manuscript-details {
+            background-color: var(--bg-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .detail-item {
+            font-size: 14px;
+        }
+
+        .detail-item label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .detail-item span {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Table Section */
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+
+        .invoice-table th {
+            text-align: left;
+            background-color: var(--bg-light);
+            padding: 15px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .invoice-table td {
+            padding: 15px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .invoice-table td.qty, .invoice-table td.price, .invoice-table td.total {
+            text-align: right;
+        }
+
+        .invoice-table .item-desc {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .invoice-table .item-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 50px;
+        }
+
+        .summary-box {
+            width: 300px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .summary-row.grand-total {
+            margin-top: 10px;
+            padding: 15px 0;
+            border-top: 2px solid var(--primary);
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        /* Payment Information */
+        .payment-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .payment-methods h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .bank-details {
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text-muted);
+        }
+
+        .bank-details span {
+            color: var(--text-dark);
+            font-weight: 600;
+            display: inline-block;
+            width: 120px;
+        }
+
+        .notes {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .notes strong {
+            color: var(--text-dark);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .signature-area {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 40px;
+        }
+
+        .signature {
+            text-align: center;
+            width: 200px;
+        }
+
+        .signature .line {
+            border-top: 1px solid var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .signature p {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Action Buttons - Hide on print */
+        .actions {
+            max-width: 850px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-print {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-print:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Print Media Query */
+        @media print {
+            body {
+                background-color: var(--white);
+                padding: 0;
+            }
+            .invoice-container {
+                box-shadow: none;
+                max-width: 100%;
+                width: 100%;
+                padding: 40px;
+            }
+            .actions {
+                display: none;
+            }
+            .invoice-container::before {
+                height: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="actions">
+        <button class="btn btn-print" onclick="window.print()">Print Invoice / Save PDF</button>
+    </div>
+
+    <div class="invoice-container" id="invoice">
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-info">
+                <div class="logo-wrapper">
+                    <img src="images/only Logo.png" alt="ScriptHive Logo">
+                    <div class="company-name">ScriptHive</div>
+                </div>
+                <div class="company-details">
+                    ScriptHive Publication<br>
+                    Academic Research & Publication Services<br>
+                    Email: info@scripthive.org<br>
+                    Web: www.scripthive.org<br>
+                    Phone: +91 9899916683
+                </div>
+            </div>
+            <div class="invoice-title">
+                <h1>Invoice</h1>
+                <div class="invoice-meta">
+                    Invoice No: <span>SH-2025-0421</span><br>
+                    Date: <span>April 21, 2026</span><br>
+                    Due Date: <span>May 05, 2026</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Billing Section -->
+        <div class="billing-section">
+            <div class="bill-to">
+                <span class="bill-label">Bill To:</span>
+                <h3>Dr. John Doe</h3>
+                <p>
+                    Professor, Department of Biotechnology<br>
+                    Global Institute of Technology & Science<br>
+                    New York, USA - 10001<br>
+                    Email: john.doe@example.com
+                </p>
+            </div>
+            <div class="ship-to" style="text-align: right;">
+                <span class="bill-label">Payment Status:</span>
+                <div style="font-size: 18px; font-weight: 700; color: #dc2626;">PENDING</div>
+                <div style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">Reference: ARTICLE-SUB-7842</div>
+            </div>
+        </div>
+
+        <!-- Manuscript Details -->
+        <div class="manuscript-details">
+            <div class="detail-item">
+                <label>Journal Name</label>
+                <span>ScriptHive Global Journal of Applied Science and Health (SGJASH)</span>
+            </div>
+            <div class="detail-item">
+                <label>Article Submit No.</label>
+                <span>SGJASH-2026-AS-1042</span>
+            </div>
+            <div class="detail-item" style="grid-column: span 2;">
+                <label>Article Title</label>
+                <span>Impact of Neural Architecture Search on Deep Learning Efficiency in Healthcare Diagnostics</span>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th class="qty">Qty</th>
+                    <th class="price">Unit Price</th>
+                    <th class="total">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <span class="item-desc">Article Processing Charges (APC)</span>
+                        <span class="item-sub">Includes peer-review management, editorial work, and technical editing.</span>
+                    </td>
+                    <td class="qty">1</td>
+                    <td class="price">$150.00</td>
+                    <td class="total">$150.00</td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="item-desc">Open Access Publication Fee</span>
+                        <span class="item-sub">Permanent open access availability on ScriptHive Journal portal.</span>
+                    </td>
+                    <td class="qty">1</td>
+                    <td class="price">$50.00</td>
+                    <td class="total">$50.00</td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="item-desc">Hard Copy (Optional)</span>
+                        <span class="item-sub">Printed copy of the journal issue with certificate.</span>
+                    </td>
+                    <td class="qty">0</td>
+                    <td class="price">$30.00</td>
+                    <td class="total">$0.00</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Summary -->
+        <div class="summary-section">
+            <div class="summary-box">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>$200.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Taxes (0%)</span>
+                    <span>$0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Discount</span>
+                    <span>-$0.00</span>
+                </div>
+                <div class="summary-row grand-total">
+                    <span>Total Amount</span>
+                    <span>$200.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment & Notes -->
+        <div class="payment-info">
+            <div class="payment-methods">
+                <h4>Payment Information</h4>
+                <div class="bank-details">
+                    <span>Account Name:</span> ScriptHive Publication<br>
+                    <span>Bank Name:</span> HDFC Bank Ltd.<br>
+                    <span>Account No:</span> 50100234567812<br>
+                    <span>IFSC Code:</span> HDFC0001234<br>
+                    <span>PayPal:</span> payments@scripthive.org<br>
+                    <span>UPI ID:</span> scripthive@okaxis
+                </div>
+            </div>
+            <div class="notes">
+                <h4>Important Notes</h4>
+                <p>
+                    1. Please quote the <strong>Article Submit No.</strong> in the payment reference.<br>
+                    2. After making the payment, please email the transaction receipt to <strong>info@scripthive.org</strong>.<br>
+                    3. Publication process will move to the next stage only after payment confirmation.<br>
+                    4. Fees once paid are non-refundable as per our policy.
+                </p>
+            </div>
+        </div>
+
+        <!-- Signature Area -->
+        <div class="signature-area">
+            <div class="signature">
+                <div class="line"></div>
+                <p>Authorised Signatory</p>
+                <p style="font-size: 10px; font-weight: 400; font-style: italic;">ScriptHive Publication</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Thank you for choosing ScriptHive Journal for your research publication.</p>
+            <p style="color: var(--primary); font-weight: 600;">www.scripthive.org</p>
+        </div>
+    </div>
+
+</body>
+</html>
+

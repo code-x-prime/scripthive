@@ -1,0 +1,834 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --navy: #0f172a;
+  --gold: #fbbf24;
+  --gold-light: #fef08a;
+  --bg-light: #f8fafc;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --glass-glow: rgba(59, 130, 246, 0.15);
+  --brand-shield: #10b981;
+  --brand-danger: #ef4444;
+}
+
+.guidelines-page {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  background-color: var(--bg-light);
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+/* Headings */
+.guidelines-page h1, 
+.guidelines-page h2, 
+.guidelines-page h3, 
+.guidelines-page h4, 
+.guidelines-page .font-heading {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Container */
+.gl-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero Section */
+.gl-hero {
+  background: var(--navy);
+  color: white;
+  padding: 150px 0 100px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 80vh;
+  overflow: hidden;
+}
+.hero-mesh {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.2) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(251, 191, 36, 0.15) 0%, transparent 50%);
+  animation: pulseMesh 10s infinite alternate;
+}
+@keyframes pulseMesh {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
+.gl-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.gl-breadcrumb {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gl-breadcrumb a { color: #cbd5e1; text-decoration: none; transition: 0.3s; }
+.gl-breadcrumb a:hover { color: var(--gold); }
+
+.gl-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--gold);
+  margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+}
+.gl-title {
+  font-size: 3.5rem;
+  line-height: 1.2;
+  font-weight: 800;
+  margin-bottom: 24px;
+  color: #fff;
+}
+.text-gradient {
+  background: linear-gradient(to right, #fff, #cbd5e1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gl-subtitle {
+  font-size: 1.2rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  max-width: 90%;
+}
+
+/* Hero Visuals */
+.gl-hero-visual {
+  position: relative;
+  height: 500px;
+}
+.gl-floating-card {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  animation: float 6s infinite ease-in-out;
+}
+.gl-card-main {
+  width: 320px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+.gl-card-check {
+  width: 240px;
+  bottom: 10%; right: 0;
+  z-index: 3;
+  animation-delay: -2s;
+  background: rgba(15, 23, 42, 0.8);
+}
+.gl-card-badge {
+  top: 15%; left: 0;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 3;
+  animation-delay: -4s;
+  background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(30,64,175,0.4));
+}
+@keyframes float {
+  0% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-20px); }
+  100% { transform: translate(-50%, -50%) translateY(0); }
+}
+.gl-card-check {
+  transform: translateY(0);
+  animation: float-simple 6s infinite ease-in-out;
+}
+.gl-card-badge {
+  transform: translateY(0);
+  animation: float-simple 5s infinite ease-in-out;
+}
+@keyframes float-simple {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0); }
+}
+
+/* Layout */
+.gl-main-layout {
+  display: block;
+  max-width: 900px;
+  margin: 40px auto 0;
+}
+
+/* Sections */
+.gl-section {
+  margin-bottom: 80px;
+  scroll-margin-top: 100px;
+}
+.gl-section-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 32px;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: 16px;
+}
+.gl-section-num {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; color: #fff; font-weight: 700;
+}
+.gl-prose p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+/* Glass Cards */
+.gl-glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 24px;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.gl-glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+  border-color: rgba(37,99,235,0.3);
+}
+
+/* Grid Layouts */
+.gl-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.gl-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+/* Important Notice Cards */
+.notice-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+}
+.notice-card i {
+  font-size: 1.5rem;
+  color: var(--gold);
+  background: rgba(251, 191, 36, 0.1);
+  padding: 12px;
+  border-radius: 50%;
+}
+.notice-card h4 {
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+.notice-card p {
+  margin: 0; font-size: 0.9rem; color: var(--text-muted);
+}
+
+/* Accordion / Tab alternative - elegant blocks */
+.prep-block {
+  margin-bottom: 32px;
+  border-left: 2px solid rgba(0,0,0,0.05);
+  padding-left: 24px;
+  position: relative;
+}
+.prep-block::before {
+  content: '';
+  position: absolute; left: -6px; top: 0;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 10px rgba(37,99,235,0.4);
+}
+.prep-block h3 {
+  font-size: 1.4rem; color: var(--text-dark); margin-top: -6px; margin-bottom: 16px; font-weight: 700;
+}
+.prep-list {
+  list-style: none; padding: 0; margin: 0;
+}
+.prep-list li {
+  position: relative; padding-left: 28px; margin-bottom: 12px; color: var(--text-muted); line-height: 1.6; font-weight: 500;
+}
+.prep-list li::before {
+  content: '\f058'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  position: absolute; left: 0; top: 2px; color: var(--primary);
+}
+
+/* Timeline */
+.gl-timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 40px 0;
+  padding: 20px 0;
+}
+.gl-timeline::before {
+  content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 2px;
+  background: rgba(0,0,0,0.05); z-index: 1; transform: translateY(-50%);
+}
+.timeline-step {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;
+  width: 120px;
+}
+.step-icon {
+  width: 50px; height: 50px; border-radius: 50%;
+  background: white; border: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; color: var(--primary);
+  transition: 0.3s;
+}
+.timeline-step:hover .step-icon {
+  background: var(--primary); color: white; box-shadow: 0 0 20px rgba(37,99,235,0.3);
+}
+.step-text { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); }
+
+/* Submission Checklist */
+.check-item-card {
+  display: flex; align-items: center; gap: 12px;
+  background: white; border: 1px solid rgba(0,0,0,0.05);
+  padding: 16px; border-radius: 12px;
+  transition: 0.3s;
+}
+.check-item-card:hover {
+  background: rgba(37,99,235,0.02); border-color: var(--primary);
+}
+.check-item-card i { color: #10b981; font-size: 1.2rem; }
+.check-item-card span { color: var(--text-dark); font-weight: 600; }
+
+/* Citation Split */
+.citation-split {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+}
+.citation-card {
+  background: white; border: 1px solid var(--glass-border);
+}
+.citation-card h4 { color: var(--primary); margin-bottom: 16px; font-size: 1.2rem; font-weight: 700; }
+.citation-example {
+  background: var(--bg-light); padding: 16px; border-radius: 8px; margin-bottom: 16px;
+  font-family: monospace; font-size: 0.9rem; color: var(--text-dark); border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Responsibilities */
+.resp-card {
+  text-align: center; padding: 32px 24px;
+}
+.resp-card i {
+  font-size: 2.5rem; color: var(--primary); margin-bottom: 20px;
+}
+.resp-card h4 { font-size: 1.2rem; color: var(--text-dark); margin-bottom: 12px; font-weight: 700; }
+.resp-card p { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
+.highlight-box {
+  background: rgba(251, 191, 36, 0.1);
+  border-left: 4px solid var(--gold);
+  padding: 20px; border-radius: 0 12px 12px 0;
+  display: flex; align-items: center; gap: 16px;
+  margin-top: 32px;
+}
+.highlight-box i { font-size: 2rem; color: var(--gold); }
+.highlight-box p { margin: 0; color: var(--text-dark); font-size: 1.1rem; font-weight: 600; }
+
+/* CTA Banner */
+.gl-cta {
+  margin-top: 100px;
+  position: relative;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: 30px;
+  padding: 80px 40px;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(37,99,235,0.2);
+}
+.gl-cta::before {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: url('https://www.transparenttextures.com/patterns/cubes.png');
+  opacity: 0.1;
+}
+.gl-cta-content { position: relative; z-index: 2; }
+.gl-cta h2 { font-size: 3rem; color: #fff; margin-bottom: 24px; font-weight: 800; }
+.gl-cta p { font-size: 1.2rem; color: #e2e8f0; margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+.cta-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+.gl-btn {
+  padding: 16px 32px; border-radius: 50px; font-size: 1.1rem; font-weight: 700;
+  text-decoration: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px;
+}
+.gl-btn-primary {
+  background: #fff; color: var(--primary);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.gl-btn-primary:hover { background: var(--bg-light); transform: translateY(-3px); }
+.gl-btn-outline {
+  border: 2px solid rgba(255,255,255,0.3); color: #fff;
+}
+.gl-btn-outline:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+/* Responsive */
+@media (max-width: 992px) {
+  .gl-main-layout { grid-template-columns: 1fr; }
+  .gl-hero-grid { grid-template-columns: 1fr; text-align: center; }
+  .gl-hero-text { order: 1; }
+  .gl-hero-visual { order: 2; height: 400px; display: none; }
+  .gl-breadcrumb { justify-content: center; }
+  .gl-badge { margin: 0 auto 24px; }
+  .gl-title { font-size: 2.5rem; }
+  .gl-subtitle { margin: 0 auto; }
+  .citation-split { grid-template-columns: 1fr; }
+  .gl-grid-3, .gl-grid-2 { grid-template-columns: 1fr; }
+  .gl-timeline { flex-direction: column; gap: 40px; padding: 0 0 0 24px; }
+  .gl-timeline::before { width: 2px; height: 100%; top: 0; left: 24px; transform: none; }
+  .timeline-step { flex-direction: row; width: 100%; text-align: left; }
+}
+
+/* Decorative visual card components */
+.doc-skeleton { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.doc-line { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+.doc-line.w-full { width: 100%; }
+.doc-line.w-3-4 { width: 75%; }
+.doc-line.w-1-2 { width: 50%; }
+.text-gradient-gold { background: linear-gradient(135deg, var(--gold-light), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+</style>
+
+<div class="guidelines-page">
+
+  <!-- Hero Section -->
+  <section class="gl-hero">
+    <div class="hero-mesh"></div>
+    <div class="container gl-container gl-hero-grid">
+      <div class="gl-hero-text gs-reveal">
+        <div class="gl-breadcrumb">
+          <a href="/">Home</a> <span>›</span> Publication Guidelines
+        </div>
+        <div class="gl-badge">
+          <i class="fa-solid fa-scroll"></i> Publication Guidelines
+        </div>
+        <h1 class="gl-title">
+          Comprehensive Guidelines for<br>
+          <span class="text-gradient">Manuscript Preparation</span>
+        </h1>
+        <p class="gl-subtitle">
+          Everything authors need to know before submitting research manuscripts to ScriptHive journals.
+        </p>
+      </div>
+      
+      <div class="gl-hero-visual gs-reveal">
+        <div class="gl-floating-card gl-card-main">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <i class="fa-solid fa-file-contract" style="font-size:2rem; color:#fff;"></i>
+            <span style="font-size:0.8rem; background:rgba(255,255,255,0.2); padding:4px 8px; border-radius:12px; color:#fff; font-weight: 600;">.DOCX</span>
+          </div>
+          <h4 style="color:#fff; margin:0 0 10px; font-weight:700;">Research Manuscript</h4>
+          <p style="font-size:0.8rem; color:#cbd5e1; margin:0;">Formatted according to ScriptHive standards.</p>
+          <div class="doc-skeleton">
+            <div class="doc-line w-3-4"></div>
+            <div class="doc-line w-full"></div>
+            <div class="doc-line w-full"></div>
+            <div class="doc-line w-1-2"></div>
+          </div>
+        </div>
+        
+        <div class="gl-floating-card gl-card-check">
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-circle-check text-gradient-gold"></i> <span style="font-size:0.9rem; color:#fff; font-weight: 600;">Original Work</span></div>
+            <div style="display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-circle-check text-gradient-gold"></i> <span style="font-size:0.9rem; color:#fff; font-weight: 600;">Peer Reviewed</span></div>
+            <div style="display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-circle-check text-gradient-gold"></i> <span style="font-size:0.9rem; color:#fff; font-weight: 600;">Open Access</span></div>
+          </div>
+        </div>
+        
+        <div class="gl-floating-card gl-card-badge">
+          <i class="fa-solid fa-barcode" style="font-size:1.5rem; color:#fff;"></i>
+          <div>
+            <div style="font-size:0.7rem; color:#cbd5e1; text-transform:uppercase;">Verified</div>
+            <div style="font-size:0.9rem; font-weight:bold; color:#fff;">DOI / ISSN</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Layout -->
+  <div class="container gl-container gl-main-layout">
+    
+    <!-- Content Area -->
+    <main class="gl-content">
+      
+      <!-- 1. Introduction -->
+      <section class="gl-section gs-reveal-up" id="intro">
+        <h2 class="gl-section-title"><div class="gl-section-num">1</div> Introduction</h2>
+        <div class="gl-prose">
+          <p>ScriptHive Publication is committed to maintaining the highest standards of academic publishing. These guidelines assist authors in preparing manuscripts that meet our strict editorial and formatting standards.</p>
+        </div>
+        <div class="gl-grid-2" style="margin-top:32px;">
+          <div class="gl-glass-card notice-card">
+            <i class="fa-solid fa-file-signature"></i>
+            <div>
+              <h4>Original Work Required</h4>
+              <p>Must be entirely original and properly cited.</p>
+            </div>
+          </div>
+          <div class="gl-glass-card notice-card">
+            <i class="fa-solid fa-ban" style="color:var(--brand-danger); background:rgba(239,68,68,0.1);"></i>
+            <div>
+              <h4>Not Under Review</h4>
+              <p>Cannot be submitted elsewhere concurrently.</p>
+            </div>
+          </div>
+          <div class="gl-glass-card notice-card">
+            <i class="fa-solid fa-scale-balanced" style="color:var(--primary); background:rgba(37,99,235,0.1);"></i>
+            <div>
+              <h4>Ethical Standards</h4>
+              <p>Must comply with global publishing ethics.</p>
+            </div>
+          </div>
+          <div class="gl-glass-card notice-card">
+            <i class="fa-solid fa-list-check" style="color:var(--brand-shield); background:rgba(16,185,129,0.1);"></i>
+            <div>
+              <h4>Compliance Required</h4>
+              <p>Non-compliant papers will be returned.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Manuscript Preparation -->
+      <section class="gl-section gs-reveal-up" id="preparation">
+        <h2 class="gl-section-title"><div class="gl-section-num">2</div> Manuscript Preparation</h2>
+        
+        <div class="prep-block">
+          <h3>General Format</h3>
+          <ul class="prep-list">
+            <li>Word format (.doc/.docx) only. PDFs are not accepted for review.</li>
+            <li>A4 size with 1-inch (2.54 cm) margins on all sides.</li>
+            <li>Times New Roman 12pt font.</li>
+            <li>1.5 line spacing for main body text.</li>
+            <li>Continuous page numbering starting from the title page.</li>
+          </ul>
+        </div>
+        
+        <div class="prep-block">
+          <h3>Title Page</h3>
+          <ul class="prep-list">
+            <li>Manuscript title must be clear, concise, and informative.</li>
+            <li>Full author names and institutional affiliations.</li>
+            <li>Corresponding author must be clearly marked with email address.</li>
+          </ul>
+        </div>
+        
+        <div class="prep-block">
+          <h3>Abstract & Keywords</h3>
+          <ul class="prep-list">
+            <li>150–250 word structured abstract required.</li>
+            <li>Must cover background, methodology, results, and conclusion.</li>
+            <li>5–7 relevant keywords separated by commas.</li>
+          </ul>
+        </div>
+
+        <div class="gl-glass-card" style="margin-top:40px;">
+          <h4 style="margin-top:0; margin-bottom:20px; color:var(--text-dark); font-size:1.2rem; font-weight: 700;"><i class="fa-solid fa-diagram-project" style="color:var(--primary); margin-right:8px;"></i> Manuscript Structure</h4>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+            <span style="background:var(--bg-light); border:1px solid rgba(0,0,0,0.05); padding:8px 16px; border-radius:20px; font-size:0.9rem; color:var(--text-dark); font-weight:600;">Title</span> <i class="fa-solid fa-arrow-right text-muted" style="color:var(--text-muted);"></i>
+            <span style="background:var(--bg-light); border:1px solid rgba(0,0,0,0.05); padding:8px 16px; border-radius:20px; font-size:0.9rem; color:var(--text-dark); font-weight:600;">Abstract</span> <i class="fa-solid fa-arrow-right text-muted" style="color:var(--text-muted);"></i>
+            <span style="background:var(--bg-light); border:1px solid rgba(0,0,0,0.05); padding:8px 16px; border-radius:20px; font-size:0.9rem; color:var(--text-dark); font-weight:600;">Introduction</span> <i class="fa-solid fa-arrow-right text-muted" style="color:var(--text-muted);"></i>
+            <span style="background:var(--bg-light); border:1px solid rgba(0,0,0,0.05); padding:8px 16px; border-radius:20px; font-size:0.9rem; color:var(--text-dark); font-weight:600;">Methods</span> <i class="fa-solid fa-arrow-right text-muted" style="color:var(--text-muted);"></i>
+            <span style="background:var(--bg-light); border:1px solid rgba(0,0,0,0.05); padding:8px 16px; border-radius:20px; font-size:0.9rem; color:var(--text-dark); font-weight:600;">Results</span> <i class="fa-solid fa-arrow-right text-muted" style="color:var(--text-muted);"></i>
+            <span style="background:var(--bg-light); border:1px solid rgba(0,0,0,0.05); padding:8px 16px; border-radius:20px; font-size:0.9rem; color:var(--text-dark); font-weight:600;">Discussion</span> <i class="fa-solid fa-arrow-right text-muted" style="color:var(--text-muted);"></i>
+            <span style="background:var(--bg-light); border:1px solid rgba(0,0,0,0.05); padding:8px 16px; border-radius:20px; font-size:0.9rem; color:var(--text-dark); font-weight:600;">References</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Submission Process -->
+      <section class="gl-section gs-reveal-up" id="submission">
+        <h2 class="gl-section-title"><div class="gl-section-num">3</div> Submission Process</h2>
+        
+        <div class="gl-grid-2" style="margin-bottom:40px;">
+          <div class="gl-glass-card" style="text-align:center;">
+            <i class="fa-solid fa-cloud-arrow-up" style="font-size:2.5rem; color:var(--primary); margin-bottom:16px;"></i>
+            <h4 style="color:var(--text-dark); margin-bottom:12px; font-weight:700;">Online Portal</h4>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Use our secure manuscript submission system.</p>
+            <a href="/submit" class="gl-btn gl-btn-outline" style="padding:8px 24px; font-size:0.9rem; border-color:var(--primary); color:var(--primary);">Go to Portal</a>
+          </div>
+          <div class="gl-glass-card" style="text-align:center;">
+            <i class="fa-solid fa-envelope-open-text" style="font-size:2.5rem; color:var(--gold); margin-bottom:16px;"></i>
+            <h4 style="color:var(--text-dark); margin-bottom:12px; font-weight:700;">Email Submission</h4>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Directly email the editorial desk.</p>
+            <a href="mailto:info@scripthive.org" class="gl-btn gl-btn-outline" style="padding:8px 24px; font-size:0.9rem; border-color:var(--gold); color:var(--text-dark);">info@scripthive.org</a>
+          </div>
+        </div>
+
+        <h3 style="color:var(--text-dark); font-size:1.5rem; margin-bottom:24px; font-weight: 700;">Submission Checklist</h3>
+        <div class="gl-grid-2">
+          <div class="check-item-card"><i class="fa-solid fa-check-double"></i> <span>Word manuscript (.doc/.docx)</span></div>
+          <div class="check-item-card"><i class="fa-solid fa-check-double"></i> <span>Title page included</span></div>
+          <div class="check-item-card"><i class="fa-solid fa-check-double"></i> <span>Structured abstract</span></div>
+          <div class="check-item-card"><i class="fa-solid fa-check-double"></i> <span>5–7 Keywords</span></div>
+          <div class="check-item-card"><i class="fa-solid fa-check-double"></i> <span>Embedded figures/tables</span></div>
+          <div class="check-item-card"><i class="fa-solid fa-check-double"></i> <span>Formatted references</span></div>
+          <div class="check-item-card"><i class="fa-solid fa-check-double"></i> <span>Plagiarism report (<15%)</span></div>
+          <div class="check-item-card"><i class="fa-solid fa-check-double"></i> <span>Cover letter (Optional)</span></div>
+        </div>
+
+        <h3 style="color:var(--text-dark); font-size:1.5rem; margin-top:40px; margin-bottom:24px; font-weight: 700;">After Submission</h3>
+        <div class="gl-timeline">
+          <div class="timeline-step">
+            <div class="step-icon"><i class="fa-regular fa-envelope"></i></div>
+            <div class="step-text">Acknowledgement<br>Email</div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="step-text">Editorial<br>Screening</div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="step-text">Reviewer<br>Assignment</div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-icon"><i class="fa-solid fa-gavel"></i></div>
+            <div class="step-text">Editorial<br>Decision</div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-icon"><i class="fa-solid fa-bullhorn"></i></div>
+            <div class="step-text">Final<br>Notification</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Peer Review Process -->
+      <section class="gl-section gs-reveal-up" id="peer-review">
+        <h2 class="gl-section-title"><div class="gl-section-num">4</div> Peer Review Process</h2>
+        <div class="gl-prose">
+          <p>ScriptHive utilizes a strict <strong style="color:var(--primary);">Double-Blind Peer Review</strong> system. Both the reviewers' and authors' identities are concealed from each other to ensure unbiased and objective evaluation.</p>
+        </div>
+        
+        <div class="gl-glass-card" style="margin-top:32px;">
+          <div style="display:flex; flex-direction:column; gap:24px;">
+            <div style="display:flex; gap:20px; align-items:flex-start;">
+              <div style="font-size:2rem; font-weight:800; color:rgba(0,0,0,0.1); line-height:1;">1</div>
+              <div>
+                <h4 style="color:var(--text-dark); margin:0 0 8px; font-weight: 700;">Editorial Screening</h4>
+                <p style="color:var(--text-muted); margin:0; font-size:0.95rem;">The manuscript is evaluated for scope, originality, and basic formatting compliance.</p>
+              </div>
+            </div>
+            <div style="display:flex; gap:20px; align-items:flex-start;">
+              <div style="font-size:2rem; font-weight:800; color:rgba(0,0,0,0.1); line-height:1;">2</div>
+              <div>
+                <h4 style="color:var(--text-dark); margin:0 0 8px; font-weight: 700;">Reviewer Assignment</h4>
+                <p style="color:var(--text-muted); margin:0; font-size:0.95rem;">At least two independent subject matter experts are invited to evaluate the manuscript.</p>
+              </div>
+            </div>
+            <div style="display:flex; gap:20px; align-items:flex-start;">
+              <div style="font-size:2rem; font-weight:800; color:var(--primary); line-height:1;">3</div>
+              <div>
+                <h4 style="color:var(--text-dark); margin:0 0 8px; font-weight: 700;">Reviewer Evaluation</h4>
+                <p style="color:var(--text-muted); margin:0; font-size:0.95rem;">Reviewers assess methodology, novelty, clarity, and relevance, submitting detailed feedback.</p>
+              </div>
+            </div>
+            <div style="display:flex; gap:20px; align-items:flex-start;">
+              <div style="font-size:2rem; font-weight:800; color:rgba(0,0,0,0.1); line-height:1;">4</div>
+              <div>
+                <h4 style="color:var(--text-dark); margin:0 0 8px; font-weight: 700;">Editorial Decision</h4>
+                <p style="color:var(--text-muted); margin:0; font-size:0.95rem;">The Editor-in-Chief decides: Accept, Minor Revision, Major Revision, or Reject.</p>
+              </div>
+            </div>
+            <div style="display:flex; gap:20px; align-items:flex-start;">
+              <div style="font-size:2rem; font-weight:800; color:rgba(0,0,0,0.1); line-height:1;">5</div>
+              <div>
+                <h4 style="color:var(--text-dark); margin:0 0 8px; font-weight: 700;">Revision & Resubmission</h4>
+                <p style="color:var(--text-muted); margin:0; font-size:0.95rem;">Authors revise based on feedback and resubmit with a point-by-point response letter.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Formatting Rules -->
+      <section class="gl-section gs-reveal-up" id="formatting">
+        <h2 class="gl-section-title"><div class="gl-section-num">5</div> Formatting Rules</h2>
+        
+        <div class="gl-grid-3">
+          <div class="gl-glass-card">
+            <i class="fa-solid fa-heading" style="font-size:2rem; color:var(--primary); margin-bottom:16px;"></i>
+            <h4 style="color:var(--text-dark); margin-bottom:12px; font-weight: 700;">Headings</h4>
+            <ul style="padding-left:16px; margin:0; color:var(--text-muted); font-size:0.9rem; line-height:1.6; font-weight: 500;">
+              <li><strong>Level 1:</strong> Bold, 14pt, numbered (1. Intro)</li>
+              <li><strong>Level 2:</strong> Bold, 12pt (1.1 Background)</li>
+              <li><strong>Level 3:</strong> Italic, 12pt</li>
+            </ul>
+          </div>
+          
+          <div class="gl-glass-card">
+            <i class="fa-solid fa-chart-bar" style="font-size:2rem; color:var(--gold); margin-bottom:16px;"></i>
+            <h4 style="color:var(--text-dark); margin-bottom:12px; font-weight: 700;">Tables & Figures</h4>
+            <ul style="padding-left:16px; margin:0; color:var(--text-muted); font-size:0.9rem; line-height:1.6; font-weight: 500;">
+              <li>Consecutive numbering required.</li>
+              <li>High resolution (300+ DPI).</li>
+              <li>Table captions above, Figure captions below.</li>
+            </ul>
+          </div>
+          
+          <div class="gl-glass-card">
+            <i class="fa-solid fa-superscript" style="font-size:2rem; color:#10b981; margin-bottom:16px;"></i>
+            <h4 style="color:var(--text-dark); margin-bottom:12px; font-weight: 700;">Equations</h4>
+            <ul style="padding-left:16px; margin:0; color:var(--text-muted); font-size:0.9rem; line-height:1.6; font-weight: 500;">
+              <li>Use Equation Editor / MathType.</li>
+              <li>Number equations in parentheses on the right margin.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Citation Style -->
+      <section class="gl-section gs-reveal-up" id="citations">
+        <h2 class="gl-section-title"><div class="gl-section-num">6</div> Citation Style</h2>
+        <div class="gl-prose" style="margin-bottom:32px;">
+          <p>Authors may use either APA or Vancouver citation styles depending on their discipline. Consistency throughout the manuscript is mandatory. Include DOIs/URLs where available.</p>
+        </div>
+        
+        <div class="citation-split">
+          <!-- APA -->
+          <div class="gl-glass-card citation-card">
+            <h4><i class="fa-solid fa-book" style="margin-right:8px;"></i> APA Style</h4>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">Recommended for Social Sciences & Humanities</p>
+            
+            <div style="font-size:0.9rem; color:var(--text-dark); margin-bottom:8px; font-weight: 600;">In-Text Citation:</div>
+            <div class="citation-example">"Research shows... (Smith & Johnson, 2023)."</div>
+            
+            <div style="font-size:0.9rem; color:var(--text-dark); margin-bottom:8px; font-weight: 600;">Reference List:</div>
+            <div class="citation-example">Smith, J., & Johnson, L. (2023). <em>Impact of AI in Publishing</em>. Journal of Modern Science, 12(4), 100-115. https://doi.org/10.xxxx</div>
+          </div>
+          
+          <!-- Vancouver -->
+          <div class="gl-glass-card citation-card">
+            <h4><i class="fa-solid fa-book-medical" style="margin-right:8px; color: #10b981;"></i> Vancouver Style</h4>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">Recommended for Sciences, Engineering & Health</p>
+            
+            <div style="font-size:0.9rem; color:var(--text-dark); margin-bottom:8px; font-weight: 600;">In-Text Citation:</div>
+            <div class="citation-example">"Research shows... [1]."</div>
+            
+            <div style="font-size:0.9rem; color:var(--text-dark); margin-bottom:8px; font-weight: 600;">Reference List:</div>
+            <div class="citation-example">1. Smith J, Johnson L. Impact of AI in publishing. J Mod Sci. 2023;12(4):100-115.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Author Responsibilities -->
+      <section class="gl-section gs-reveal-up" id="responsibilities">
+        <h2 class="gl-section-title"><div class="gl-section-num">7</div> Author Responsibilities</h2>
+        
+        <div class="gl-grid-3">
+          <div class="gl-glass-card resp-card">
+            <i class="fa-solid fa-fingerprint"></i>
+            <h4>Originality</h4>
+            <p>Work must be entirely original and unpublished.</p>
+          </div>
+          <div class="gl-glass-card resp-card">
+            <i class="fa-solid fa-users-viewfinder"></i>
+            <h4>Authorship</h4>
+            <p>All listed authors must have contributed significantly.</p>
+          </div>
+          <div class="gl-glass-card resp-card">
+            <i class="fa-solid fa-database"></i>
+            <h4>Data Integrity</h4>
+            <p>Reported data must be accurate. Fabrication is strictly prohibited.</p>
+          </div>
+          <div class="gl-glass-card resp-card">
+            <i class="fa-solid fa-handshake-angle"></i>
+            <h4>Conflict of Interest</h4>
+            <p>Must disclose any financial or personal conflicts.</p>
+          </div>
+          <div class="gl-glass-card resp-card">
+            <i class="fa-solid fa-microscope"></i>
+            <h4>Ethical Approval</h4>
+            <p>Required for research involving human/animal subjects.</p>
+          </div>
+          <div class="gl-glass-card resp-card">
+            <i class="fa-solid fa-file-circle-exclamation"></i>
+            <h4>Corrections</h4>
+            <p>Authors must promptly report errors to editors.</p>
+          </div>
+        </div>
+        
+        <div class="highlight-box">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <p>Similarity Index Must Not Exceed 15%. Strict zero-tolerance policy for plagiarism.</p>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="gl-cta gs-reveal">
+        <div class="gl-cta-content">
+          <h2>Ready to Submit Your Manuscript?</h2>
+          <p>Ensure your manuscript complies with ScriptHive publication guidelines before beginning the submission process to avoid delays.</p>
+          <div class="cta-buttons">
+            <a href="/submit" class="gl-btn gl-btn-primary">
+              <i class="fa-solid fa-paper-plane"></i> Submit Your Paper Now
+            </a>
+            <a href="mailto:info@scripthive.org" class="gl-btn gl-btn-outline">
+              <i class="fa-regular fa-envelope"></i> Contact Editorial Team
+            </a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Animation & Logic Scripts -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Reveal animations
+    gsap.utils.toArray('.gs-reveal').forEach(function(elem) {
+      gsap.from(elem, {
+        scrollTrigger: { trigger: elem, start: "top 85%" },
+        y: 50, opacity: 0, duration: 1, ease: "power3.out"
+      });
+    });
+
+    gsap.utils.toArray('.gs-reveal-up').forEach(function(elem) {
+      gsap.from(elem, {
+        scrollTrigger: { trigger: elem, start: "top 85%" },
+        y: 30, opacity: 0, duration: 0.8, ease: "power2.out"
+      });
+    });
+  });
+</script>
+
+<%- include('../partials/footer') %>

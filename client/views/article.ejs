@@ -1,0 +1,178 @@
+<%- include('partials/header') %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  .art-page { background: #f8fafc; min-height: 100vh; font-family: 'Inter', sans-serif; color: #0f172a; }
+
+  .art-hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; padding: 100px 20px 40px; }
+  .art-hero-inner { max-width: 900px; margin: 0 auto; }
+  .art-journal-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 600; color: #93c5fd; margin-bottom: 20px; text-decoration: none; }
+  .art-journal-badge:hover { background: rgba(255,255,255,0.2); }
+  .art-title { font-family: 'Outfit', sans-serif; font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800; line-height: 1.35; color: #fff; margin-bottom: 16px; }
+  .art-authors { font-size: 1rem; color: #bfdbfe; margin-bottom: 20px; }
+  .art-meta-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .art-chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 6px 12px; font-size: 0.8rem; color: #e0f2fe; }
+
+  .art-body { max-width: 900px; margin: 0 auto; padding: 40px 20px; display: grid; grid-template-columns: 1fr 280px; gap: 32px; }
+  @media (max-width: 768px) { .art-body { grid-template-columns: 1fr; } .art-sidebar { order: -1; } }
+
+  .art-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 28px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+  .art-section-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #2563eb; margin-bottom: 10px; }
+  .art-abstract { font-size: 0.95rem; line-height: 1.8; color: #334155; text-align: justify; }
+  .art-keywords { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .art-kw { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 4px 10px; font-size: 0.8rem; color: #1d4ed8; font-weight: 500; }
+
+  .art-doi-link { display: flex; align-items: center; gap: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px 16px; }
+  .art-doi-link a { color: #15803d; font-weight: 600; font-size: 0.88rem; word-break: break-all; text-decoration: none; }
+  .art-doi-link a:hover { text-decoration: underline; }
+
+  .art-cite-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; font-size: 0.82rem; color: #475569; font-family: monospace; line-height: 1.6; }
+
+  /* Sidebar */
+  .art-sidebar {}
+  .sidebar-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .sidebar-card h4 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; margin-bottom: 14px; }
+
+  .dl-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: linear-gradient(135deg,#1d4ed8,#2563eb); color: #fff; font-weight: 700; font-size: 0.9rem; padding: 13px; border-radius: 10px; text-decoration: none; transition: 0.2s; margin-bottom: 10px; }
+  .dl-btn:hover { background: linear-gradient(135deg,#1e40af,#1d4ed8); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+
+  .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row span:first-child { color: #64748b; }
+  .stat-row span:last-child { font-weight: 600; color: #0f172a; }
+
+  .back-link { display: inline-flex; align-items: center; gap: 6px; color: #64748b; font-size: 0.85rem; text-decoration: none; margin-bottom: 20px; }
+  .back-link:hover { color: #2563eb; }
+</style>
+
+<%
+  const art = article;
+  const vol = art.part?.issue?.volume;
+  const iss = art.part?.issue;
+  const jid = art.journalId || '';
+  const apiBase = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+  const pdfUrl = art.pdfPublicPath ? (apiBase + '/' + art.pdfPublicPath) : null;
+  const doiUrl = art.doiRecord?.doi ? ('https://www.doi.org/' + art.doiRecord.doi) : null;
+  const partName = art.part?.name || 'A';
+  const partLetter = partName.toLowerCase();
+  const citation = vol && iss ? (jid + '; ' + vol.year + '; ' + vol.number + '(' + iss.number + partLetter + ')' + (art.pageStart ? (':' + String(art.pageStart).padStart(2,'0') + (art.pageEnd ? '-' + String(art.pageEnd).padStart(2,'0') : '')) : '')) : '';
+  const issueLabel = vol && iss ? ('Vol. ' + vol.number + ', Issue ' + iss.number + (partName !== 'A' ? ' Part ' + partName : '') + ' (' + vol.year + ')') : '';
+  const journalUrl = '/' + jid;
+%>
+
+<div class="art-page">
+  <!-- Hero -->
+  <div class="art-hero">
+    <div class="art-hero-inner">
+      <a href="<%= journalUrl %>#archives" class="art-journal-badge">
+        <i class="fa-solid fa-arrow-left" style="font-size:0.7rem;"></i>
+        <%= art.journal?.name || jid %> — Back to Archives
+      </a>
+      <div class="art-title"><%= art.title %></div>
+      <div class="art-authors">
+        <i class="fa-solid fa-user-pen" style="margin-right:6px;font-size:0.85rem;color:#93c5fd;"></i>
+        <%= art.authorName %><%= art.coAuthors ? ', ' + art.coAuthors : '' %>
+      </div>
+      <div class="art-meta-chips">
+        <% if (issueLabel) { %><span class="art-chip"><i class="fa-solid fa-book-open"></i> <%= issueLabel %></span><% } %>
+        <% if (art.country) { %><span class="art-chip"><i class="fa-solid fa-location-dot"></i> <%= art.country %></span><% } %>
+        <% if (art.pageStart && art.pageEnd) { %><span class="art-chip"><i class="fa-solid fa-file-lines"></i> Pages <%= art.pageStart %>–<%= art.pageEnd %></span><% } %>
+        <% if (art.pubDate) { %><span class="art-chip"><i class="fa-solid fa-calendar"></i> <%= new Date(art.pubDate).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'}) %></span><% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="art-body">
+    <main>
+      <a href="<%= journalUrl %>#archives" class="back-link"><i class="fa-solid fa-chevron-left"></i> Back to Archives</a>
+
+      <!-- DOI -->
+      <% if (doiUrl) { %>
+      <div class="art-card" style="padding:16px 20px;">
+        <div class="art-doi-link">
+          <i class="fa-solid fa-fingerprint" style="color:#15803d;font-size:1.1rem;shrink:0;"></i>
+          <div>
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.05em;margin-bottom:2px;">DOI</div>
+            <a href="<%= doiUrl %>" target="_blank" rel="noopener"><%= doiUrl %></a>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Abstract -->
+      <div class="art-card">
+        <div class="art-section-label">Abstract</div>
+        <div class="art-abstract">
+          <% if (art.abstract) { %>
+            <%- art.abstract.replace(/<[^>]*>/g,'') %>
+          <% } else { %>
+            <span style="color:#94a3b8;">Abstract not available.</span>
+          <% } %>
+        </div>
+        <% if (art.keywords) { %>
+          <div style="margin-top:16px;">
+            <div class="art-section-label">Keywords</div>
+            <div class="art-keywords">
+              <% art.keywords.split(',').forEach(function(kw){ %>
+                <span class="art-kw"><%= kw.trim() %></span>
+              <% }); %>
+            </div>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Citation -->
+      <% if (citation) { %>
+      <div class="art-card">
+        <div class="art-section-label">How to Cite</div>
+        <div class="art-cite-box">
+          <%= art.authorName %><%= art.coAuthors ? ', ' + art.coAuthors : '' %>. "<%= art.title %>." <%= art.journal?.name || jid %> <%= citation %>.<% if (doiUrl) { %> <%= doiUrl %><% } %>
+        </div>
+      </div>
+      <% } %>
+    </main>
+
+    <!-- Sidebar -->
+    <aside class="art-sidebar">
+      <% if (pdfUrl) { %>
+      <div class="sidebar-card">
+        <h4>Full Article</h4>
+        <a href="<%= pdfUrl %>" target="_blank" class="dl-btn" onclick="trackDownload('<%= art.id %>')">
+          <i class="fa-solid fa-file-pdf"></i> Download PDF
+        </a>
+        <% if (art.pageStart && art.pageEnd) { %>
+          <p style="text-align:center;font-size:0.78rem;color:#94a3b8;">Pages <%= art.pageStart %>–<%= art.pageEnd %></p>
+        <% } %>
+      </div>
+      <% } %>
+
+      <div class="sidebar-card">
+        <h4>Article Info</h4>
+        <div class="stat-row"><span>Views</span><span><%= art.viewCount || 0 %></span></div>
+        <div class="stat-row"><span>Downloads</span><span><%= art.downloadCount || 0 %></span></div>
+        <% if (art.pubDate) { %><div class="stat-row"><span>Published</span><span><%= new Date(art.pubDate).getFullYear() %></span></div><% } %>
+        <div class="stat-row"><span>Access</span><span>Open Access</span></div>
+        <% if (art.doiRecord?.status) { %><div class="stat-row"><span>DOI</span><span><%= art.doiRecord.status %></span></div><% } %>
+      </div>
+
+      <div class="sidebar-card" style="background:linear-gradient(135deg,#1e40af,#2563eb);border:none;">
+        <h4 style="color:rgba(255,255,255,0.7);">Submit Research</h4>
+        <p style="font-size:0.82rem;color:rgba(255,255,255,0.8);margin-bottom:14px;">Publish your research in <%= jid %>.</p>
+        <a href="/submit?journal=<%= jid %>" style="display:block;text-align:center;background:#fbbf24;color:#1e3a8a;font-weight:700;font-size:0.85rem;padding:10px;border-radius:8px;text-decoration:none;">Submit Paper →</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+  const API = '<%= (process.env.SCRIPTHIVE_API_URL || "http://localhost:3001") %>';
+  window.trackDownload = function(id){
+    fetch(API+'/api/archive/download/'+encodeURIComponent(id),{method:'POST'}).catch(function(){});
+  };
+})();
+</script>
+
+<%- include('partials/footer') %>

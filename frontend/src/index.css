@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --primary: #16a34a;
+  --primary-foreground: #ffffff;
+  --primary-hover: #15803d;
+  --secondary: #f0fdf4;
+  --accent: #dcfce7;
+  --accent-foreground: #166534;
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e2e8f0;
+  --sidebar-active-bg: #f0fdf4;
+  --sidebar-active-text: #16a34a;
+  --sidebar-active-border: #16a34a;
+  --topbar-bg: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Poppins', system-ui, sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading, .font-display {
+  font-family: 'Poppins', system-ui, sans-serif;
+}
+
+.font-mono, code, .id-text {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── Report print styles ─────────────────────────────────────────── */
+@media print {
+  @page { size: A4; margin: 14mm 12mm; }
+
+  /* when body has .printing-report, hide everything except #report-section */
+  body.printing-report * { visibility: hidden; }
+  body.printing-report #report-section,
+  body.printing-report #report-section * { visibility: visible; }
+  body.printing-report #report-section {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .no-print { display: none !important; }
+}

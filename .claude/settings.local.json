@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp *)",
+      "Bash(node \"C:/Users/welcome/.claude/plugins/cache/thedotmack/claude-mem/12.4.7/scripts/smart-install.js\")"
+    ]
+  }
+}

@@ -1,0 +1,978 @@
+<%- include('../partials/header') %>
+
+  <!-- AOS Animation CSS -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <!-- Google Font for Barcode -->
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39+Text&display=swap" rel="stylesheet">
+
+  <style>
+    /* CSS scoped to .issn-page */
+    .issn-page {
+      --brand-navy: #040914;
+      --brand-blue: #1d4ed8;
+      --brand-light-blue: #3b82f6;
+      --brand-gold: #f59e0b;
+      --brand-light-gold: #fbbf24;
+      --brand-shield: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-hover: rgba(255, 255, 255, 0.06);
+      --card-bg: rgba(15, 23, 42, 0.7);
+
+      font-family: 'Inter', sans-serif;
+      color: var(--text-main);
+      background-color: var(--brand-navy);
+      position: relative;
+      overflow-x: hidden;
+      padding-bottom: 80px;
+    }
+
+    /* Base Headings */
+    .issn-page h1,
+    .issn-page h2,
+    .issn-page h3,
+    .issn-page h4,
+    .issn-page h5 {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Background Effects */
+    .issn-bg-effects {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .issn-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.3;
+      animation: float-glow 12s infinite alternate ease-in-out;
+    }
+
+    .issn-glow-1 {
+      top: 0%;
+      left: -10%;
+      width: 600px;
+      height: 600px;
+      background: rgba(59, 130, 246, 0.25);
+    }
+
+    .issn-glow-2 {
+      top: 40%;
+      right: -5%;
+      width: 500px;
+      height: 500px;
+      background: rgba(245, 158, 11, 0.15);
+      animation-delay: -3s;
+    }
+
+    .issn-glow-3 {
+      bottom: 10%;
+      left: 20%;
+      width: 700px;
+      height: 700px;
+      background: rgba(16, 185, 129, 0.15);
+      animation-delay: -6s;
+    }
+
+    .issn-particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+      background-size: 50px 50px;
+      opacity: 0.2;
+    }
+
+    /* Container */
+    .issn-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Hero Section */
+    .issn-hero {
+      padding: 140px 0 100px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 80vh;
+    }
+
+    .issn-hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .issn-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--brand-light-gold);
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .issn-title {
+      font-size: 3.8rem;
+      line-height: 1.1;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: #fff;
+    }
+
+    .text-gradient {
+      background: linear-gradient(135deg, #fff, var(--brand-light-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .issn-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 90%;
+    }
+
+    /* Hero Visuals */
+    .issn-hero-visual {
+      position: relative;
+      height: 500px;
+    }
+
+    .issn-float-card {
+      position: absolute;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .issn-cert {
+      width: 320px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      text-align: center;
+      border-color: rgba(59, 130, 246, 0.4);
+      animation: float-center 6s infinite ease-in-out;
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .issn-cert i {
+      font-size: 4rem;
+      color: var(--brand-light-blue);
+      text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+      margin-bottom: 16px;
+    }
+
+    .issn-cert-text {
+      font-family: monospace;
+      letter-spacing: 2px;
+      font-size: 1.4rem;
+      color: var(--brand-light-gold);
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .issn-verify {
+      width: 240px;
+      top: 5%;
+      right: 0;
+      z-index: 1;
+      animation: float-simple 7s infinite ease-in-out;
+      animation-delay: -2s;
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .issn-tags {
+      width: 250px;
+      bottom: 5%;
+      left: 0;
+      z-index: 3;
+      animation: float-simple 5s infinite ease-in-out;
+      animation-delay: -4s;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .issn-tag-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .issn-tag-item i {
+      color: var(--brand-shield);
+    }
+
+    @keyframes float-simple {
+      0% {
+        transform: translateY(0) translateX(0);
+      }
+
+      50% {
+        transform: translateY(-15px) translateX(5px);
+      }
+
+      100% {
+        transform: translateY(0) translateX(0);
+      }
+    }
+
+    @keyframes float-center {
+      0% {
+        transform: translate(-50%, -50%) translateY(0);
+      }
+
+      50% {
+        transform: translate(-50%, -50%) translateY(-20px);
+      }
+
+      100% {
+        transform: translate(-50%, -50%) translateY(0);
+      }
+    }
+
+    /* Sections */
+    .issn-section {
+      margin-top: 100px;
+      margin-bottom: 100px;
+    }
+
+    .issn-section-title {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .issn-section-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 48px;
+      line-height: 1.6;
+    }
+
+    /* About Block */
+    .issn-about-block {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 48px;
+      backdrop-filter: blur(10px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .issn-about-text p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .issn-highlight-box {
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+      border-left: 4px solid var(--brand-gold);
+      padding: 20px 24px;
+      border-radius: 0 12px 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .issn-highlight-box i {
+      font-size: 2rem;
+      color: var(--brand-gold);
+    }
+
+    .issn-highlight-box p {
+      margin: 0;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .issn-about-visual {
+      text-align: center;
+      position: relative;
+    }
+
+    .issn-barcode {
+      font-family: 'Libre Barcode 39 Text', cursive;
+      font-size: 5rem;
+      color: #fff;
+      opacity: 0.9;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: inline-block;
+    }
+
+    /* Grid Cards */
+    .issn-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .issn-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .issn-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      transition: 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .issn-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .issn-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+      transition: left 0.5s;
+    }
+
+    .issn-card:hover::before {
+      left: 200%;
+    }
+
+    .issn-card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.2));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--brand-light-blue);
+      margin-bottom: 20px;
+    }
+
+    .issn-card h4 {
+      font-size: 1.25rem;
+      color: #fff;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .issn-card p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Specific Colors for Icons */
+    .icon-gold {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: var(--brand-gold);
+    }
+
+    .icon-shield {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: var(--brand-shield);
+    }
+
+    .icon-purple {
+      background: rgba(168, 85, 247, 0.1);
+      border-color: rgba(168, 85, 247, 0.3);
+      color: #a855f7;
+    }
+
+    /* Publishing Standards split */
+    .issn-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: stretch;
+    }
+
+    .issn-standard-box {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+    }
+
+    .issn-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .issn-list li {
+      position: relative;
+      padding-left: 36px;
+      margin-bottom: 16px;
+      color: var(--text-main);
+      font-size: 1.05rem;
+      line-height: 1.6;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .issn-list li i {
+      position: absolute;
+      left: 0;
+      top: 4px;
+      color: var(--brand-shield);
+      font-size: 1.2rem;
+    }
+
+    /* Status Section */
+    .issn-status-section {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(15, 23, 42, 0.8));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 24px;
+      padding: 60px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .issn-status-section h2 {
+      font-size: 2.5rem;
+      color: #fff;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    .issn-status-section p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 700px;
+      margin: 0 auto 32px;
+    }
+
+    .issn-status-badges {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .issn-status-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      backdrop-filter: blur(5px);
+    }
+
+    /* CTA */
+    .issn-cta {
+      margin-top: 100px;
+      position: relative;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(29, 78, 216, 0.6));
+      border-radius: 30px;
+      padding: 80px 40px;
+      text-align: center;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .issn-cta::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://www.transparenttextures.com/patterns/cubes.png');
+      opacity: 0.1;
+    }
+
+    .issn-cta-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .issn-cta h2 {
+      font-size: 3rem;
+      color: #fff;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+
+    .issn-cta p {
+      font-size: 1.2rem;
+      color: #e2e8f0;
+      margin-bottom: 40px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    .issn-cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .issn-btn {
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .issn-btn-primary {
+      background: #fff;
+      color: var(--brand-navy);
+      box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .issn-btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 25px rgba(255, 255, 255, 0.3);
+    }
+
+    .issn-btn-outline {
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+    }
+
+    .issn-btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #fff;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .issn-hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .issn-hero-visual {
+        height: 400px;
+        margin-top: 40px;
+      }
+
+      .issn-title {
+        font-size: 2.8rem;
+      }
+
+      .issn-subtitle {
+        margin: 0 auto;
+      }
+
+      .issn-grid-3,
+      .issn-grid-2,
+      .issn-split,
+      .issn-about-block {
+        grid-template-columns: 1fr;
+      }
+
+      .issn-about-visual {
+        order: -1;
+        margin-bottom: 30px;
+      }
+
+      .issn-cta h2 {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+
+  <div class="issn-page">
+    <!-- Background Effects -->
+    <div class="issn-bg-effects">
+      <div class="issn-particles"></div>
+      <div class="issn-glow issn-glow-1"></div>
+      <div class="issn-glow issn-glow-2"></div>
+      <div class="issn-glow issn-glow-3"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="issn-hero">
+      <div class="container issn-container issn-hero-grid">
+        <div class="issn-hero-text" data-aos="fade-right">
+          <div class="issn-breadcrumb" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px;">
+            <a href="/" style="color: var(--brand-light-blue); text-decoration: none;">Home</a> › ISSN Compliance
+          </div>
+          <div class="issn-badge">
+            <i class="fa-solid fa-receipt"></i> ISSN Compliance
+          </div>
+          <h1 class="issn-title">
+            International Publishing Standards &<br>
+            <span class="text-gradient">ISSN Compliance</span>
+          </h1>
+          <p class="issn-subtitle">
+            ScriptHive Publication follows all necessary ISSN standards, ethical publishing practices, and international
+            academic publishing requirements.
+          </p>
+        </div>
+
+        <div class="issn-hero-visual" data-aos="fade-left">
+          <div class="issn-float-card issn-cert">
+            <i class="fa-solid fa-certificate"></i>
+            <h3 style="color:#fff; margin:0 0 4px; font-size:1.2rem;">ISSN International Centre</h3>
+            <div class="issn-cert-text">ISSN 2XXX-XXXX</div>
+            <p style="color:var(--text-muted); margin:0; font-size:0.85rem;">Registered & Verified</p>
+          </div>
+
+          <div class="issn-float-card issn-verify">
+            <div style="display:flex; align-items:center; gap:16px;">
+              <div
+                style="width:40px; height:40px; border-radius:50%; background:rgba(16,185,129,0.2); display:flex; align-items:center; justify-content:center;">
+                <i class="fa-solid fa-check-double" style="color:var(--brand-shield);"></i>
+              </div>
+              <div>
+                <div style="color:#fff; font-weight:600; font-size:1rem;">Compliant</div>
+                <div style="color:var(--text-muted); font-size:0.8rem;">Global Standards</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="issn-float-card issn-tags">
+            <div class="issn-tag-item"><i class="fa-solid fa-file-signature"></i> 📜 ISSN Registered</div>
+            <div class="issn-tag-item"><i class="fa-solid fa-microscope"></i> 🔬 Peer Reviewed</div>
+            <div class="issn-tag-item"><i class="fa-solid fa-lock-open"></i> 🌐 Open Access</div>
+            <div class="issn-tag-item"><i class="fa-solid fa-book-journal-whills"></i> 📚 Archived</div>
+            <div class="issn-tag-item"><i class="fa-solid fa-scale-balanced"></i> 🛡 Ethical Publishing</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About ISSN Section -->
+    <section class="issn-section" data-aos="fade-up">
+      <div class="container issn-container">
+        <div class="issn-about-block">
+          <div class="issn-about-text">
+            <h2 class="issn-section-title" style="text-align:left;">About ISSN</h2>
+            <p>The International Standard Serial Number (ISSN) is a unique eight-digit identifier assigned to serial
+              publications — including academic journals, magazines, and newspapers. Issued by the ISSN International
+              Centre in Paris and national ISSN centres worldwide, it is the globally recognised standard for
+              identifying periodical publications.</p>
+            <div class="issn-highlight-box">
+              <i class="fa-solid fa-globe"></i>
+              <p>ISSN confirms the legitimacy and international identity of scholarly journals.</p>
+            </div>
+          </div>
+          <div class="issn-about-visual" data-aos="zoom-in" data-aos-delay="200">
+            <div class="issn-barcode">*ISSN 1234-5678*</div>
+            <p style="color:var(--brand-light-blue); font-weight:600; margin-top:16px; letter-spacing:1px;">GLOBAL
+              IDENTIFIER</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Compliance Standards Section -->
+    <section class="issn-section">
+      <div class="container issn-container">
+        <h2 class="issn-section-title" data-aos="fade-up">Our Compliance Standards</h2>
+        <p class="issn-section-subtitle" data-aos="fade-up" data-aos-delay="100">ScriptHive rigorously follows all ISSN
+          registration requirements and international publishing norms.</p>
+
+        <div class="issn-grid-3">
+          <!-- Card 1 -->
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="issn-card-icon"><i class="fa-solid fa-fingerprint"></i></div>
+            <h4>Unique Journal Titles</h4>
+            <p>Each journal has a unique and discipline-specific title, preventing confusion in indexing databases.</p>
+          </div>
+          <!-- Card 2 -->
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="issn-card-icon icon-gold"><i class="fa-solid fa-users"></i></div>
+            <h4>Editorial Board</h4>
+            <p>Visible editorial boards with clear institutional affiliations and academic qualifications.</p>
+          </div>
+          <!-- Card 3 -->
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="issn-card-icon icon-purple"><i class="fa-solid fa-bullseye"></i></div>
+            <h4>Aim & Scope</h4>
+            <p>Clearly defined journal scope and academic focus to guide authors and readers.</p>
+          </div>
+          <!-- Card 4 -->
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="issn-card-icon"><i class="fa-regular fa-calendar-check"></i></div>
+            <h4>Regular Publication</h4>
+            <p>Quarterly publication schedule maintained with strict consistency and timeliness.</p>
+          </div>
+          <!-- Card 5 -->
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="issn-card-icon icon-shield"><i class="fa-solid fa-user-secret"></i></div>
+            <h4>Peer Review Transparency</h4>
+            <p>Transparent double-blind peer review process ensuring rigorous academic evaluation.</p>
+          </div>
+          <!-- Card 6 -->
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="issn-card-icon icon-gold"><i class="fa-solid fa-earth-americas"></i></div>
+            <h4>Online Accessibility</h4>
+            <p>Open-access digital availability for all publications without paywalls.</p>
+          </div>
+          <!-- Card 7 -->
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="issn-card-icon icon-purple"><i class="fa-solid fa-box-archive"></i></div>
+            <h4>Archive Availability</h4>
+            <p>Permanent online archives of all issues and volumes securely maintained.</p>
+          </div>
+          <!-- Card 8 -->
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="issn-card-icon"><i class="fa-solid fa-building"></i></div>
+            <h4>Publisher Disclosure</h4>
+            <p>Visible publisher identity, corporate address, and responsive contact details.</p>
+          </div>
+          <!-- Card 9 -->
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="issn-card-icon icon-shield"><i class="fa-solid fa-scale-balanced"></i></div>
+            <h4>Ethical Publishing</h4>
+            <p>Strict compliance with COPE guidelines and international publishing ethics.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ISSN Display Guidelines Section -->
+    <section class="issn-section">
+      <div class="container issn-container">
+        <h2 class="issn-section-title" data-aos="fade-up">ISSN Display Guidelines</h2>
+        <p class="issn-section-subtitle" data-aos="fade-up" data-aos-delay="100">We ensure standardized ISSN visibility
+          across all our platforms and documents.</p>
+
+        <div class="issn-grid-3">
+          <div class="issn-card" data-aos="zoom-in" data-aos-delay="100" style="text-align:center;">
+            <i class="fa-solid fa-laptop-code"
+              style="font-size:3rem; color:var(--brand-light-blue); margin-bottom:20px;"></i>
+            <h4>Journal Homepage</h4>
+            <p>ISSN is displayed prominently on all journal banners, footers, and index headers.</p>
+          </div>
+          <div class="issn-card" data-aos="zoom-in" data-aos-delay="200" style="text-align:center;">
+            <i class="fa-solid fa-file-lines" style="font-size:3rem; color:var(--brand-gold); margin-bottom:20px;"></i>
+            <h4>Article Pages</h4>
+            <p>ISSN remains visible in article metadata, DOI links, and citation generators.</p>
+          </div>
+          <div class="issn-card" data-aos="zoom-in" data-aos-delay="300" style="text-align:center;">
+            <i class="fa-solid fa-file-pdf" style="font-size:3rem; color:#ef4444; margin-bottom:20px;"></i>
+            <h4>PDF Publications</h4>
+            <p>ISSN is explicitly included in headers, footers, and the first page of all downloaded articles.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Publishing Standards Section -->
+    <section class="issn-section">
+      <div class="container issn-container">
+        <div class="issn-split">
+          <div data-aos="fade-right">
+            <h2 class="issn-section-title" style="text-align:left;">Publishing Standards</h2>
+            <p style="font-size: 1.1rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 32px;">ScriptHive
+              follows international publishing norms aligned with the ISSN International Centre, COPE Guidelines, and
+              Scholarly Publishing Standards.</p>
+            <a href="/guidelines" class="issn-btn issn-btn-outline"><i class="fa-solid fa-scroll"></i> Read Full
+              Guidelines</a>
+          </div>
+
+          <div class="issn-standard-box" data-aos="fade-left">
+            <h3 style="color:#fff; margin-bottom:24px; font-size:1.5rem;"><i class="fa-solid fa-list-check"
+                style="color:var(--brand-light-blue); margin-right:10px;"></i> Our Commitments</h3>
+            <ul class="issn-list">
+              <li><i class="fa-solid fa-circle-check"></i> Transparent publication policies</li>
+              <li><i class="fa-solid fa-circle-check"></i> Fair and unbiased peer review</li>
+              <li><i class="fa-solid fa-circle-check"></i> Prompt corrections & retractions</li>
+              <li><i class="fa-solid fa-circle-check"></i> Long-term archival preservation</li>
+              <li><i class="fa-solid fa-circle-check"></i> Author intellectual property protection</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ISSN Registration Status -->
+    <section class="issn-section">
+      <div class="container issn-container" data-aos="zoom-in">
+        <div class="issn-status-section">
+          <h2>ISSN Registration Status</h2>
+          <p>All ScriptHive journals are registered with the ISSN International Centre for both Print and Online
+            editions.</p>
+
+          <div class="issn-status-badges">
+            <div class="issn-status-badge">
+              <i class="fa-solid fa-print" style="color:var(--brand-light-blue);"></i> Print ISSN Registered
+            </div>
+            <div class="issn-status-badge">
+              <i class="fa-solid fa-wifi" style="color:var(--brand-gold);"></i> Online ISSN Registered
+            </div>
+          </div>
+
+          <div style="margin-top:20px; color:var(--text-muted);">
+            Questions about indexing? Contact: <a href="mailto:info@scripthive.org"
+              style="color:var(--brand-light-blue); font-weight:600; text-decoration:none;">info@scripthive.org</a>
+          </div>
+          <div style="margin-top:32px;">
+            <a href="/journals" class="issn-btn issn-btn-primary">📚 View Our Journals</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust & Credibility Section -->
+    <section class="issn-section">
+      <div class="container issn-container">
+        <h2 class="issn-section-title" data-aos="fade-up">Why ISSN Compliance Matters</h2>
+        <p class="issn-section-subtitle" data-aos="fade-up" data-aos-delay="100">An active ISSN provides profound
+          benefits for authors and their research.</p>
+
+        <div class="issn-grid-3">
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="100">
+            <i class="fa-solid fa-globe" style="font-size:2rem; color:var(--brand-light-blue); margin-bottom:16px;"></i>
+            <h4>Global Recognition</h4>
+            <p>Ensures the journal is recognized internationally by researchers and institutions.</p>
+          </div>
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="200">
+            <i class="fa-solid fa-chart-line"
+              style="font-size:2rem; color:var(--brand-shield); margin-bottom:16px;"></i>
+            <h4>Improved Indexing</h4>
+            <p>Crucial for eligibility in major databases like Scopus, Web of Science, and Crossref.</p>
+          </div>
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="300">
+            <i class="fa-solid fa-magnifying-glass"
+              style="font-size:2rem; color:var(--brand-gold); margin-bottom:16px;"></i>
+            <h4>Discoverability</h4>
+            <p>Helps librarians, researchers, and automated systems easily locate the publication.</p>
+          </div>
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="100">
+            <i class="fa-solid fa-award" style="font-size:2rem; color:var(--brand-light-gold); margin-bottom:16px;"></i>
+            <h4>Academic Credibility</h4>
+            <p>Signifies a commitment to sustained publishing standards and editorial quality.</p>
+          </div>
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="200">
+            <i class="fa-solid fa-server"
+              style="font-size:2rem; color:var(--brand-light-blue); margin-bottom:16px;"></i>
+            <h4>Digital Preservation</h4>
+            <p>Facilities proper archival storage and cataloging in international registries.</p>
+          </div>
+          <div class="issn-card" data-aos="fade-up" data-aos-delay="300">
+            <i class="fa-solid fa-quote-right"
+              style="font-size:2rem; color:var(--brand-shield); margin-bottom:16px;"></i>
+            <h4>Standardized Citation</h4>
+            <p>Ensures citations are accurately tracked across various bibliometric platforms.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="container issn-container" style="margin-bottom:80px;">
+      <div class="issn-cta" data-aos="zoom-in">
+        <div class="issn-cta-content">
+          <h2>Committed to International Publishing Excellence</h2>
+          <p>ScriptHive ensures transparency, ethical publishing, and full ISSN compliance across all journals to
+            provide a premium platform for global researchers.</p>
+          <div class="issn-cta-buttons">
+            <a href="/submit" class="issn-btn issn-btn-primary">
+              <i class="fa-solid fa-paper-plane"></i> Submit Paper
+            </a>
+            <a href="/journals" class="issn-btn issn-btn-outline">
+              <i class="fa-solid fa-book-open"></i> Explore Journals
+            </a>
+            <a href="mailto:info@scripthive.org" class="issn-btn issn-btn-outline">
+              <i class="fa-solid fa-headset"></i> Contact Editorial Team
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- AOS Animation Script -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof AOS !== 'undefined') {
+        AOS.init({
+          duration: 800,
+          offset: 50,
+          once: true,
+          easing: 'ease-out-cubic'
+        });
+      }
+    });
+  </script>
+
+  <%- include('../partials/footer') %>

@@ -1,0 +1,294 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id String @id @default(uuid())
+}
+
+model Role {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  displayName String
+  description String?
+  permissions RolePermission[]
+  users       AdminUser[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Permission {
+  id       String           @id @default(uuid())
+  resource String
+  action   String
+  roles    RolePermission[]
+
+  @@unique([resource, action])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model Author {
+  id             String                @id @default(uuid())
+  email          String                @unique
+  passwordHash   String
+  name           String
+  phone          String?
+  country        String?
+  affiliations   String?
+  isActive       Boolean               @default(true)
+  lastLoginAt    DateTime?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  submissions    Submission[]
+  refreshTokens  AuthorRefreshToken[]
+}
+
+model AuthorRefreshToken {
+  id        String   @id @default(uuid())
+  authorId  String
+  author    Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model AdminUser {
+  id            String         @id @default(uuid())
+  email         String?        @unique
+  username      String?        @unique
+  passwordHash  String
+  name          String
+  roleId        String
+  role          Role           @relation(fields: [roleId], references: [id])
+  isActive      Boolean        @default(true)
+  lastLoginAt   DateTime?
+  createdBy     String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+  mediaFiles    MediaFile[]
+}
+
+model MediaFile {
+  id           String     @id @default(uuid())
+  originalName String
+  storedName   String     @unique
+  mimeType     String
+  size         Int
+  url          String
+  uploadedById String?
+  uploadedBy   AdminUser? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt    DateTime   @default(now())
+}
+
+model Journal {
+  id             String                @id
+  name           String
+  issn           String?
+  eIssn          String?
+  description    String?
+  scope          String?
+  status         String                @default("Active")
+  sortOrder      Int                   @default(0)
+  createdAt      DateTime              @default(now())
+  volumes        Volume[]
+  submissions    Submission[]
+  editorialBoard EditorialBoardMember[]
+}
+
+model EditorialBoardMember {
+  id          String   @id @default(uuid())
+  journalId   String
+  journal     Journal  @relation(fields: [journalId], references: [id], onDelete: Cascade)
+  name        String
+  role        String
+  institution String
+  email       String?
+  phone       String?
+  photoUrl    String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Volume {
+  id        Int      @id @default(autoincrement())
+  journalId String
+  journal   Journal  @relation(fields: [journalId], references: [id])
+  number    Int
+  year      Int
+  issues    Issue[]
+
+  @@unique([journalId, number])
+}
+
+model Issue {
+  id        Int      @id @default(autoincrement())
+  volumeId  Int
+  volume    Volume   @relation(fields: [volumeId], references: [id])
+  number    Int
+  period    String?
+  isCurrent Boolean  @default(false)
+  parts     Part[]
+
+  @@unique([volumeId, number])
+}
+
+model Part {
+  id       Int          @id @default(autoincrement())
+  issueId  Int
+  issue    Issue        @relation(fields: [issueId], references: [id])
+  name     String
+  articles Submission[]
+
+  @@unique([issueId, name])
+}
+
+model Submission {
+  id             String    @id
+  journalId      String
+  journal        Journal   @relation(fields: [journalId], references: [id])
+  authorUserId   String?
+  authorUser     Author?   @relation(fields: [authorUserId], references: [id], onDelete: SetNull)
+  title          String
+  country        String?
+  authorName     String
+  authorEmail    String
+  authorPhone    String?
+  affiliations   String?
+  coAuthors      String?
+  abstract       String
+  keywords       String
+  articleType    String    @default("Research")
+  manuscriptPath String?
+  status         String    @default("Pending")
+  priority       Boolean   @default(false)
+  productionStatus String?
+  reviewNotes    String?
+  editorNotes    String?
+  volumeId       Int?
+  issueId        Int?
+  partId         Int?
+  part           Part?     @relation(fields: [partId], references: [id])
+  pageStart      Int?
+  pageEnd        Int?
+  pubDate        DateTime?
+  pdfPublicPath  String?
+  slug           String?   @unique
+  specialIssue   Boolean   @default(false)
+  addons         Json?
+  viewCount      Int       @default(0)
+  downloadCount  Int       @default(0)
+  apcAmount      Float     @default(0)
+  apcCurrency    String    @default("USD")
+  paymentStatus  String    @default("Pending")
+  paymentMethod  String?
+  paymentId      String?
+  paidAt         DateTime?
+  doiRecord      DoiRecord?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  invoices       Invoice[]
+}
+
+model DoiRecord {
+  id           Int        @id @default(autoincrement())
+  submissionId String     @unique
+  submission   Submission @relation(fields: [submissionId], references: [id])
+  doi          String?    @unique
+  status       String     @default("Pending")
+  xmlPath      String?
+  logs         String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Invoice {
+  id            String     @id
+  submissionId  String
+  submission    Submission @relation(fields: [submissionId], references: [id])
+  customerName  String
+  customerEmail String
+  address       String?
+  items         Json
+  subtotal      Float
+  tax           Float      @default(0)
+  total         Float
+  currency      String     @default("USD")
+  method        String?
+  status        String     @default("Pending")
+  dueDate       DateTime?
+  paidAt        DateTime?
+  gatewayOrderId String?
+  gatewayPayId   String?
+  notes         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model CarouselSlide {
+  id        String   @id @default(uuid())
+  imageUrl  String
+  title     String?
+  subtitle  String?
+  linkUrl   String?
+  position  Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id         Int       @id @default(autoincrement())
+  adminId    String?
+  admin      AdminUser? @relation(fields: [adminId], references: [id])
+  action     String
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  createdAt  DateTime  @default(now())
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  adminId   String
+  admin     AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+}
+
+model ContactQuery {
+  id        String   @id @default(uuid())
+  queryId   String   @unique
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  status    String   @default("New")
+  ipAddress String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

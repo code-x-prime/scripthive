@@ -1,0 +1,1247 @@
+<%- include('../partials/header') %>
+
+<!-- jsPDF CDN for Premium Client-Side PDF Generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --navy: #0f172a;
+    --gold: #fbbf24;
+    --gold-light: #fef08a;
+    --bg-light: #f8fafc;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --brand-shield: #10b981;
+    --brand-danger: #ef4444;
+  }
+
+  .submit-page {
+    background-color: var(--bg-light);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    color: var(--text-dark);
+  }
+
+  .submit-page h1, .submit-page h2, .submit-page h3, .submit-page h4, .submit-page h5 {
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .section-title { font-size: 2.5rem; font-weight: 800; color: var(--text-dark); margin-bottom: 20px; text-align: center; }
+  .section-subtitle { font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; max-width: 700px; margin: 0 auto 50px; text-align: center; }
+
+  /* Hero Section matched to contact.ejs */
+  .submit-hero {
+    background: var(--navy);
+    color: white;
+    padding: 150px 20px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-mesh {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(251, 191, 36, 0.15) 0%, transparent 50%);
+    animation: pulseMesh 10s infinite alternate;
+  }
+
+  @keyframes pulseMesh {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.1); opacity: 1; }
+  }
+
+  .hero-content {
+    max-width: 1200px; margin: 0 auto;
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 50px; align-items: center;
+  }
+
+  .breadcrumb { font-size: 0.9rem; color: #94a3b8; margin-bottom: 20px; }
+  .breadcrumb a { color: #cbd5e1; text-decoration: none; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px 16px; border-radius: 30px; font-size: 0.9rem; margin-bottom: 20px;
+    backdrop-filter: blur(10px); color: var(--gold);
+  }
+
+  .submit-hero h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; background: linear-gradient(to right, #fff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .submit-hero p { font-size: 1.2rem; color: #94a3b8; line-height: 1.6; margin-bottom: 40px; }
+
+  .hero-visual { position: relative; height: 400px; perspective: 1000px; }
+  .floating-bubble {
+    position: absolute; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    padding: 20px; border-radius: 16px; backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    display: flex; align-items: center; gap: 15px;
+  }
+  .fb-1 { top: 40px; right: 20px; animation: floatCard 6s infinite alternate ease-in-out; }
+  .fb-2 { bottom: 60px; left: 0; background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(30,64,175,0.4)); animation: floatCard 5s infinite alternate-reverse ease-in-out; }
+  .fb-3 { top: 200px; right: -20px; border-color: var(--gold); animation: floatCard 7s infinite alternate ease-in-out; }
+  .fb-icon { background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--primary); }
+
+  @keyframes floatCard {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-20px); }
+  }
+
+  /* Grid 4 for Features */
+  .features-section { padding: 80px 20px; background: var(--bg-light); max-width: 1200px; margin: 0 auto; position: relative; z-index: 10; margin-top: -50px; }
+  .sub-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .sub-feature-card {
+    background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
+    border-radius: 20px; padding: 32px 24px; text-align: center;
+    transition: 0.3s; position: relative; overflow: hidden; box-shadow: var(--glass-shadow);
+  }
+  .sub-feature-card:hover { transform: translateY(-5px); border-color: rgba(37,99,235,0.3); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
+  .sub-feature-card i { font-size: 2.5rem; color: var(--primary); margin-bottom: 16px; }
+  .sub-feature-card h4 { font-size: 1.3rem; color: var(--text-dark); margin-bottom: 8px; font-weight: 700; }
+  .sub-feature-card p { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+
+  /* Compliance Section */
+  .compliance-section { padding: 40px 20px 80px; max-width: 1200px; margin: 0 auto; }
+  .sub-compliance-box {
+    background: white;
+    border: 1px solid var(--glass-border); border-radius: 24px; padding: 48px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+  }
+  .sub-compliance-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 24px; }
+  .sub-compliance-header i { font-size: 2rem; color: var(--gold); }
+  .sub-compliance-header h3 { font-size: 1.8rem; color: var(--text-dark); margin: 0; font-weight: 800; }
+
+  .sub-check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .sub-check-item {
+    display: flex; align-items: flex-start; gap: 16px;
+    background: var(--bg-light); border: 1px solid rgba(0,0,0,0.05);
+    padding: 16px 20px; border-radius: 16px; transition: 0.3s;
+  }
+  .sub-check-item:hover { background: white; border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+  .sub-check-item i { color: #10b981; font-size: 1.2rem; margin-top: 2px; }
+  .sub-check-item p { margin: 0; color: var(--text-dark); font-size: 1rem; line-height: 1.5; font-weight: 500; }
+
+  /* Form Container */
+  .form-container-wrapper { padding: 40px 20px 80px; max-width: 1000px; margin: 0 auto; }
+  .form-card {
+    background: white; border-radius: 24px; padding: 60px; box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+    border: 1px solid var(--glass-border); position: relative; overflow: hidden;
+  }
+  .form-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px;
+    background: linear-gradient(90deg, var(--primary), var(--gold));
+  }
+  
+  .sub-form-header { text-align: center; margin-bottom: 48px; }
+  .sub-form-header h2 { font-size: 2.5rem; color: var(--text-dark); margin-bottom: 12px; font-weight: 800; }
+  .sub-form-header p { color: var(--text-muted); font-size: 1.1rem; }
+
+  .sub-form-section { margin-bottom: 40px; }
+  .sub-form-section-title { font-size: 1.3rem; color: var(--primary); margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-weight: 700; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 12px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-group { position: relative; margin-bottom: 25px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-control {
+    width: 100%; padding: 18px 20px 10px; background: #ffffff; border: 1.5px solid #cbd5e1;
+    border-radius: 12px; font-size: 1rem; color: var(--text-dark); transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+    font-family: inherit;
+  }
+  .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+  .form-control:hover:not(:focus) { border-color: #94a3b8; }
+  .form-label {
+    position: absolute; left: 20px; top: 14px; color: var(--text-muted); pointer-events: none;
+    transition: 0.2s; font-size: 0.95rem; font-weight: 500;
+  }
+  .form-control:focus ~ .form-label, .form-control:not(:placeholder-shown) ~ .form-label {
+    top: 5px; font-size: 0.72rem; color: var(--primary); font-weight: 700; letter-spacing: 0.02em;
+  }
+
+  select.form-control { appearance: none; cursor: pointer; }
+  .select-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+  textarea.form-control { resize: vertical; min-height: 120px; }
+
+  /* File Drop Zone */
+  .file-drop {
+    border: 2px dashed #cbd5e1; border-radius: 12px; padding: 40px 20px; text-align: center;
+    transition: 0.3s; cursor: pointer; background: var(--bg-light); position: relative; overflow: hidden;
+  }
+  .file-drop:hover { border-color: var(--primary); background: rgba(37,99,235,0.02); }
+  .file-drop input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .file-drop-icon { font-size: 3rem; color: var(--primary); margin-bottom: 16px; }
+  .file-drop p { color: var(--text-dark); font-weight: 600; font-size: 1.1rem; margin-bottom: 8px; }
+  .file-drop span { color: var(--text-muted); font-size: 0.9rem; }
+  .sub-file-name { margin-top: 16px; font-weight: 700; color: #10b981; font-size: 1rem; }
+
+  /* Checkbox */
+  .sub-checkbox-group {
+    display: flex; align-items: flex-start; gap: 16px;
+    background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2);
+    padding: 24px; border-radius: 16px; margin-top: 20px;
+  }
+  .sub-checkbox {
+    appearance: none; width: 24px; height: 24px; border: 2px solid #cbd5e1;
+    border-radius: 6px; cursor: pointer; position: relative; flex-shrink: 0; margin-top: 2px;
+    transition: 0.2s; background: white;
+  }
+  .sub-checkbox:checked { background: #10b981; border-color: #10b981; }
+  .sub-checkbox:checked::after {
+    content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    color: white; font-size: 0.8rem;
+  }
+  .sub-checkbox-label { color: var(--text-dark); font-size: 0.95rem; line-height: 1.6; cursor: pointer; font-weight: 500; }
+
+  /* Submit Button */
+  .submit-btn {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white; border: none; width: 100%; padding: 20px; border-radius: 16px;
+    font-size: 1.2rem; font-weight: 800; cursor: pointer; transition: 0.3s;
+    box-shadow: 0 10px 20px rgba(37,99,235,0.2); position: relative; overflow: hidden; margin-top: 30px;
+  }
+  .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(37,99,235,0.3); }
+  .submit-btn::after {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: rgba(255,255,255,0.2); transform: rotate(45deg); transition: 0.5s; opacity: 0;
+  }
+  .submit-btn:hover::after { opacity: 1; left: 100%; }
+
+  .sub-btn-outline {
+    padding: 12px 24px; font-size: 0.95rem; background: var(--bg-light); border: 1px solid #cbd5e1; color: var(--text-dark); border-radius: 12px; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-weight: 600;
+  }
+  .sub-btn-outline:hover {
+    border-color: var(--primary); color: var(--primary); background: white;
+  }
+
+  /* Note Section */
+  .sub-note-section { margin-top: 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .sub-note-card {
+    background: var(--glass-bg); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    padding: 32px; border-radius: 20px; backdrop-filter: blur(10px);
+  }
+  .sub-note-card h4 { font-size: 1.2rem; color: var(--text-dark); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; font-weight: 800; }
+  .sub-note-list { list-style: none; padding: 0; margin: 0; }
+  .sub-note-list li { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 12px; line-height: 1.5; display: flex; gap: 10px; font-weight: 500; }
+  .sub-note-list li i { color: var(--gold); margin-top: 4px; }
+
+  .sub-contact-grid { display: flex; flex-direction: column; gap: 16px; }
+  .sub-contact-item { display: flex; align-items: center; gap: 16px; background: white; padding: 16px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); }
+  .sub-contact-item i { font-size: 1.5rem; color: var(--primary); }
+  .sub-contact-item div { color: var(--text-dark); font-weight: 700; font-size: 1rem; }
+  .sub-contact-item span { display: block; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; margin-bottom: 2px; }
+
+  /* Status UI / Trust */
+  .sub-trust-badges { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 60px; }
+  .sub-trust-badge { display: flex; align-items: center; gap: 10px; color: var(--text-dark); font-size: 0.95rem; background: var(--bg-light); padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(0,0,0,0.05); font-weight: 600; }
+  .sub-trust-badge i { color: #10b981; }
+
+  /* Responsive */
+  @media (max-width: 992px) {
+    .hero-content { grid-template-columns: 1fr; text-align: center; }
+    .hero-visual { display: none; }
+    .submit-hero h1 { font-size: 3rem; }
+    .sub-subtitle { margin: 0 auto 40px; }
+    .hero-stats { justify-content: center; }
+    .sub-grid-4 { grid-template-columns: 1fr 1fr; }
+    .sub-check-grid { grid-template-columns: 1fr; }
+    .form-card { padding: 40px 24px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .sub-note-section { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 576px) {
+    .sub-grid-4 { grid-template-columns: 1fr; }
+  }
+
+  /* Premium Modal styling */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center; z-index: 9999;
+    opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+  }
+  .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+  .premium-modal {
+    background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 24px;
+    padding: 40px; width: 90%; max-width: 550px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: translateY(30px) scale(0.95); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: center; color: var(--text-dark); position: relative; overflow: hidden;
+  }
+  .modal-overlay.active .premium-modal { transform: translateY(0) scale(1); }
+
+  .modal-glow {
+    position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+    width: 250px; height: 150px; background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .modal-glow.danger {
+    background: radial-gradient(circle, rgba(239,68,68,0.2) 0%, transparent 70%);
+  }
+
+  .modal-content { position: relative; z-index: 10; }
+
+  /* Success Tick Animation */
+  .success-checkmark {
+    width: 80px; height: 80px; margin: 0 auto 24px;
+    background: rgba(16, 185, 129, 0.1); border: 2px solid #10b981; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #10b981;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    animation: scaleInCheck 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes scaleInCheck {
+    0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  /* Error Cross Animation */
+  .error-cross {
+    width: 80px; height: 80px; margin: 0 auto 24px;
+    background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #ef4444;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+    animation: shakeCross 0.5s ease-in-out;
+  }
+  @keyframes shakeCross {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  .modal-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; font-family: 'Outfit', sans-serif; }
+  .modal-message { color: var(--text-muted); font-size: 1.05rem; line-height: 1.6; margin-bottom: 24px; }
+
+  /* Submission ID styling */
+  .submission-id-container {
+    background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 12px;
+    padding: 16px; margin-bottom: 24px; font-family: monospace; font-size: 1.3rem;
+    font-weight: 700; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 10px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  }
+
+  /* Loader Spinner */
+  .loader-spinner {
+    border: 4px solid rgba(37, 99, 235, 0.1); border-left-color: var(--primary);
+    border-radius: 50%; width: 60px; height: 60px; margin: 0 auto 24px;
+    animation: spinLoader 1s linear infinite;
+  }
+  @keyframes spinLoader {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .progress-container {
+    width: 100%; height: 8px; background: #e2e8f0; border-radius: 10px;
+    overflow: hidden; margin: 20px 0 10px; display: none;
+  }
+  .progress-bar {
+    width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--gold));
+    transition: width 0.3s ease;
+  }
+
+  .modal-btn-group { display: flex; gap: 16px; justify-content: center; }
+  .modal-btn {
+    padding: 14px 28px; border-radius: 12px; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; border: none;
+  }
+  .modal-btn.primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white;
+    box-shadow: 0 8px 16px rgba(37,99,235,0.2);
+  }
+  .modal-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 12px 20px rgba(37,99,235,0.3); }
+  .modal-btn.secondary {
+    background: #e2e8f0; color: var(--text-dark);
+  }
+  .modal-btn.secondary:hover { background: #cbd5e1; transform: translateY(-2px); }
+  .modal-btn.danger {
+    background: var(--brand-danger); color: white;
+  }
+  .modal-btn.danger:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(239,68,68,0.2); }
+</style>
+
+
+<div class="submit-page">
+  
+  <!-- HERO SECTION -->
+  <section class="submit-hero">
+    <div class="hero-mesh"></div>
+    <div class="hero-content">
+      <div class="hero-text gs-reveal">
+        <div class="breadcrumb"><a href="/">Home</a> › Submit Paper</div>
+        <div class="hero-badge"><i class="fa-solid fa-file-arrow-up"></i> Submit Your Paper</div>
+        <h1>Submit Your<br>Research Manuscript</h1>
+        <p class="sub-subtitle">Fill out the submission form below to submit your manuscript for peer review and publication consideration. We respond within 7–15 working days.</p>
+        
+        <div class="hero-stats">
+          <div class="hero-stat-card"><i class="fa-solid fa-bolt stat-icon"></i> <span class="stat-text" style="color:white;">7–15 Day Review</span></div>
+          <div class="hero-stat-card"><i class="fa-solid fa-lock-open stat-icon"></i> <span class="stat-text" style="color:white;">Open Access</span></div>
+          <div class="hero-stat-card"><i class="fa-solid fa-certificate stat-icon"></i> <span class="stat-text" style="color:white;">ISSN Registered</span></div>
+        </div>
+      </div>
+      
+      <div class="hero-visual gs-reveal">
+        <div class="floating-bubble fb-1">
+          <div class="fb-icon"><i class="fa-solid fa-file-signature"></i></div>
+          <div>
+            <div style="font-weight:700;color:white;">Submit Manuscript</div>
+            <div style="font-size:0.8rem;color:#cbd5e1;">Word Format</div>
+          </div>
+        </div>
+        <div class="floating-bubble fb-2">
+          <div class="fb-icon" style="color:#10b981;"><i class="fa-solid fa-microscope"></i></div>
+          <div>
+            <div style="font-weight:700;color:white;">Peer Review</div>
+            <div style="font-size:0.8rem;color:#cbd5e1;">Double-Blind</div>
+          </div>
+        </div>
+        <div class="floating-bubble fb-3">
+          <div class="fb-icon" style="color:var(--gold);"><i class="fa-solid fa-check-double"></i></div>
+          <div>
+            <div style="font-weight:700;color:white;">Publishing</div>
+            <div style="font-size:0.8rem;color:#cbd5e1;">Global Visibility</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Highlights -->
+  <section class="features-section gs-reveal-up">
+    <div class="sub-grid-4">
+      <div class="sub-feature-card">
+        <i class="fa-solid fa-bolt"></i>
+        <h4>7–15 Days</h4>
+        <p>Initial Review Time</p>
+      </div>
+      <div class="sub-feature-card">
+        <i class="fa-solid fa-user-secret"></i>
+        <h4>Double Blind</h4>
+        <p>Peer Review Process</p>
+      </div>
+      <div class="sub-feature-card">
+        <i class="fa-solid fa-globe"></i>
+        <h4>Open Access</h4>
+        <p>Global Visibility</p>
+      </div>
+      <div class="sub-feature-card">
+        <i class="fa-solid fa-scroll"></i>
+        <h4>ISSN Registered</h4>
+        <p>International Journals</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Before You Submit -->
+  <section class="compliance-section gs-reveal-up">
+    <div class="sub-compliance-box">
+      <div class="sub-compliance-header">
+        <i class="fa-solid fa-clipboard-check"></i>
+        <h3>Before You Submit — Please Note</h3>
+      </div>
+      <div class="sub-check-grid">
+        <div class="sub-check-item">
+          <i class="fa-solid fa-check"></i>
+          <p>Manuscript must be original and not currently under review elsewhere.</p>
+        </div>
+        <div class="sub-check-item">
+          <i class="fa-solid fa-check"></i>
+          <p>Submit exclusively in MS Word format (.doc or .docx).</p>
+        </div>
+        <div class="sub-check-item">
+          <i class="fa-solid fa-check"></i>
+          <p>Include a structured Abstract (150–250 words) and 5–7 keywords.</p>
+        </div>
+        <div class="sub-check-item">
+          <i class="fa-solid fa-check"></i>
+          <p>Plagiarism must be strictly below 15% (checked before review).</p>
+        </div>
+        <div class="sub-check-item">
+          <i class="fa-solid fa-check"></i>
+          <p>Adhere to APA or Vancouver citation styles uniformly.</p>
+        </div>
+        <div class="sub-check-item">
+          <i class="fa-solid fa-check"></i>
+          <p>All submissions undergo rigorous double-blind peer review.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Form -->
+  <section class="form-container-wrapper gs-reveal">
+    <div class="form-card">
+      <div class="sub-form-header">
+        <h2>Submit Your Manuscript</h2>
+        <p>Fill out all required fields marked with <span class="sub-req" style="color:var(--brand-danger);">*</span></p>
+      </div>
+
+      <form id="paper-submit-form" novalidate>
+
+        <!-- Author Info -->
+        <div class="sub-form-section">
+          <div class="sub-form-section-title"><i class="fa-solid fa-user"></i> Author Information</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <input type="text" id="author-name" name="author_name" class="form-control" placeholder=" " required>
+              <label for="author-name" class="form-label">Full Name *</label>
+            </div>
+            <div class="form-group">
+              <input type="email" id="author-email" name="author_email" class="form-control" placeholder=" " required>
+              <label for="author-email" class="form-label">Email Address *</label>
+            </div>
+            <div class="form-group">
+              <input type="tel" id="author-phone" name="author_phone" class="form-control" placeholder=" ">
+              <label for="author-phone" class="form-label">Phone Number</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Journal Selection -->
+        <div class="sub-form-section">
+          <div class="sub-form-section-title"><i class="fa-solid fa-book-open"></i> Journal Selection</div>
+          <div class="form-group full">
+            <%
+              const journals = [
+                { id: 'SGJVSR', name: 'ScriptHive Global Journal of Vedic and Sanskrit Research (SGJVSR)' },
+                { id: 'SGMRJ',  name: 'ScriptHive Global Multidisciplinary Research Journal (SGMRJ)' },
+                { id: 'SGJPLS', name: 'ScriptHive Global Journal of Physical and Life Sciences (SGJPLS)' },
+                { id: 'SGJETR', name: 'ScriptHive Global Journal of Engineering and Technology Research (SGJETR)' },
+                { id: 'SGJSSH', name: 'ScriptHive Global Journal of Social Sciences and Humanities (SGJSSH)' },
+                { id: 'SGJASH', name: 'ScriptHive Global Journal of Applied Science and Health (SGJASH)' }
+              ];
+              const preJ = typeof preselectedJournal !== 'undefined' ? preselectedJournal : '';
+            %>
+            <select id="journal-select" name="journal" class="form-control" required>
+              <option value="" disabled <%= preJ ? '' : 'selected' %>></option>
+              <% journals.forEach(function(j){ %>
+                <option value="<%= j.id %>" <%= preJ === j.id ? 'selected' : '' %>><%= j.name %></option>
+              <% }); %>
+            </select>
+            <label for="journal-select" class="form-label">Select Journal *</label>
+            <i class="fa-solid fa-chevron-down select-icon"></i>
+          </div>
+        </div>
+
+        <!-- Manuscript Details -->
+        <div class="sub-form-section">
+          <div class="sub-form-section-title"><i class="fa-solid fa-pen-nib"></i> Manuscript Details</div>
+          <div class="form-grid">
+            <div class="form-group full">
+              <input type="text" id="paper-title" name="paper_title" class="form-control" placeholder=" " required>
+              <label for="paper-title" class="form-label">Paper Title *</label>
+            </div>
+            <div class="form-group full" id="authors-container">
+              <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 10px; font-size: 0.95rem;">Author Names <span style="color:var(--brand-danger);">*</span></div>
+              <div class="author-input-group" style="margin-bottom:16px; position:relative;">
+                <input type="text" id="author_name_1" name="author_names[]" class="form-control" placeholder=" " required>
+                <label for="author_name_1" class="form-label">Author Name 1 *</label>
+              </div>
+              <div class="author-input-group" style="margin-bottom:16px; position:relative;">
+                <input type="text" id="author_name_2" name="author_names[]" class="form-control" placeholder=" ">
+                <label for="author_name_2" class="form-label">Author Name 2</label>
+              </div>
+              
+            </div>
+            <div class="form-group full">
+              <button type="button" id="add-author-btn" class="sub-btn-outline">
+                <i class="fa-solid fa-plus"></i> Add More Author Names
+              </button>
+            </div>
+            <div class="form-group full" style="margin-top: 15px;">
+              <textarea id="abstract" name="abstract" class="form-control" placeholder=" " required></textarea>
+              <label for="abstract" class="form-label">Abstract * (150–250 words)</label>
+            </div>
+            <div class="form-group full">
+              <input type="text" id="keywords" name="keywords" class="form-control" placeholder=" " required>
+              <label for="keywords" class="form-label">Keywords * (5–7 keywords, comma separated)</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- File Upload -->
+        <div class="sub-form-section">
+          <div class="sub-form-section-title"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Manuscript</div>
+          <div class="form-group full">
+            <div class="file-drop" id="manuscript-drop">
+              <input type="file" name="manuscript" id="manuscript" accept=".pdf,.doc,.docx" required>
+              <div class="file-drop-icon"><i class="fa-solid fa-file-arrow-up"></i></div>
+              <p>Drag & drop your manuscript here or click to browse</p>
+              <span>Supported: PDF, DOC, DOCX — Max 10 MB</span>
+              <div class="sub-file-name" id="file-name-display" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add-on Services (dynamic from backend) -->
+        <div class="sub-form-section" id="addon-section" style="display:none;">
+          <div class="sub-form-section-title"><i class="fa-solid fa-plus-circle"></i> Add-On Services <span style="font-size:0.75rem;font-weight:500;color:#64748b;">(Optional)</span></div>
+          <p style="font-size:0.88rem;color:#64748b;margin-bottom:16px;">Select optional paid services for your submission.</p>
+          <div id="addon-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;"></div>
+          <div id="addon-total" style="display:none;margin-top:14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:0.9rem;font-weight:600;color:#166534;">Total add-ons</span>
+            <span id="addon-total-amt" style="font-family:monospace;font-weight:800;color:#15803d;font-size:1rem;"></span>
+          </div>
+          <input type="hidden" name="addons" id="addons-input" value="">
+        </div>
+
+        <!-- Declaration -->
+        <div class="form-group full">
+          <div class="sub-checkbox-group">
+            <input type="checkbox" id="declaration" name="declaration" class="sub-checkbox" required>
+            <label for="declaration" class="sub-checkbox-label">
+              I confirm that this manuscript is original, has not been previously published, and is not currently under review elsewhere. I agree to the publication ethics and author guidelines of ScriptHive Publication.
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn">
+          Submit Paper <i class="fa-solid fa-paper-plane" style="margin-left:8px;"></i>
+        </button>
+
+      </form>
+
+      <!-- Trust Badges inside form container -->
+      <div class="sub-trust-badges">
+        <div class="sub-trust-badge"><i class="fa-solid fa-shield-halved"></i> Secure Submission</div>
+        <div class="sub-trust-badge"><i class="fa-solid fa-lock"></i> Data Privacy Protected</div>
+        <div class="sub-trust-badge"><i class="fa-solid fa-scale-balanced"></i> Ethical Publishing</div>
+      </div>
+
+    </div>
+
+    <!-- Note Section -->
+    <div class="sub-note-section gs-reveal-up">
+      <div class="sub-note-card">
+        <h4><i class="fa-solid fa-circle-info" style="color:var(--primary);"></i> Important Information</h4>
+        <ul class="sub-note-list">
+          <li><i class="fa-solid fa-angle-right"></i> All submissions undergo rigorous double-blind peer review.</li>
+          <li><i class="fa-solid fa-angle-right"></i> Authors will be notified of the editorial decision within 7–15 working days.</li>
+          <li><i class="fa-solid fa-angle-right"></i> Please ensure your manuscript follows the Author Guidelines before submission.</li>
+        </ul>
+      </div>
+      <div class="sub-note-card">
+        <h4><i class="fa-solid fa-headset" style="color:var(--gold);"></i> Need Assistance?</h4>
+        <div class="sub-contact-grid">
+          <div class="sub-contact-item">
+            <i class="fa-solid fa-envelope"></i>
+            <div>
+              <span>Email Support</span>
+              info@scripthive.org
+            </div>
+          </div>
+          <div class="sub-contact-item">
+            <i class="fa-solid fa-phone"></i>
+            <div>
+              <span>Phone / WhatsApp</span>
+              +91 9899916683
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Animation & Logic Scripts -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // If journal pre-selected via URL param, scroll form into view
+    const journalSel = document.getElementById('journal-select');
+    if (journalSel && journalSel.value) {
+      journalSel.dispatchEvent(new Event('change'));
+      setTimeout(function(){ journalSel.closest('.sub-form-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 400);
+    }
+
+    // Add-on services — injected server-side, no CORS issues
+    (function initAddons() {
+      const addons = <%- JSON.stringify(typeof addonServices !== 'undefined' ? addonServices : []) %>;
+      if (!addons || !addons.length) return;
+
+      const section  = document.getElementById('addon-section');
+      const grid     = document.getElementById('addon-grid');
+      const input    = document.getElementById('addons-input');
+      const totalBox = document.getElementById('addon-total');
+      const totalAmt = document.getElementById('addon-total-amt');
+      if (!section || !grid) return;
+      section.style.display = 'block';
+
+      const selected = {};
+
+      function updateTotal() {
+        const picked = addons.filter(function(a){ return selected[a.id]; });
+        const sum = picked.reduce(function(s,a){ return s + a.price; }, 0);
+        if (input) input.value = picked.length ? JSON.stringify(picked) : '';
+        if (totalBox) totalBox.style.display = picked.length ? 'flex' : 'none';
+        if (totalAmt) totalAmt.textContent = '₹' + sum.toLocaleString('en-IN');
+      }
+
+      addons.forEach(function(addon) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px 16px;background:#fff;cursor:pointer;text-align:left;transition:all 0.2s;font-family:inherit;width:100%;';
+        btn.innerHTML = '<span style="font-size:0.88rem;font-weight:600;color:#334155;">' + addon.label + '</span>' +
+          '<span style="font-family:monospace;font-size:0.85rem;font-weight:700;color:#64748b;flex-shrink:0;">₹' + addon.price.toLocaleString('en-IN') + '</span>';
+        btn.addEventListener('click', function() {
+          selected[addon.id] = !selected[addon.id];
+          if (selected[addon.id]) {
+            btn.style.borderColor = '#22c55e'; btn.style.background = '#f0fdf4';
+            btn.querySelectorAll('span')[1].style.color = '#16a34a';
+          } else {
+            btn.style.borderColor = '#e2e8f0'; btn.style.background = '#fff';
+            btn.querySelectorAll('span')[1].style.color = '#64748b';
+          }
+          updateTotal();
+        });
+        grid.appendChild(btn);
+      });
+    })();
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Reveal animations
+    gsap.utils.toArray('.gs-reveal').forEach(function(elem) {
+      gsap.from(elem, {
+        scrollTrigger: { trigger: elem, start: "top 85%" },
+        y: 50, opacity: 0, duration: 1, ease: "power3.out"
+      });
+    });
+
+    gsap.utils.toArray('.gs-reveal-up').forEach(function(elem) {
+      gsap.from(elem, {
+        scrollTrigger: { trigger: elem, start: "top 85%" },
+        y: 30, opacity: 0, duration: 0.8, ease: "power2.out"
+      });
+    });
+
+    // Form Inputs & Helpers
+    const fileInput = document.getElementById('manuscript');
+
+    // Dynamic Author Input
+    const addAuthorBtn = document.getElementById('add-author-btn');
+    const authorsContainer = document.getElementById('authors-container');
+    let authorCount = 2;
+
+    if (addAuthorBtn && authorsContainer) {
+      addAuthorBtn.addEventListener('click', function () {
+        authorCount++;
+        const newGroup = document.createElement('div');
+        newGroup.className = 'author-input-group';
+        newGroup.style.marginBottom = '16px';
+        newGroup.style.display = 'flex';
+        newGroup.style.gap = '16px';
+        newGroup.style.position = 'relative';
+
+        const inputContainer = document.createElement('div');
+        inputContainer.style.position = 'relative';
+        inputContainer.style.flex = '1';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'author_name_' + authorCount;
+        input.name = 'author_names[]';
+        input.className = 'form-control';
+        input.placeholder = ' ';
+
+        const label = document.createElement('label');
+        label.htmlFor = 'author_name_' + authorCount;
+        label.className = 'form-label';
+        label.textContent = 'Author Name ' + authorCount;
+
+        inputContainer.appendChild(input);
+        inputContainer.appendChild(label);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.style.padding = '0 20px';
+        removeBtn.style.background = 'rgba(239, 68, 68, 0.1)';
+        removeBtn.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+        removeBtn.style.color = '#ef4444';
+        removeBtn.style.borderRadius = '12px';
+        removeBtn.style.cursor = 'pointer';
+        removeBtn.style.transition = '0.3s';
+        removeBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+
+        removeBtn.onmouseover = function () { this.style.background = 'rgba(239, 68, 68, 0.2)'; };
+        removeBtn.onmouseout = function () { this.style.background = 'rgba(239, 68, 68, 0.1)'; };
+
+        removeBtn.onclick = function () {
+          newGroup.remove();
+        };
+
+        newGroup.appendChild(inputContainer);
+        newGroup.appendChild(removeBtn);
+        authorsContainer.appendChild(newGroup);
+      });
+    }
+
+    // Drag & Drop
+    const manuscriptDrop = document.getElementById('manuscript-drop');
+    if (manuscriptDrop && fileInput) {
+      ['dragenter', 'dragover'].forEach(eventName => {
+        manuscriptDrop.addEventListener(eventName, e => {
+          e.preventDefault();
+          manuscriptDrop.style.borderColor = 'var(--primary)';
+          manuscriptDrop.style.background = 'rgba(37,99,235,0.05)';
+        }, false);
+      });
+
+      ['dragleave', 'dragend', 'drop'].forEach(eventName => {
+        manuscriptDrop.addEventListener(eventName, e => {
+          e.preventDefault();
+          manuscriptDrop.style.borderColor = '#cbd5e1';
+          manuscriptDrop.style.background = 'var(--bg-light)';
+        }, false);
+      });
+
+      manuscriptDrop.addEventListener('drop', e => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files.length > 0) {
+          fileInput.files = files;
+          fileInput.dispatchEvent(new Event('change'));
+        }
+      });
+    }
+
+    // Display selected file name and perform instant validation
+    const fileNameDisplay = document.getElementById('file-name-display');
+
+    if (fileInput && fileNameDisplay) {
+      fileInput.addEventListener('change', function (e) {
+        if (this.files && this.files.length > 0) {
+          const file = this.files[0];
+          const fileExt = file.name.split('.').pop().toLowerCase();
+          const allowedExts = ['pdf', 'doc', 'docx'];
+          
+          if (!allowedExts.includes(fileExt)) {
+            showError('Invalid file type! Only PDF, DOC, and DOCX files are allowed.');
+            fileInput.value = '';
+            fileNameDisplay.style.display = 'none';
+            return;
+          }
+          
+          if (file.size > 10 * 1024 * 1024) {
+            showError('File size is too large! Maximum limit is 10MB.');
+            fileInput.value = '';
+            fileNameDisplay.style.display = 'none';
+            return;
+          }
+
+          fileNameDisplay.style.display = 'block';
+          fileNameDisplay.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#10b981; margin-right:6px;"></i> Selected: ' + file.name + ' (' + (file.size / (1024 * 1024)).toFixed(2) + ' MB)';
+        } else {
+          fileNameDisplay.style.display = 'none';
+        }
+      });
+    }
+
+    // Modal Control Helpers
+    const loadingOverlay = document.getElementById('loading-modal-overlay');
+    const loadingTitle = document.getElementById('loading-title');
+    const loadingMessage = document.getElementById('loading-message');
+    const loadingProgressContainer = document.getElementById('loading-progress-container');
+    const loadingProgressBar = document.getElementById('loading-progress-bar');
+    const loadingPercentage = document.getElementById('loading-percentage');
+
+    const successOverlay = document.getElementById('success-modal-overlay');
+    const successSubId = document.getElementById('success-sub-id');
+    const successPaperTitle = document.getElementById('success-paper-title');
+    const successJournalName = document.getElementById('success-journal-name');
+    
+    const errorOverlay = document.getElementById('error-modal-overlay');
+    const errorModalMessage = document.getElementById('error-modal-message');
+
+    function showError(message, detail) {
+      errorModalMessage.innerText = message || 'An unexpected error occurred. Please try again.';
+      const detailBox = document.getElementById('error-detail-box');
+      if (detail && detailBox) {
+        detailBox.style.display = 'block';
+        detailBox.innerText = detail;
+      } else if (detailBox) {
+        detailBox.style.display = 'none';
+      }
+      errorOverlay.classList.add('active');
+    }
+
+    // Dismiss buttons
+    document.getElementById('close-success-btn').addEventListener('click', () => {
+      successOverlay.classList.remove('active');
+    });
+    document.getElementById('close-error-btn').addEventListener('click', () => {
+      errorOverlay.classList.remove('active');
+    });
+
+    let currentSubmissionDetails = null;
+
+    // AJAX Form submission
+    const form = document.getElementById('paper-submit-form');
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // 1. Client-Side Field Validations
+        const authorName = document.getElementById('author-name').value.trim();
+        const authorEmail = document.getElementById('author-email').value.trim();
+        const journal = document.getElementById('journal-select').value;
+        const paperTitle = document.getElementById('paper-title').value.trim();
+        const abstract = document.getElementById('abstract').value.trim();
+        const keywords = document.getElementById('keywords').value.trim();
+        const declaration = document.getElementById('declaration').checked;
+
+        if (!authorName || !authorEmail || !journal || !paperTitle || !abstract || !keywords) {
+          showError('Please fill out all marked fields (*) before submitting.');
+          return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(authorEmail)) {
+          showError('Please provide a valid email address.');
+          return;
+        }
+
+        if (!fileInput.files || fileInput.files.length === 0) {
+          showError('Please upload your manuscript file (.pdf, .doc, or .docx).');
+          return;
+        }
+
+        if (!declaration) {
+          showError('You must agree to the publication ethics and guidelines to submit.');
+          return;
+        }
+
+        // 2. Initialize Loading Overlay
+        loadingTitle.innerText = 'Submitting Manuscript';
+        loadingMessage.innerText = 'Initializing connection and sanitizing manuscript...';
+        loadingProgressContainer.style.display = 'block';
+        loadingProgressBar.style.width = '0%';
+        loadingPercentage.innerText = '0%';
+        loadingOverlay.classList.add('active');
+
+        // Prepare FormData
+        const formData = new FormData(form);
+
+        // 3. Perform AJAX Request with detailed progress tracking!
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/submit-paper', true);
+
+        // Track upload progress
+        xhr.upload.addEventListener('progress', function (e) {
+          if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            
+            if (percent < 99) {
+              loadingProgressBar.style.width = percent + '%';
+              loadingPercentage.innerText = percent + '%';
+              loadingMessage.innerText = 'Uploading manuscript file... (' + (e.loaded / (1024 * 1024)).toFixed(2) + 'MB / ' + (e.total / (1024 * 1024)).toFixed(2) + 'MB)';
+            } else {
+              // Upload finished, now processing on server
+              loadingProgressBar.style.width = '99%';
+              loadingPercentage.innerText = '99%';
+              loadingTitle.innerText = 'Processing Submission';
+              loadingMessage.innerText = 'Sending confirmation emails and securing database entry...';
+            }
+          }
+        });
+
+        // Track load end
+        xhr.onload = function () {
+          loadingOverlay.classList.remove('active');
+          
+          let response = {};
+          try {
+            response = JSON.parse(xhr.responseText);
+          } catch (e) {
+            response = { status: 'error', message: 'An unexpected response was received from the server.' };
+          }
+
+          if (xhr.status === 200 && response.status === 'success') {
+            // Save submission details for receipt download
+            currentSubmissionDetails = response;
+            
+            // Populate success modal
+            successSubId.innerText = response.submission_id;
+            successPaperTitle.innerText = response.paper_title;
+            successJournalName.innerText = response.journal;
+
+            // Show Success Modal
+            successOverlay.classList.add('active');
+
+            // Reset form
+            form.reset();
+            if (fileNameDisplay) fileNameDisplay.style.display = 'none';
+            
+            // Clean up any extra author fields added dynamically
+            const dynamicAuthorGroups = document.querySelectorAll('#authors-container .author-input-group');
+            dynamicAuthorGroups.forEach((group, index) => {
+              if (index >= 0) group.remove(); // keep only original inputs
+            });
+          } else {
+            const errMsg = response.message || 'Failed to submit manuscript. Please try again.';
+            const errDetail = xhr.status !== 200 ? `HTTP ${xhr.status}` : undefined;
+            showError(errMsg, errDetail);
+          }
+        };
+
+        xhr.onerror = function () {
+          loadingOverlay.classList.remove('active');
+          showError('A network error occurred. Please check your internet connection.');
+        };
+
+        xhr.send(formData);
+      });
+    }
+
+    // 4. Client-Side Premium PDF Generator (jsPDF Integration)
+    const downloadBtn = document.getElementById('download-receipt-btn');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', function () {
+        if (!currentSubmissionDetails) return;
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        const { submission_id, timestamp, author_name, email, paper_title, journal, review_timeline } = currentSubmissionDetails;
+
+        // Elegant branding border & background styling
+        doc.setFillColor(15, 23, 42); // Navy primary
+        doc.rect(0, 0, 210, 40, 'F');
+
+        // ScriptHive Branding Header
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(22);
+        doc.text('SCRIPTHIVE PUBLICATION', 20, 18);
+        
+        doc.setTextColor(251, 191, 36); // Amber secondary
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text('OFFICIAL MANUSCRIPT SUBMISSION RECEIPT', 20, 26);
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.text('Date: ' + timestamp, 150, 26);
+
+        // Core Submission Invoice Details
+        doc.setTextColor(15, 23, 42);
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text('Submission Metadata', 20, 55);
+
+        // Draw decorative thin rule
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.5);
+        doc.line(20, 58, 190, 58);
+
+        // Metadata grid table-like structure
+        const gridData = [
+          ['Submission ID', submission_id],
+          ['Primary Author', author_name],
+          ['Contact Email', email],
+          ['Target Journal', journal],
+          ['Submission Date', timestamp],
+          ['Review Timeline', review_timeline],
+          ['Status', 'Submitted under Peer Review']
+        ];
+
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(10);
+
+        let currentY = 68;
+        gridData.forEach(row => {
+          doc.setFont('Helvetica', 'bold');
+          doc.setTextColor(100, 116, 139);
+          doc.text(row[0] + ':', 20, currentY);
+
+          doc.setFont('Helvetica', 'normal');
+          doc.setTextColor(15, 23, 42);
+          
+          if (row[0] === 'Target Journal' || row[0] === 'Submission ID') {
+            doc.setFont('Helvetica', 'bold');
+          }
+          
+          const textVal = row[1];
+          const splitText = doc.splitTextToSize(textVal, 120);
+          doc.text(splitText, 70, currentY);
+
+          currentY += (splitText.length * 5) + 3;
+        });
+
+        // Paper Title Section
+        currentY += 5;
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(15, 23, 42);
+        doc.text('Manuscript Title', 20, currentY);
+        
+        currentY += 3;
+        doc.line(20, currentY, 190, currentY);
+        
+        currentY += 8;
+        doc.setFont('Helvetica', 'oblique');
+        doc.setFontSize(11);
+        doc.setTextColor(30, 41, 59);
+        
+        const splitTitle = doc.splitTextToSize('"' + paper_title + '"', 170);
+        doc.text(splitTitle, 20, currentY);
+
+        currentY += (splitTitle.length * 6) + 10;
+
+        // Structured Info Callout box
+        doc.setFillColor(248, 250, 252);
+        doc.setDrawColor(226, 232, 240);
+        doc.rect(20, currentY, 170, 32, 'FD');
+
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(9.5);
+        doc.setTextColor(29, 78, 216);
+        doc.text('Important Information for Authors:', 24, currentY + 7);
+
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(71, 85, 105);
+        
+        const termsText = [
+          '• Your manuscript has entered our rigorous double-blind peer review process.',
+          '• The editorial board will complete the credential evaluation within 7 to 15 working days.',
+          '• For any questions or updates, please contact editorial support at info@scripthive.org.'
+        ];
+        
+        let termsY = currentY + 13;
+        termsText.forEach(term => {
+          doc.text(term, 24, termsY);
+          termsY += 5;
+        });
+
+        // Bottom Footer
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(100, 116, 139);
+        doc.text('Thank you for choosing ScriptHive to publish your valuable research.', 20, 275);
+        
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.text('ScriptHive Academic Publication Portal — www.scripthive.org', 20, 280);
+
+        // Save PDF receipt
+        doc.save('ScriptHive_Receipt_' + submission_id + '.pdf');
+      });
+    }
+  });
+</script>
+
+<!-- PREVENT SILENT FAILURES / LOADER MODAL -->
+<div class="modal-overlay" id="loading-modal-overlay">
+  <div class="premium-modal">
+    <div class="modal-glow"></div>
+    <div class="modal-content">
+      <div class="loader-spinner"></div>
+      <div class="modal-title" id="loading-title">Submitting Manuscript</div>
+      <div class="modal-message" id="loading-message">Preparing your manuscript files for secure upload...</div>
+      <div class="progress-container" id="loading-progress-container">
+        <div class="progress-bar" id="loading-progress-bar"></div>
+      </div>
+      <div id="loading-percentage" style="font-weight: 700; color: var(--primary); font-size: 0.95rem;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="success-modal-overlay">
+  <div class="premium-modal" style="max-width:680px; padding: 0; overflow:hidden;">
+    <div class="modal-glow"></div>
+    <!-- Green top banner -->
+    <div style="background: linear-gradient(135deg,#059669 0%,#10b981 100%); padding: 36px 40px 28px; text-align:center; position:relative; z-index:10;">
+      <div style="width:72px;height:72px;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2rem;color:#fff;animation:scaleInCheck 0.6s cubic-bezier(0.34,1.56,0.64,1);">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <div style="font-family:'Outfit',sans-serif;font-size:2rem;font-weight:800;color:#fff;margin-bottom:6px;">Submission Successful!</div>
+      <div style="color:rgba(255,255,255,0.85);font-size:0.95rem;">Your manuscript has been registered and sent for peer review.</div>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:32px 40px; position:relative; z-index:10;">
+      <!-- Submission ID prominent -->
+      <div style="background:#f0fdf4;border:1.5px dashed #10b981;border-radius:14px;padding:18px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div>
+          <div style="font-size:0.75rem;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Tracking ID</div>
+          <div style="font-family:monospace;font-size:1.5rem;font-weight:800;color:#065f46;" id="success-sub-id">SH-SGJVSR-2026-XXXX</div>
+        </div>
+        <i class="fa-solid fa-fingerprint" style="font-size:2rem;color:#10b981;opacity:0.6;"></i>
+      </div>
+
+      <!-- Details grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+          <div style="font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Paper Title</div>
+          <div style="font-size:0.92rem;font-weight:600;color:#0f172a;line-height:1.4;" id="success-paper-title">—</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+          <div style="font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Journal</div>
+          <div style="font-size:0.92rem;font-weight:600;color:#0f172a;line-height:1.4;" id="success-journal-name">—</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+          <div style="font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Review Timeline</div>
+          <div style="font-size:0.92rem;font-weight:700;color:#10b981;">7–15 Working Days</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+          <div style="font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Support</div>
+          <div style="font-size:0.88rem;font-weight:500;color:#2563eb;font-family:monospace;">info@scripthive.org</div>
+        </div>
+      </div>
+
+      <!-- Next steps -->
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px 20px;margin-bottom:28px;">
+        <div style="font-size:0.78rem;font-weight:700;color:#1e40af;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">What happens next?</div>
+        <div style="font-size:0.88rem;color:#1e3a8a;line-height:1.7;">
+          <div>📋 <strong>Initial screening</strong> — 1–2 days (formatting &amp; plagiarism check)</div>
+          <div>🔍 <strong>Peer review</strong> — 7–15 days (double-blind)</div>
+          <div>✉️ <strong>Decision email</strong> sent to your registered email</div>
+        </div>
+      </div>
+
+      <div class="modal-btn-group">
+        <button type="button" class="modal-btn primary" id="download-receipt-btn">
+          <i class="fa-solid fa-file-pdf"></i> Download Receipt
+        </button>
+        <button type="button" class="modal-btn secondary" id="close-success-btn">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ERROR MODAL -->
+<div class="modal-overlay" id="error-modal-overlay">
+  <div class="premium-modal" style="max-width:480px;">
+    <div class="modal-glow danger"></div>
+    <div class="modal-content">
+      <div class="error-cross"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div class="modal-title" style="color:var(--brand-danger);">Submission Failed</div>
+      <div class="modal-message" id="error-modal-message">An error occurred while uploading your paper. Please try again.</div>
+      <!-- Error detail box -->
+      <div id="error-detail-box" style="display:none;background:#fff1f2;border:1px solid #fecdd3;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.85rem;color:#9f1239;text-align:left;font-family:monospace;word-break:break-word;" id="error-detail-text"></div>
+      <div class="modal-btn-group">
+        <button type="button" class="modal-btn danger" id="close-error-btn">
+          <i class="fa-solid fa-rotate-left"></i> Try Again
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

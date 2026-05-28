@@ -1,0 +1,1086 @@
+<%- include('../partials/header') %>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --navy: #0f172a;
+      --gold: #fbbf24;
+      --gold-light: #fef08a;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.5);
+      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    }
+
+    body {
+      background-color: var(--bg-light);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Common */
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 700px;
+      margin: 0 auto 50px;
+      text-align: center;
+    }
+
+    .btn-primary-custom {
+      background: var(--primary);
+      color: white;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.3s;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary-custom:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      color: white;
+    }
+
+    .btn-outline-custom {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      padding: 10px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.3s;
+      display: inline-block;
+      margin-left: 10px;
+    }
+
+    .btn-outline-custom:hover {
+      background: rgba(37, 99, 235, 0.05);
+    }
+
+    /* Hero Section */
+    .services-hero {
+      background: var(--navy);
+      color: white;
+      padding: 150px 20px 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-mesh {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(251, 191, 36, 0.15) 0%, transparent 50%);
+      animation: pulseMesh 10s infinite alternate;
+    }
+
+    @keyframes pulseMesh {
+      0% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+    }
+
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .breadcrumb {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 20px;
+    }
+
+    .breadcrumb a {
+      color: #cbd5e1;
+      text-decoration: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .services-hero h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      background: linear-gradient(to right, #fff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .services-hero p {
+      font-size: 1.2rem;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .hero-stat-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 15px 20px;
+      border-radius: 12px;
+      backdrop-filter: blur(5px);
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .stat-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--gold);
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #cbd5e1;
+      text-transform: uppercase;
+    }
+
+    .hero-visual {
+      position: relative;
+      height: 400px;
+      perspective: 1000px;
+    }
+
+    .floating-card {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .fc-1 {
+      top: 30px;
+      right: 20px;
+      width: 260px;
+      transform: rotateY(-10deg) rotateX(10deg);
+      animation: floatCard 6s infinite alternate ease-in-out;
+    }
+
+    .fc-2 {
+      bottom: 20px;
+      left: 0;
+      width: 230px;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(30, 64, 175, 0.4));
+      transform: rotateY(15deg) rotateX(-5deg);
+      animation: floatCard 5s infinite alternate-reverse ease-in-out;
+    }
+
+    .fc-3 {
+      top: -20px;
+      left: 40px;
+      width: 190px;
+      border-color: var(--gold);
+      animation: floatCard 7s infinite alternate ease-in-out;
+    }
+
+    @keyframes floatCard {
+      0% {
+        transform: translateY(0) rotateY(0) rotateX(0);
+      }
+
+      100% {
+        transform: translateY(-20px) rotateY(-5deg) rotateX(5deg);
+      }
+    }
+
+    /* What We Offer Grid */
+    .offer-section {
+      padding: 100px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .offer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+    }
+
+    .service-mini-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 30px 20px;
+      text-align: center;
+      box-shadow: var(--glass-shadow);
+      transition: 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-mini-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      opacity: 0;
+      transition: 0.3s;
+    }
+
+    .service-mini-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .service-mini-card:hover::before {
+      opacity: 1;
+    }
+
+    .service-mini-card:hover .mini-icon {
+      transform: scale(1.1);
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    .mini-icon {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 70px;
+      height: 70px;
+      background: rgba(37, 99, 235, 0.05);
+      border-radius: 16px;
+      transition: 0.3s;
+    }
+
+    .service-mini-card h3 {
+      font-size: 1.2rem;
+      color: var(--text-dark);
+      margin-bottom: 10px;
+    }
+
+    .service-mini-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* Detailed Services Split Layout */
+    .detail-section {
+      padding: 100px 20px;
+    }
+
+    .detail-section.alt {
+      background: var(--bg-light);
+    }
+
+    .detail-section.white {
+      background: white;
+    }
+
+    .detail-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .detail-container.reverse {
+      direction: rtl;
+    }
+
+    .detail-container.reverse>* {
+      direction: ltr;
+    }
+
+    .detail-text h2 {
+      font-size: 2.5rem;
+      color: var(--text-dark);
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+
+    .detail-text p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .detail-list {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 30px;
+    }
+
+    .detail-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+      font-weight: 500;
+      font-size: 1.05rem;
+    }
+
+    .detail-list li i {
+      color: var(--primary);
+      background: rgba(37, 99, 235, 0.1);
+      padding: 5px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+    }
+
+    .detail-visual {
+      position: relative;
+      height: 450px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Specific Visual Gradients */
+    .v-journal {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.15));
+    }
+
+    .v-book {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(251, 191, 36, 0.15));
+    }
+
+    .v-sub {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.15));
+    }
+
+    .v-issn {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(139, 92, 246, 0.15));
+    }
+
+    .v-edit {
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.05), rgba(236, 72, 153, 0.15));
+    }
+
+    .visual-center-icon {
+      font-size: 5rem;
+      color: rgba(0, 0, 0, 0.1);
+      position: absolute;
+    }
+
+    .detail-badge {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 700;
+      color: var(--text-dark);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
+    }
+
+    .floating-element {
+      position: absolute;
+      background: white;
+      padding: 15px;
+      border-radius: 16px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .fe-1 {
+      top: 40px;
+      right: -20px;
+      animation: floatCard 4s infinite alternate ease-in-out;
+    }
+
+    .fe-2 {
+      bottom: 80px;
+      left: -20px;
+      animation: floatCard 5s infinite alternate-reverse ease-in-out;
+    }
+
+    /* Process Timeline */
+    .process-section {
+      padding: 100px 20px;
+      background: var(--bg-light);
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .process-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .timeline {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin-top: 60px;
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 40px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, rgba(37, 99, 235, 0.1), rgba(37, 99, 235, 0.5), rgba(37, 99, 235, 0.1));
+      z-index: 0;
+    }
+
+    .process-step {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .step-icon {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border: 4px solid var(--bg-light);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--primary);
+      margin: 0 auto 20px;
+      transition: 0.3s;
+      position: relative;
+    }
+
+    .process-step:hover .step-icon {
+      transform: scale(1.1);
+      border-color: var(--primary);
+      box-shadow: 0 15px 30px rgba(37, 99, 235, 0.2);
+    }
+
+    .step-number {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--gold);
+      color: #78350f;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .process-step h4 {
+      font-size: 1.1rem;
+      color: var(--text-dark);
+      margin-bottom: 10px;
+    }
+
+    /* Trust Cards */
+    .trust-section {
+      padding: 100px 20px;
+      background: white;
+    }
+
+    .trust-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+
+    .trust-card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+      transition: 0.3s;
+      border: 1px solid var(--glass-border);
+    }
+
+    .trust-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
+      border-color: rgba(37, 99, 235, 0.3);
+    }
+
+    .trust-card i {
+      font-size: 2rem;
+      color: var(--gold);
+      background: rgba(251, 191, 36, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    .trust-card h4 {
+      font-size: 1.1rem;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    /* CTA */
+    .final-cta {
+      background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+      padding: 120px 20px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .final-cta h2 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .final-cta p {
+      font-size: 1.25rem;
+      opacity: 0.9;
+      margin-bottom: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .btn-white {
+      background: white;
+      color: var(--primary);
+      padding: 15px 35px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: 0.3s;
+      display: inline-block;
+      margin: 0 10px 10px;
+    }
+
+    .btn-white:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-outline-white {
+      border: 2px solid white;
+      color: white;
+      padding: 15px 35px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: 0.3s;
+      display: inline-block;
+      margin: 0 10px 10px;
+    }
+
+    .btn-outline-white:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 900px) {
+
+      .hero-content,
+      .detail-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .hero-stats {
+        justify-content: center;
+      }
+
+      .hero-visual {
+        display: none;
+      }
+
+      .detail-list li {
+        justify-content: center;
+      }
+
+      .detail-badge {
+        position: relative;
+        bottom: 0;
+        left: 0;
+        transform: none;
+        display: inline-flex;
+        margin-top: 20px;
+      }
+
+      .floating-element {
+        display: none;
+      }
+
+      .timeline::before {
+        display: none;
+      }
+
+      .process-step {
+        margin-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    @media (max-width: 600px) {
+
+      .services-hero h1,
+      .detail-text h2 {
+        font-size: 2.5rem;
+      }
+
+      .final-cta h2 {
+        font-size: 2.2rem;
+      }
+
+      .btn-primary-custom,
+      .btn-outline-custom,
+      .btn-white,
+      .btn-outline-white {
+        display: block;
+        width: 100%;
+        max-width: 300px;
+        margin: 10px auto;
+      }
+    }
+  </style>
+
+  <!-- HERO SECTION -->
+  <section class="services-hero">
+    <div class="hero-mesh"></div>
+    <div class="hero-content">
+      <div class="hero-text gs-reveal">
+        <div class="breadcrumb"><a href="/">Home</a> › Services</div>
+        <div class="hero-badge"><i class="fa-solid fa-screwdriver-wrench"></i> Our Services</div>
+        <h1>Comprehensive Academic Publishing & Research Support Services</h1>
+        <p>Supporting scholars, institutions, journals, and researchers with end-to-end publishing, editing, ISSN
+          guidance, and academic support solutions.</p>
+
+        <div class="hero-stats">
+          <div class="hero-stat-card">
+            <div class="stat-val"><i class="fa-solid fa-certificate" style="font-size: 1.2rem; margin-right:5px;"></i>
+              ISO</div>
+            <div class="stat-label">Certified</div>
+          </div>
+          <div class="hero-stat-card">
+            <div class="stat-val counter" data-target="10000">0</div>
+            <div class="stat-label">Researchers</div>
+          </div>
+          <div class="hero-stat-card">
+            <div class="stat-val counter" data-target="100">0</div>
+            <div class="stat-label">% Peer Reviewed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="floating-card fc-1">
+          <i class="fa-solid fa-book-open" style="font-size:2rem;color:var(--primary);margin-bottom:10px;"></i>
+          <h4 style="color:white;margin-bottom:5px;">Journal Publishing</h4>
+          <div style="height:4px;background:#3b82f6;width:50%;border-radius:2px;margin-bottom:5px;"></div>
+          <div style="height:4px;background:rgba(255,255,255,0.2);width:80%;border-radius:2px;"></div>
+        </div>
+        <div class="floating-card fc-2">
+          <i class="fa-solid fa-chart-pie" style="font-size:2rem;color:white;margin-bottom:10px;"></i>
+          <h4 style="color:white;margin-bottom:5px;">Research Analytics</h4>
+          <p style="color:#cbd5e1;font-size:0.8rem;">Global reach & citations</p>
+        </div>
+        <div class="floating-card fc-3">
+          <i class="fa-solid fa-fingerprint" style="font-size:2rem;color:var(--gold);margin-bottom:10px;"></i>
+          <h4 style="color:white;margin-bottom:5px;">DOI & ISSN</h4>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT WE OFFER GRID -->
+  <section class="offer-section">
+    <h2 class="section-title gs-reveal-up">What We Offer</h2>
+    <p class="section-subtitle gs-reveal-up">From journal publishing to editing and ISSN guidance — ScriptHive supports
+      your complete academic publishing journey.</p>
+
+    <div class="offer-grid">
+      <div class="service-mini-card gs-reveal-up">
+        <div class="mini-icon"><i class="fa-solid fa-book-journal-whills"></i></div>
+        <h3>Journal Publishing</h3>
+        <p>End-to-end peer-reviewed journal publishing with editorial management and global visibility.</p>
+      </div>
+      <div class="service-mini-card gs-reveal-up" style="transition-delay: 0.1s;">
+        <div class="mini-icon" style="color: var(--gold); background: rgba(251,191,36,0.1);"><i
+            class="fa-solid fa-book"></i></div>
+        <h3>Book Publishing</h3>
+        <p>Academic and research book publishing with ISBN registration and distribution support.</p>
+      </div>
+      <div class="service-mini-card gs-reveal-up" style="transition-delay: 0.2s;">
+        <div class="mini-icon" style="color: #10b981; background: rgba(16,185,129,0.1);"><i
+            class="fa-solid fa-bell"></i></div>
+        <h3>Subscription Services</h3>
+        <p>Automated journal alerts, institutional subscriptions, and research notifications.</p>
+      </div>
+      <div class="service-mini-card gs-reveal-up" style="transition-delay: 0.3s;">
+        <div class="mini-icon" style="color: #8b5cf6; background: rgba(139,92,246,0.1);"><i
+            class="fa-solid fa-barcode"></i></div>
+        <h3>ISSN Guidance</h3>
+        <p>Expert support for ISSN registration, compliance, and publishing standards.</p>
+      </div>
+      <div class="service-mini-card gs-reveal-up" style="transition-delay: 0.4s;">
+        <div class="mini-icon" style="color: #ec4899; background: rgba(236,72,153,0.1);"><i
+            class="fa-solid fa-pen-nib"></i></div>
+        <h3>Editing & Proofreading</h3>
+        <p>Professional manuscript editing, proofreading, formatting, and plagiarism review.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1. JOURNAL PUBLISHING -->
+  <section class="detail-section white">
+    <div class="detail-container">
+      <div class="detail-text gs-reveal">
+        <h2>Journal Publishing</h2>
+        <p>ScriptHive provides complete academic journal publishing services covering the full lifecycle of scholarly
+          publication — from ISSN registration and editorial setup to peer review coordination and final publication.
+        </p>
+        <ul class="detail-list">
+          <li><i class="fa-solid fa-check"></i> ISSN registration for Print & Online editions</li>
+          <li><i class="fa-solid fa-check"></i> Editorial workflow management</li>
+          <li><i class="fa-solid fa-check"></i> Double-blind peer review coordination</li>
+          <li><i class="fa-solid fa-check"></i> Professional typesetting and layout</li>
+          <li><i class="fa-solid fa-check"></i> PDF & HTML article preparation</li>
+          <li><i class="fa-solid fa-check"></i> Online journal hosting and archiving</li>
+        </ul>
+        <a href="/contact" class="btn-primary-custom">Enquire Now →</a>
+        <a href="/journals" class="btn-outline-custom">Explore Journals</a>
+      </div>
+      <div class="detail-visual v-journal gs-reveal">
+        <i class="fa-solid fa-book-open visual-center-icon"></i>
+        <div class="floating-element fe-1"><i class="fa-solid fa-check-double" style="color:var(--primary);"></i>
+          Double-Blind Review</div>
+        <div class="floating-element fe-2"><i class="fa-solid fa-fingerprint" style="color:var(--gold);"></i> DOI
+          Activated</div>
+        <div class="detail-badge"><i class="fa-regular fa-newspaper"></i> Professional Journal Management</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. BOOK PUBLISHING -->
+  <section class="detail-section alt">
+    <div class="detail-container reverse">
+      <div class="detail-text gs-reveal">
+        <h2>Academic Book Publishing</h2>
+        <p>ScriptHive supports academic books, textbooks, edited volumes, and research monographs with complete
+          publishing assistance from manuscript preparation to global distribution.</p>
+        <ul class="detail-list">
+          <li><i class="fa-solid fa-check"></i> ISBN & catalogue registration</li>
+          <li><i class="fa-solid fa-check"></i> Professional copy-editing</li>
+          <li><i class="fa-solid fa-check"></i> Cover design & layout</li>
+          <li><i class="fa-solid fa-check"></i> Print-on-demand support</li>
+          <li><i class="fa-solid fa-check"></i> Digital edition publishing</li>
+          <li><i class="fa-solid fa-check"></i> Author royalty management</li>
+        </ul>
+        <a href="/contact" class="btn-primary-custom">Enquire Now →</a>
+      </div>
+      <div class="detail-visual v-book gs-reveal">
+        <i class="fa-solid fa-book visual-center-icon"></i>
+        <div class="floating-element fe-1"><i class="fa-solid fa-barcode" style="color:var(--text-dark);"></i> ISBN
+          Assigned</div>
+        <div class="floating-element fe-2"><i class="fa-solid fa-print" style="color:var(--primary);"></i> Print-Ready
+        </div>
+        <div class="detail-badge"><i class="fa-solid fa-book-bookmark"></i> Academic Book Publishing</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. SUBSCRIPTION SERVICES -->
+  <section class="detail-section white">
+    <div class="detail-container">
+      <div class="detail-text gs-reveal">
+        <h2>Stay Updated with Latest Research</h2>
+        <p>Subscription and alerting services designed for researchers, libraries, universities, and institutions.</p>
+        <ul class="detail-list">
+          <li><i class="fa-solid fa-check"></i> New issue publication alerts</li>
+          <li><i class="fa-solid fa-check"></i> Keyword-based notifications</li>
+          <li><i class="fa-solid fa-check"></i> Institutional subscriptions</li>
+          <li><i class="fa-solid fa-check"></i> Library integrations</li>
+          <li><i class="fa-solid fa-check"></i> Citation notifications</li>
+          <li><i class="fa-solid fa-check"></i> RSS journal updates</li>
+        </ul>
+        <a href="/contact" class="btn-primary-custom">Enquire Now →</a>
+      </div>
+      <div class="detail-visual v-sub gs-reveal">
+        <i class="fa-solid fa-bell visual-center-icon"></i>
+        <div class="floating-element fe-1"><i class="fa-solid fa-envelope-open-text" style="color:#10b981;"></i> New
+          Issue Alert</div>
+        <div class="floating-element fe-2"><i class="fa-solid fa-building-columns" style="color:var(--primary);"></i>
+          Library Synced</div>
+        <div class="detail-badge"><i class="fa-solid fa-tower-broadcast"></i> Live Research Updates</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. ISSN GUIDANCE -->
+  <section class="detail-section alt">
+    <div class="detail-container reverse">
+      <div class="detail-text gs-reveal">
+        <h2>ISSN Compliance Made Simple</h2>
+        <p>ScriptHive provides expert guidance for obtaining and maintaining ISSN registration and compliance for
+          academic journals.</p>
+        <ul class="detail-list">
+          <li><i class="fa-solid fa-check"></i> ISSN application assistance</li>
+          <li><i class="fa-solid fa-check"></i> Journal compliance audit</li>
+          <li><i class="fa-solid fa-check"></i> ISSN display implementation</li>
+          <li><i class="fa-solid fa-check"></i> Print & Online ISSN management</li>
+          <li><i class="fa-solid fa-check"></i> Annual compliance review</li>
+          <li><i class="fa-solid fa-check"></i> International standards alignment</li>
+        </ul>
+        <a href="/contact" class="btn-primary-custom">Enquire Now</a>
+        <a href="/issn" class="btn-outline-custom">Learn More</a>
+      </div>
+      <div class="detail-visual v-issn gs-reveal">
+        <i class="fa-solid fa-barcode visual-center-icon"></i>
+        <div class="floating-element fe-1"><i class="fa-solid fa-circle-check" style="color:#8b5cf6;"></i> Audit Passed
+        </div>
+        <div class="floating-element fe-2"><i class="fa-solid fa-globe" style="color:var(--primary);"></i> Global
+          Standards</div>
+        <div class="detail-badge"><i class="fa-solid fa-clipboard-check"></i> ISSN Registration</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. EDITING & PROOFREADING -->
+  <section class="detail-section white">
+    <div class="detail-container">
+      <div class="detail-text gs-reveal">
+        <h2>Professional Manuscript Editing</h2>
+        <p>Professional academic editing and proofreading services designed to improve clarity, structure, grammar,
+          formatting, and submission readiness.</p>
+        <ul class="detail-list">
+          <li><i class="fa-solid fa-check"></i> Grammar & language correction</li>
+          <li><i class="fa-solid fa-check"></i> Academic tone enhancement</li>
+          <li><i class="fa-solid fa-check"></i> Structural editing</li>
+          <li><i class="fa-solid fa-check"></i> Citation formatting</li>
+          <li><i class="fa-solid fa-check"></i> Plagiarism review</li>
+          <li><i class="fa-solid fa-check"></i> Journal formatting compliance</li>
+        </ul>
+        <a href="/contact" class="btn-primary-custom">Enquire Now →</a>
+      </div>
+      <div class="detail-visual v-edit gs-reveal">
+        <i class="fa-solid fa-pen-nib visual-center-icon"></i>
+        <div class="floating-element fe-1"><i class="fa-solid fa-spell-check" style="color:#ec4899;"></i> Grammar Fixed
+        </div>
+        <div class="floating-element fe-2"><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i>
+          Plagiarism Checked</div>
+        <div class="detail-badge"><i class="fa-solid fa-marker"></i> Ready for Submission</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICE PROCESS TIMELINE -->
+  <section class="process-section">
+    <div class="process-container">
+      <h2 class="section-title gs-reveal-up">How Our Publishing Process Works</h2>
+
+      <div class="timeline gs-reveal">
+        <div class="process-step">
+          <div class="step-icon"><i class="fa-solid fa-file-arrow-up"></i>
+            <div class="step-number">1</div>
+          </div>
+          <h4>Submit Manuscript</h4>
+        </div>
+        <div class="process-step">
+          <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i>
+            <div class="step-number">2</div>
+          </div>
+          <h4>Initial Screening</h4>
+        </div>
+        <div class="process-step">
+          <div class="step-icon"><i class="fa-solid fa-users-viewfinder"></i>
+            <div class="step-number">3</div>
+          </div>
+          <h4>Peer Review</h4>
+        </div>
+        <div class="process-step">
+          <div class="step-icon"><i class="fa-solid fa-pen-to-square"></i>
+            <div class="step-number">4</div>
+          </div>
+          <h4>Editing & Formatting</h4>
+        </div>
+        <div class="process-step">
+          <div class="step-icon"><i class="fa-solid fa-fingerprint"></i>
+            <div class="step-number">5</div>
+          </div>
+          <h4>DOI & Publication</h4>
+        </div>
+        <div class="process-step">
+          <div class="step-icon"><i class="fa-solid fa-globe"></i>
+            <div class="step-number">6</div>
+          </div>
+          <h4>Global Distribution</h4>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY CHOOSE -->
+  <section class="trust-section">
+    <h2 class="section-title gs-reveal-up">Why Researchers & Institutions Choose ScriptHive</h2>
+    <div class="trust-grid">
+      <div class="trust-card gs-reveal-up"><i class="fa-solid fa-bolt"></i>
+        <h4>Fast Publishing Workflow</h4>
+      </div>
+      <div class="trust-card gs-reveal-up" style="transition-delay:0.1s"><i class="fa-solid fa-globe"></i>
+        <h4>Global Visibility</h4>
+      </div>
+      <div class="trust-card gs-reveal-up" style="transition-delay:0.2s"><i class="fa-solid fa-barcode"></i>
+        <h4>ISSN-Compliant Publishing</h4>
+      </div>
+      <div class="trust-card gs-reveal-up" style="transition-delay:0.3s"><i class="fa-solid fa-scale-balanced"></i>
+        <h4>Ethical Editorial Standards</h4>
+      </div>
+      <div class="trust-card gs-reveal-up" style="transition-delay:0.4s"><i class="fa-solid fa-headset"></i>
+        <h4>Dedicated Author Support</h4>
+      </div>
+      <div class="trust-card gs-reveal-up" style="transition-delay:0.5s"><i class="fa-solid fa-chart-line"></i>
+        <h4>Professional Academic Branding</h4>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta gs-reveal">
+    <h2>Need a Custom Publishing Solution?</h2>
+    <p>Tailored publishing and academic support services for universities, institutions, research organisations, and
+      independent journals.</p>
+    <div class="cta-buttons">
+      <a href="/contact" class="btn-white"><i class="fa-solid fa-phone"></i> Contact Us</a>
+      <a href="/submit" class="btn-outline-white"><i class="fa-solid fa-file-contract"></i> Submit Paper</a>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Reveal animations
+      gsap.utils.toArray('.gs-reveal').forEach(function (elem) {
+        gsap.from(elem, {
+          scrollTrigger: { trigger: elem, start: "top 85%" },
+          y: 50, opacity: 0, duration: 1, ease: "power3.out"
+        });
+      });
+
+      gsap.utils.toArray('.gs-reveal-up').forEach(function (elem) {
+        gsap.from(elem, {
+          scrollTrigger: { trigger: elem, start: "top 85%" },
+          y: 30, opacity: 0, duration: 0.8, ease: "power2.out"
+        });
+      });
+
+      // Counters
+      const counters = document.querySelectorAll('.counter');
+      counters.forEach(counter => {
+        gsap.to(counter, {
+          scrollTrigger: { trigger: counter, start: "top 90%" },
+          innerHTML: counter.getAttribute('data-target'),
+          duration: 2,
+          snap: { innerHTML: 1 },
+          onUpdate: function () {
+            let val = Math.round(this.targets()[0].innerHTML);
+            if (counter.getAttribute('data-target') == 10000) {
+              counter.innerHTML = val.toLocaleString('en-IN') + "+";
+            } else if (counter.getAttribute('data-target') == 100) {
+              counter.innerHTML = val + "%";
+            } else {
+              counter.innerHTML = val;
+            }
+          }
+        });
+      });
+    });
+  </script>
+
+  <%- include('../partials/footer') %>

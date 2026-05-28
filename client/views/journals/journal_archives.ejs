@@ -1,0 +1,202 @@
+<%- include('../partials/header') %>
+
+<style>
+  .arch-page { background: #f8fafc; min-height: 100vh; font-family: 'Segoe UI', sans-serif; }
+
+  /* Journal sticky nav */
+  .j-subnav { background: #fff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+  .j-subnav ul { display: flex; gap: 0; list-style: none; margin: 0; padding: 0; max-width: 1100px; margin: 0 auto; overflow-x: auto; }
+  .j-subnav ul li a { display: block; padding: 14px 20px; font-size: 0.9rem; font-weight: 500; color: #475569; text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; transition: 0.2s; }
+  .j-subnav ul li a:hover, .j-subnav ul li a.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 600; }
+
+  .arch-container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; display: grid; grid-template-columns: 1fr 280px; gap: 32px; }
+  @media (max-width: 900px) { .arch-container { grid-template-columns: 1fr; } .arch-sidebar { display: none; } }
+
+  /* Issue selector tabs */
+  .issue-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .issue-tab { padding: 8px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; background: #fff; color: #475569; transition: 0.2s; text-decoration: none; }
+  .issue-tab:hover, .issue-tab.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+
+  /* Volume heading */
+  .vol-heading { font-size: 1.3rem; font-weight: 800; text-align: center; color: #0f172a; margin-bottom: 6px; }
+  .vol-divider { height: 3px; background: linear-gradient(90deg,#dc2626,#b91c1c); max-width: 200px; margin: 0 auto 24px; border-radius: 2px; }
+
+  /* Articles table */
+  .art-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .art-table thead tr { background: #f1f5f9; }
+  .art-table th { padding: 11px 14px; text-align: left; font-weight: 700; font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #e2e8f0; }
+  .art-table th:first-child { width: 56px; text-align: center; }
+  .art-table th:last-child { width: 110px; text-align: center; }
+  .art-table tbody tr { border-bottom: 1px solid #f1f5f9; }
+  .art-table tbody tr:last-child { border-bottom: none; }
+  .art-table td { padding: 14px; vertical-align: top; }
+  .art-table td:first-child { text-align: center; font-weight: 700; color: #64748b; }
+  .art-table td:last-child { text-align: center; color: #475569; font-size: 0.85rem; }
+
+  .art-title { font-weight: 700; color: #0f172a; line-height: 1.45; margin-bottom: 4px; font-style: italic; }
+  .art-title em { font-style: normal; font-weight: 700; }
+  .art-authors { color: #374151; font-size: 0.88rem; margin-bottom: 4px; }
+  .art-doi { margin-bottom: 3px; }
+  .art-doi a { color: #2563eb; font-size: 0.85rem; text-decoration: none; }
+  .art-doi a:hover { text-decoration: underline; }
+  .art-cite { color: #6b7280; font-size: 0.82rem; margin-bottom: 6px; }
+  .art-links { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.82rem; color: #6b7280; }
+  .art-links a { color: #2563eb; font-weight: 600; text-decoration: none; }
+  .art-links a:hover { text-decoration: underline; }
+  .art-sep { color: #cbd5e1; }
+
+  /* Empty state */
+  .no-articles { text-align: center; padding: 60px 20px; color: #94a3b8; font-size: 1rem; }
+
+  /* Sidebar */
+  .arch-sidebar { }
+  .sidebar-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .sidebar-card h4 { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 12px; }
+  .sidebar-info-row { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px solid #f1f5f9; color: #374151; }
+  .sidebar-info-row:last-child { border-bottom: none; }
+  .sidebar-info-row span:first-child { color: #64748b; }
+  .sidebar-info-row span:last-child { font-weight: 600; }
+
+  .submit-cta { background: linear-gradient(135deg,#1e40af,#2563eb); color: #fff; border-radius: 12px; padding: 24px; text-align: center; }
+  .submit-cta h4 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: #fff; }
+  .submit-cta p { font-size: 0.82rem; color: rgba(255,255,255,0.8); margin-bottom: 16px; }
+  .submit-cta a { display: inline-block; background: #fbbf24; color: #1e3a8a; font-weight: 700; font-size: 0.85rem; padding: 10px 20px; border-radius: 8px; text-decoration: none; }
+</style>
+
+<div class="arch-page">
+
+  <!-- Subnav -->
+  <nav class="j-subnav">
+    <ul>
+      <li><a href="/<%= journal.abbr %>">About</a></li>
+      <li><a href="/<%= journal.abbr %>#aim-scope">Aim &amp; Scope</a></li>
+      <li><a href="/<%= journal.abbr %>#editorial-board">Editorial Board</a></li>
+      <li><a href="/<%= journal.abbr %>#author-guidelines">Author Guidelines</a></li>
+      <li><a href="/<%= journal.abbr %>#publication-ethics">Publication Ethics</a></li>
+      <li><a href="/<%= journal.abbr %>/archives" class="active">Archives</a></li>
+    </ul>
+  </nav>
+
+  <div class="arch-container">
+    <!-- Main content -->
+    <main>
+      <% if (!archive || archive.length === 0) { %>
+        <div class="no-articles">
+          <p style="font-size:2rem;margin-bottom:12px;">📄</p>
+          <p>No published articles yet. Check back soon.</p>
+        </div>
+      <% } else { %>
+
+        <%
+          // Build flat list of issues with articles
+          const issues = [];
+          archive.forEach(vol => {
+            (vol.issues || []).forEach(iss => {
+              (iss.parts || []).forEach(part => {
+                if ((part.articles || []).length > 0) {
+                  const partLetter = (part.name || 'A').toLowerCase();
+                  const slug = `${vol.year}.v${vol.number}i${iss.number}${partLetter}`;
+                  issues.push({ vol, iss, part, slug, articles: part.articles });
+                }
+              });
+            });
+          });
+          issues.sort((a,b) => {
+            if (b.vol.year !== a.vol.year) return b.vol.year - a.vol.year;
+            if (b.vol.number !== a.vol.number) return b.vol.number - a.vol.number;
+            if (b.iss.number !== a.iss.number) return b.iss.number - a.iss.number;
+            return b.part.name.localeCompare(a.part.name);
+          });
+          const activeIssue = issues.find(i => i.slug === (typeof activeSlug !== 'undefined' ? activeSlug : null)) || issues[0];
+        %>
+
+        <!-- Issue tabs -->
+        <% if (issues.length > 1) { %>
+        <div class="issue-tabs">
+          <% issues.forEach(i => { %>
+            <a href="/<%= journal.abbr %>/archives/<%= i.slug %>"
+               class="issue-tab <%= (activeIssue && activeIssue.slug === i.slug) ? 'active' : '' %>">
+              Vol. <%= i.vol.number %>, Issue <%= i.iss.number %><%= i.part.name !== 'A' ? ` Part ${i.part.name}` : '' %> (<%= i.vol.year %>)
+            </a>
+          <% }); %>
+        </div>
+        <% } %>
+
+        <% if (activeIssue) { %>
+          <div class="vol-heading">
+            Vol. <%= activeIssue.vol.number %>, Issue <%= activeIssue.iss.number %><%= activeIssue.part.name !== 'A' ? ` Part ${activeIssue.part.name}` : '' %> (<%= activeIssue.vol.year %>)<%= activeIssue.iss.period ? ` — ${activeIssue.iss.period}` : '' %>
+          </div>
+          <div class="vol-divider"></div>
+
+          <table class="art-table">
+            <thead>
+              <tr>
+                <th>S. No.</th>
+                <th>Title and Authors Name</th>
+                <th>Country</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% activeIssue.articles.forEach((art, idx) => {
+                const pageRange = (art.pageStart && art.pageEnd) ? `${String(art.pageStart).padStart(2,'0')}-${String(art.pageEnd).padStart(2,'0')}` : null;
+                const citation = `${journal.abbr}; ${activeIssue.vol.year}; ${activeIssue.vol.number}(${activeIssue.iss.number}${activeIssue.part.name !== 'A' ? activeIssue.part.name.toLowerCase() : ''}):${pageRange || ''}`;
+                const pdfUrl = art.pdfPublicPath ? `/api-files/${art.pdfPublicPath}` : null;
+              %>
+              <tr>
+                <td><%= idx + 1 %></td>
+                <td>
+                  <div class="art-title"><%= art.title %></div>
+                  <div class="art-authors"><%= art.authorName %><%= art.coAuthors ? ', ' + art.coAuthors : '' %></div>
+                  <% if (art.doiRecord && art.doiRecord.doi) { %>
+                  <div class="art-doi">
+                    <a href="https://www.doi.org/<%= art.doiRecord.doi %>" target="_blank" rel="noopener">
+                      DOI: https://www.doi.org/<%= art.doiRecord.doi %>
+                    </a>
+                  </div>
+                  <% } %>
+                  <div class="art-cite"><%= citation %></div>
+                  <div class="art-links">
+                    <% if (art.slug) { %>
+                      <a href="/article/<%= art.slug %>">Abstract</a>
+                      <span class="art-sep">|</span>
+                    <% } %>
+                    <% if (pdfUrl) { %>
+                      <a href="<%= pdfUrl %>">Download</a>
+                      <span class="art-sep">|</span>
+                    <% } %>
+                    <span><%= art.viewCount || 0 %> Views</span>
+                    <span class="art-sep">|</span>
+                    <span><%= art.downloadCount || 0 %> Downloads</span>
+                  </div>
+                </td>
+                <td><%= art.country || 'India' %></td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        <% } %>
+
+      <% } %>
+    </main>
+
+    <!-- Sidebar -->
+    <aside class="arch-sidebar">
+      <div class="sidebar-card">
+        <h4>Journal Info</h4>
+        <div class="sidebar-info-row"><span>ISSN (Print)</span><span><%= journal.issn %></span></div>
+        <div class="sidebar-info-row"><span>Frequency</span><span>Quarterly</span></div>
+        <div class="sidebar-info-row"><span>Access</span><span>Open Access</span></div>
+        <div class="sidebar-info-row"><span>Review</span><span>Double Blind</span></div>
+        <div class="sidebar-info-row"><span>DOI</span><span>Supported</span></div>
+      </div>
+
+      <div class="submit-cta">
+        <h4>Submit Your Research</h4>
+        <p>Join researchers worldwide. Fast peer review, ISSN-indexed, DOI assigned.</p>
+        <a href="/submit">Submit Paper →</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
