@@ -93,6 +93,12 @@ JOURNAL_IDS_LIST.forEach(jid => {
     const archive = await fetchArchive(jid);
     res.render(`journals/${jid}`, { archive, journalId: jid });
   });
+
+  // /SGJVSR/archives dedicated route
+  app.get(`/${jid}/archives`, async (req, res) => {
+    const archive = await fetchArchive(jid);
+    res.render('journals/journal_archives', { archive, journalId: jid });
+  });
 });
 
 // Journal archive data helper
