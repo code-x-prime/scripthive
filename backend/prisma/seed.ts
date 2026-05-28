@@ -234,13 +234,8 @@ async function main(): Promise<void> {
   }
   console.log("Seeded 6 journals");
 
-  await seedDemoData(prisma);
-
   console.log("Seed complete");
   console.log("Super Admin: admin@scripthive.org / Admin@ScriptHive123");
-  console.log("Demo editor: editor.john / Demo@ScriptHive123");
-  console.log("Demo finance: finance.priya / Demo@ScriptHive123");
-  console.log("Demo reviewer: reviewer.amit / Demo@ScriptHive123");
 }
 
 main()
