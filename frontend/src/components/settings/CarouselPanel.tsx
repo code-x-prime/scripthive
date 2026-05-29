@@ -25,7 +25,7 @@ import {
   setCarouselTokenGetter,
   updateCarouselSlide
 } from "@/services/carousel.service";
-import { listMediaFiles, setMediaTokenGetter, type MediaFileRecord } from "@/services/media.service";
+import { listMediaFiles, setMediaTokenGetter, uploadMediaFile, type MediaFileRecord } from "@/services/media.service";
 
 type FormState = {
   imageUrl: string;
@@ -68,12 +68,8 @@ function SlideForm({
     if (!file.type.startsWith("image/")) { toast.error("Only image files allowed"); return; }
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("files", file);
-      const res = await fetch("/api/media/upload", { method: "POST", body: fd, credentials: "include" });
-      if (!res.ok) throw new Error("Upload failed");
-      const data = await res.json() as { files: { url: string }[] };
-      const url = data.files?.[0]?.url ?? "";
+      const files = await uploadMediaFile(file, () => {});
+      const url = files?.[0]?.url ?? "";
       if (url) setForm((f) => ({ ...f, imageUrl: url }));
       toast.success("Image uploaded");
     } catch (e) {
