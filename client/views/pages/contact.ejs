@@ -1,217 +1,396 @@
 <%- include('../partials/header') %>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
-<style>
-  .contact-page { background: #f8fafc; min-height: 100vh; font-family: 'Inter', sans-serif; padding-top: 80px; }
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  .contact-hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; padding: 60px 20px 50px; text-align: center; }
-  .contact-hero h1 { font-family: 'Outfit', sans-serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; margin-bottom: 12px; }
-  .contact-hero p { color: rgba(255,255,255,0.75); font-size: 1rem; max-width: 480px; margin: 0 auto; }
+  <style>
+    :root { --primary:#2563eb; --primary-dark:#1e40af; --navy:#0f172a; --gold:#fbbf24; --bg-light:#f8fafc; --text-dark:#1e293b; --text-muted:#64748b; --glass-bg:rgba(255,255,255,0.7); --glass-border:rgba(255,255,255,0.5); --glass-shadow:0 8px 32px 0 rgba(31,38,135,0.07); }
+    body { background-color:var(--bg-light); font-family:'Inter',sans-serif; overflow-x:hidden; }
+    .section-title { font-size:2.5rem; font-weight:800; color:var(--text-dark); margin-bottom:20px; text-align:center; }
+    .contact-hero { background:var(--navy); color:white; padding:150px 20px 100px; position:relative; overflow:hidden; }
+    .hero-mesh { position:absolute; top:0; left:0; right:0; bottom:0; z-index:0; background:radial-gradient(circle at 20% 50%,rgba(37,99,235,0.2) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(251,191,36,0.15) 0%,transparent 50%); animation:pulseMesh 10s infinite alternate; }
+    @keyframes pulseMesh { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(1.1);opacity:1} }
+    .hero-content { max-width:1200px; margin:0 auto; position:relative; z-index:1; display:grid; grid-template-columns:1.2fr 0.8fr; gap:50px; align-items:center; }
+    .breadcrumb { font-size:0.9rem; color:#94a3b8; margin-bottom:20px; }
+    .breadcrumb a { color:#cbd5e1; text-decoration:none; }
+    .hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:30px; font-size:0.9rem; margin-bottom:20px; backdrop-filter:blur(10px); }
+    .contact-hero h1 { font-size:3.5rem; font-weight:800; line-height:1.2; margin-bottom:20px; background:linear-gradient(to right,#fff,#cbd5e1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .contact-hero p { font-size:1.2rem; color:#94a3b8; line-height:1.6; margin-bottom:40px; }
+    .hero-stats { display:flex; flex-wrap:wrap; gap:15px; }
+    .hero-stat-card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:12px 20px; border-radius:12px; backdrop-filter:blur(5px); display:flex; align-items:center; gap:10px; }
+    .stat-icon { color:var(--gold); font-size:1.2rem; }
+    .stat-text { font-size:0.85rem; color:#cbd5e1; font-weight:600; text-transform:uppercase; }
+    .hero-visual { position:relative; height:400px; }
+    .floating-bubble { position:absolute; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:20px; border-radius:16px; backdrop-filter:blur(10px); box-shadow:0 20px 40px rgba(0,0,0,0.3); display:flex; align-items:center; gap:15px; }
+    .fb-1 { top:40px; right:20px; animation:floatCard 6s infinite alternate ease-in-out; }
+    .fb-2 { bottom:60px; left:0; background:linear-gradient(135deg,rgba(37,99,235,0.2),rgba(30,64,175,0.4)); animation:floatCard 5s infinite alternate-reverse ease-in-out; }
+    .fb-3 { top:200px; right:-20px; border-color:var(--gold); animation:floatCard 7s infinite alternate ease-in-out; }
+    .fb-icon { background:white; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:var(--primary); }
+    @keyframes floatCard { 0%{transform:translateY(0)} 100%{transform:translateY(-20px)} }
+    .contact-split { padding:100px 20px; max-width:1200px; margin:-50px auto 0; position:relative; z-index:10; display:grid; grid-template-columns:1fr 1.2fr; gap:50px; }
+    .info-grid { display:grid; gap:20px; }
+    .info-card { background:var(--glass-bg); backdrop-filter:blur(20px); border:1px solid var(--glass-border); padding:25px; border-radius:20px; box-shadow:var(--glass-shadow); transition:0.3s; display:flex; align-items:flex-start; gap:20px; position:relative; overflow:hidden; }
+    .info-card:hover { transform:translateY(-5px); box-shadow:0 15px 30px rgba(0,0,0,0.08); border-color:rgba(37,99,235,0.3); }
+    .info-icon { width:50px; height:50px; border-radius:15px; background:rgba(37,99,235,0.1); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0; }
+    .info-card.whatsapp .info-icon { background:rgba(37,211,102,0.1); color:#25D366; }
+    .info-content h4 { font-size:1rem; color:var(--text-muted); margin-bottom:5px; font-weight:600; }
+    .info-content p { font-size:1.1rem; color:var(--text-dark); font-weight:700; margin:0; }
+    .info-link { position:absolute; inset:0; z-index:1; }
+    .whatsapp-btn { display:inline-flex; align-items:center; gap:8px; background:#25D366; color:white; padding:8px 16px; border-radius:30px; font-size:0.9rem; font-weight:600; text-decoration:none; margin-top:10px; transition:0.3s; position:relative; z-index:2; }
+    .whatsapp-btn:hover { background:#1ebd57; transform:translateY(-2px); color:white; }
+    .form-card { background:white; border-radius:24px; padding:40px; box-shadow:0 20px 50px rgba(0,0,0,0.05); border:1px solid var(--glass-border); }
+    .form-card h3 { font-size:2rem; color:var(--text-dark); margin-bottom:30px; font-weight:800; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .form-group { position:relative; margin-bottom:25px; }
+    .form-group.full { grid-column:1/-1; }
+    .form-control { width:100%; padding:15px 20px; background:var(--bg-light); border:2px solid transparent; border-radius:12px; font-size:1rem; color:var(--text-dark); transition:0.3s; outline:none; font-family:inherit; }
+    .form-control:focus { border-color:var(--primary); background:white; box-shadow:0 0 0 4px rgba(37,99,235,0.1); }
+    .form-label { position:absolute; left:20px; top:15px; color:var(--text-muted); pointer-events:none; transition:0.3s; font-size:1rem; }
+    .form-control:focus~.form-label,.form-control:not(:placeholder-shown)~.form-label { top:-10px; left:10px; font-size:0.8rem; background:white; padding:0 5px; color:var(--primary); font-weight:600; border-radius:4px; }
+    select.form-control { appearance:none; cursor:pointer; }
+    .select-icon { position:absolute; right:20px; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
+    textarea.form-control { resize:vertical; min-height:120px; }
+    .file-drop { border:2px dashed #cbd5e1; border-radius:12px; padding:30px; text-align:center; transition:0.3s; cursor:pointer; background:var(--bg-light); position:relative; overflow:hidden; }
+    .file-drop:hover { border-color:var(--primary); }
+    .file-drop input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+    .file-drop-icon { font-size:2rem; color:var(--primary); margin-bottom:10px; }
+    .submit-btn { background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%); color:white; border:none; width:100%; padding:18px; border-radius:12px; font-size:1.1rem; font-weight:700; cursor:pointer; transition:0.3s; box-shadow:0 10px 20px rgba(37,99,235,0.2); }
+    .submit-btn:hover { transform:translateY(-2px); box-shadow:0 15px 30px rgba(37,99,235,0.3); }
+    .support-topics { padding:80px 20px; max-width:1200px; margin:0 auto; }
+    .topics-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
+    .topic-card { background:white; border-radius:16px; padding:25px; display:flex; align-items:center; gap:15px; border:1px solid var(--glass-border); transition:0.3s; }
+    .topic-card:hover { transform:translateY(-5px); box-shadow:0 15px 30px rgba(0,0,0,0.05); }
+    .topic-icon { font-size:1.5rem; color:var(--primary); background:rgba(37,99,235,0.1); width:45px; height:45px; display:flex; align-items:center; justify-content:center; border-radius:12px; }
+    .topic-card h4 { font-size:1rem; color:var(--text-dark); margin:0; font-weight:600; }
+    .map-section { padding:0; position:relative; height:500px; background:#e2e8f0; overflow:hidden; }
+    .map-overlay-card { position:absolute; top:50%; left:10%; transform:translateY(-50%); background:var(--glass-bg); backdrop-filter:blur(20px); padding:30px; border-radius:20px; box-shadow:var(--glass-shadow); border:1px solid var(--glass-border); max-width:350px; z-index:2; }
+    .map-overlay-card h3 { font-size:1.5rem; color:var(--text-dark); margin-bottom:15px; font-weight:800; }
+    .map-overlay-card p { color:var(--text-muted); line-height:1.6; margin-bottom:20px; }
+    .btn-direction { background:var(--text-dark); color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600; display:inline-block; transition:0.3s; }
+    .btn-direction:hover { background:black; color:white; }
+    .quick-actions { padding:100px 20px; max-width:1200px; margin:0 auto; }
+    .qa-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
+    .qa-card { background:var(--primary); color:white; padding:30px; border-radius:20px; text-align:center; text-decoration:none; transition:0.3s; display:block; }
+    .qa-card.alt { background:white; color:var(--text-dark); border:1px solid var(--glass-border); box-shadow:0 10px 30px rgba(0,0,0,0.05); }
+    .qa-card:hover { transform:translateY(-10px); }
+    .qa-icon { font-size:2.5rem; margin-bottom:15px; display:block; }
+    .qa-card.alt .qa-icon { color:var(--primary); }
+    .qa-card h4 { font-size:1.2rem; font-weight:700; margin:0; }
+    .trust-section { padding:80px 20px; background:white; text-align:center; }
+    .trust-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; max-width:1000px; margin:40px auto 0; }
+    .trust-item { display:flex; align-items:center; gap:10px; font-weight:600; color:var(--text-dark); background:var(--bg-light); padding:15px 25px; border-radius:12px; transition:0.3s; }
+    .trust-item i { color:#10b981; font-size:1.2rem; }
+    .final-cta { background:linear-gradient(135deg,var(--primary) 0%,#8b5cf6 100%); padding:120px 20px; text-align:center; color:white; }
+    .final-cta h2 { font-size:3.5rem; font-weight:800; margin-bottom:20px; }
+    .final-cta p { font-size:1.25rem; opacity:0.9; margin-bottom:40px; max-width:800px; margin-left:auto; margin-right:auto; }
+    .btn-white { background:white; color:var(--primary); padding:15px 35px; border-radius:12px; font-weight:700; text-decoration:none; transition:0.3s; display:inline-block; margin:0 10px 10px; }
+    .btn-white:hover { transform:scale(1.05); }
+    .btn-outline-white { border:2px solid white; color:white; padding:15px 35px; border-radius:12px; font-weight:700; text-decoration:none; transition:0.3s; display:inline-block; margin:0 10px 10px; }
+    .btn-outline-white:hover { background:rgba(255,255,255,0.1); }
+    .modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,0.7); backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; z-index:9999; opacity:0; pointer-events:none; transition:opacity 0.4s ease; padding:20px; }
+    .modal-overlay.active { opacity:1; pointer-events:all; }
+    .premium-modal { background:rgba(255,255,255,0.95); backdrop-filter:blur(25px); border:1px solid rgba(255,255,255,0.4); border-radius:24px; padding:40px; width:90%; max-width:550px; max-height:90vh; overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); transform:translateY(30px) scale(0.95); transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); text-align:center; color:var(--text-dark); position:relative; }
+    .modal-overlay.active .premium-modal { transform:translateY(0) scale(1); }
+    .modal-glow { position:absolute; top:-50px; left:50%; transform:translateX(-50%); width:250px; height:150px; background:radial-gradient(circle,rgba(37,99,235,0.2) 0%,transparent 70%); pointer-events:none; z-index:0; }
+    .modal-glow.danger { background:radial-gradient(circle,rgba(239,68,68,0.2) 0%,transparent 70%); }
+    .modal-content { position:relative; z-index:10; }
+    .success-checkmark { width:80px; height:80px; margin:0 auto 24px; background:rgba(16,185,129,0.1); border:2px solid #10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.2rem; color:#10b981; animation:scaleInCheck 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes scaleInCheck { 0%{transform:scale(0) rotate(-45deg);opacity:0} 100%{transform:scale(1) rotate(0deg);opacity:1} }
+    .error-cross { width:80px; height:80px; margin:0 auto 24px; background:rgba(239,68,68,0.1); border:2px solid #ef4444; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.2rem; color:#ef4444; animation:shakeCross 0.5s ease-in-out; }
+    @keyframes shakeCross { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
+    .modal-title { font-size:1.8rem; font-weight:800; margin-bottom:12px; }
+    .modal-message { color:var(--text-muted); font-size:1.05rem; line-height:1.6; margin-bottom:24px; }
+    .submission-id-container { background:#f1f5f9; border:1px dashed #cbd5e1; border-radius:12px; padding:16px; margin-bottom:24px; font-family:monospace; font-size:1.3rem; font-weight:700; color:var(--primary); display:flex; align-items:center; justify-content:center; gap:10px; }
+    .loader-spinner { border:4px solid rgba(37,99,235,0.1); border-left-color:var(--primary); border-radius:50%; width:60px; height:60px; margin:0 auto 24px; animation:spinLoader 1s linear infinite; }
+    @keyframes spinLoader { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+    .progress-container { width:100%; height:8px; background:#e2e8f0; border-radius:10px; overflow:hidden; margin:20px 0 10px; display:none; }
+    .progress-bar { width:0%; height:100%; background:linear-gradient(90deg,var(--primary),var(--gold)); transition:width 0.3s ease; }
+    .modal-btn-group { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+    .modal-btn { padding:14px 28px; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; transition:0.3s; display:inline-flex; align-items:center; gap:8px; border:none; }
+    .modal-btn.primary { background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%); color:white; }
+    .modal-btn.primary:hover { transform:translateY(-2px); }
+    .modal-btn.secondary { background:#e2e8f0; color:var(--text-dark); }
+    .modal-btn.secondary:hover { background:#cbd5e1; }
+    .modal-btn.danger { background:#ef4444; color:white; }
+    @media (max-width:900px) {
+      .contact-split,.form-grid { grid-template-columns:1fr; }
+      .hero-content { grid-template-columns:1fr; text-align:center; }
+      .hero-stats { justify-content:center; }
+      .hero-visual { display:none; }
+      .map-overlay-card { position:relative; top:0; left:0; transform:none; margin:20px auto; max-width:90%; }
+      .contact-split { margin-top:0; padding-top:50px; }
+      .premium-modal { padding:24px 16px; }
+      .contact-hero h1 { font-size:2.2rem; }
+    }
+  </style>
 
-  .contact-body { max-width: 1000px; margin: 0 auto; padding: 48px 20px; display: grid; grid-template-columns: 1fr 380px; gap: 32px; }
-  @media(max-width:768px){ .contact-body { grid-template-columns:1fr; } }
-
-  /* Form card */
-  .form-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 36px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-  .form-card h2 { font-family: 'Outfit',sans-serif; font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
-  .form-card p.sub { color: #64748b; font-size: 0.9rem; margin-bottom: 28px; }
-
-  .field { margin-bottom: 20px; }
-  .field label { display: block; font-size: 0.78rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 7px; }
-  .field label span { color: #ef4444; }
-  .field input, .field select, .field textarea {
-    width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 10px;
-    font-size: 0.95rem; font-family: 'Inter',sans-serif; color: #0f172a; background: #fff;
-    outline: none; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus {
-    border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-  }
-  .field textarea { resize: vertical; min-height: 120px; }
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media(max-width:500px){ .field-row { grid-template-columns:1fr; } }
-
-  .submit-btn { width: 100%; padding: 14px; background: linear-gradient(135deg,#1d4ed8,#2563eb); color: #fff; font-weight: 700; font-size: 1rem; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(37,99,235,0.3); }
-  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-  /* Info sidebar */
-  .info-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-  .info-card h3 { font-family:'Outfit',sans-serif; font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
-  .info-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
-  .info-row:last-child { margin-bottom: 0; }
-  .info-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
-  .info-text { font-size: 0.88rem; color: #475569; line-height: 1.5; }
-  .info-text strong { color: #0f172a; display: block; font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
-
-  /* Success / Error */
-  .result-box { display: none; border-radius: 12px; padding: 20px 24px; margin-top: 20px; }
-  .result-box.success { background: #f0fdf4; border: 1.5px solid #86efac; }
-  .result-box.error   { background: #fff1f2; border: 1.5px solid #fca5a5; }
-  .result-box .qid { font-family: monospace; font-size: 1.2rem; font-weight: 800; color: #15803d; margin: 6px 0; }
-  .result-box.error .qid { color: #dc2626; font-size: 0.9rem; }
-  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-</style>
-
-<div class="contact-page">
-  <div class="contact-hero">
-    <h1>Get in Touch</h1>
-    <p>Have a question? Our editorial team responds within 24–48 business hours.</p>
-  </div>
-
-  <div class="contact-body">
-    <!-- Form -->
-    <div class="form-card">
-      <h2>Send us a Message</h2>
-      <p class="sub">Fill in the details below and we'll get back to you shortly.</p>
-
-      <form id="contact-form" novalidate>
-        <div class="field-row">
-          <div class="field">
-            <label>Full Name <span>*</span></label>
-            <input type="text" name="name" id="c-name" placeholder="Your full name" required>
-          </div>
-          <div class="field">
-            <label>Email Address <span>*</span></label>
-            <input type="email" name="email" id="c-email" placeholder="your@email.com" required>
-          </div>
+  <section class="contact-hero">
+    <div class="hero-mesh"></div>
+    <div class="hero-content">
+      <div class="hero-text gs-reveal">
+        <div class="breadcrumb"><a href="/">Home</a> › Contact Us</div>
+        <div class="hero-badge"><i class="fa-solid fa-headset"></i> Contact Us</div>
+        <h1>Reach Out to Our Editorial Team</h1>
+        <p>Contact ScriptHive Publication House for manuscript submissions, publishing services, editorial collaborations, ISSN guidance, or general academic inquiries.</p>
+        <div class="hero-stats">
+          <div class="hero-stat-card"><i class="fa-solid fa-clock stat-icon"></i><span class="stat-text">24–48 Hr Response</span></div>
+          <div class="hero-stat-card"><i class="fa-solid fa-certificate stat-icon"></i><span class="stat-text">ISO Certified</span></div>
+          <div class="hero-stat-card"><i class="fa-solid fa-phone-volume stat-icon"></i><span class="stat-text">24/7 Assistance</span></div>
         </div>
-        <div class="field-row">
-          <div class="field">
-            <label>Phone Number</label>
-            <input type="tel" name="phone" id="c-phone" placeholder="+91 98765 43210">
-          </div>
-          <div class="field">
-            <label>Subject <span>*</span></label>
-            <select name="subject" id="c-subject" required>
-              <option value="" disabled selected>Select a subject</option>
-              <option value="Manuscript Submission Inquiry">Manuscript Submission Inquiry</option>
-              <option value="Review Status Update">Review Status Update</option>
-              <option value="Payment & Invoice">Payment &amp; Invoice</option>
-              <option value="DOI & Certificate">DOI &amp; Certificate</option>
-              <option value="Editorial Board">Editorial Board</option>
-              <option value="General Inquiry">General Inquiry</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label>Message <span>*</span></label>
-          <textarea name="message" id="c-message" placeholder="Describe your query in detail..." required></textarea>
-        </div>
-
-        <button type="submit" class="submit-btn" id="submit-btn">
-          <i class="fa-solid fa-paper-plane"></i> Send Message
-        </button>
-      </form>
-
-      <!-- Success -->
-      <div class="result-box success" id="success-box">
-        <div style="font-weight:700;color:#15803d;font-size:1rem;margin-bottom:4px;">✅ Message sent successfully!</div>
-        <div class="qid" id="query-id-display"></div>
-        <div style="font-size:0.85rem;color:#166534;margin-top:6px;">Save this reference ID. We'll reply to your email within 24–48 business hours.</div>
       </div>
+      <div class="hero-visual gs-reveal">
+        <div class="floating-bubble fb-1"><div class="fb-icon"><i class="fa-solid fa-envelope"></i></div><div><div style="font-weight:700;color:white;">Email Support</div><div style="font-size:0.8rem;color:#cbd5e1;">Active Now</div></div></div>
+        <div class="floating-bubble fb-2"><div class="fb-icon" style="color:#25D366;"><i class="fa-brands fa-whatsapp"></i></div><div><div style="font-weight:700;color:white;">WhatsApp Chat</div><div style="font-size:0.8rem;color:#cbd5e1;">Typically replies instantly</div></div></div>
+        <div class="floating-bubble fb-3"><div class="fb-icon" style="color:var(--gold);"><i class="fa-solid fa-file-contract"></i></div><div><div style="font-weight:700;color:white;">Submission Desk</div><div style="font-size:0.8rem;color:#cbd5e1;">Open 24/7</div></div></div>
+      </div>
+    </div>
+  </section>
 
-      <!-- Error -->
-      <div class="result-box error" id="error-box">
-        <div style="font-weight:700;color:#dc2626;margin-bottom:4px;">❌ Failed to send</div>
-        <div class="qid" id="error-msg-display"></div>
+  <section class="contact-split">
+    <div class="info-section gs-reveal">
+      <h2 style="font-size:2rem;font-weight:800;color:var(--text-dark);margin-bottom:10px;">Get in Touch</h2>
+      <p style="color:var(--text-muted);font-size:1.1rem;margin-bottom:40px;">We're here to help with manuscript submissions, journal guidelines, publishing services, collaborations, and research support.</p>
+      <div class="info-grid">
+        <div class="info-card"><a href="mailto:info@scripthive.org" class="info-link"></a><div class="info-icon"><i class="fa-solid fa-envelope-open-text"></i></div><div class="info-content"><h4>Email Address</h4><p>info@scripthive.org</p></div></div>
+        <div class="info-card"><a href="tel:+919899916683" class="info-link"></a><div class="info-icon"><i class="fa-solid fa-phone-volume"></i></div><div class="info-content"><h4>Phone Number</h4><p>+91 9899916683</p></div></div>
+        <div class="info-card whatsapp"><div class="info-icon"><i class="fa-brands fa-whatsapp"></i></div><div class="info-content"><h4>WhatsApp Chat</h4><p>+91 9899916683</p><a href="https://wa.me/919899916683" target="_blank" class="whatsapp-btn"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp</a></div></div>
+        <div class="info-card"><div class="info-icon" style="color:var(--gold);background:rgba(251,191,36,0.1);"><i class="fa-solid fa-clock-rotate-left"></i></div><div class="info-content"><h4>Response Time</h4><p>Within 24–48 hours</p></div></div>
+        <div class="info-card"><div class="info-icon" style="color:#8b5cf6;background:rgba(139,92,246,0.1);"><i class="fa-solid fa-map-location-dot"></i></div><div class="info-content"><h4>Office Address</h4><p style="font-size:0.95rem;font-weight:500;">Plot No. 1, Kh. No. 17/23, Ground Floor, Begumpur Village, New Delhi - 110086</p></div></div>
       </div>
     </div>
 
-    <!-- Info sidebar -->
-    <aside>
-      <div class="info-card">
-        <h3>Contact Information</h3>
-        <div class="info-row">
-          <div class="info-icon" style="background:#eff6ff;color:#2563eb;"><i class="fa-solid fa-envelope"></i></div>
-          <div class="info-text"><strong>Email</strong>info@scripthive.org</div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon" style="background:#f0fdf4;color:#16a34a;"><i class="fa-brands fa-whatsapp"></i></div>
-          <div class="info-text"><strong>WhatsApp</strong>Available on request</div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon" style="background:#fef9c3;color:#ca8a04;"><i class="fa-solid fa-clock"></i></div>
-          <div class="info-text"><strong>Response Time</strong>24–48 business hours</div>
-        </div>
+    <div class="form-section gs-reveal" style="transition-delay:0.2s;">
+      <div class="form-card">
+        <h3>Send Us a Message</h3>
+        <form id="contactForm" novalidate>
+          <div class="form-grid">
+            <div class="form-group"><input type="text" id="name" name="name" class="form-control" placeholder=" " required><label for="name" class="form-label">Full Name *</label></div>
+            <div class="form-group"><input type="email" id="email" name="email" class="form-control" placeholder=" " required><label for="email" class="form-label">Email Address *</label></div>
+            <div class="form-group full"><input type="tel" id="phone" name="phone" class="form-control" placeholder=" "><label for="phone" class="form-label">Phone Number</label></div>
+            <div class="form-group full">
+              <select id="subject" name="subject" class="form-control" required>
+                <option value="" disabled selected></option>
+                <option value="Manuscript Submission Query">Manuscript Submission Query</option>
+                <option value="Publication Guidelines">Publication Guidelines</option>
+                <option value="ISSN Guidance">ISSN Guidance</option>
+                <option value="Editing Services">Editing Services</option>
+                <option value="Editorial Collaboration">Editorial Collaboration</option>
+                <option value="General Inquiry">General Inquiry</option>
+              </select>
+              <label for="subject" class="form-label">Subject *</label>
+              <i class="fa-solid fa-chevron-down select-icon"></i>
+            </div>
+            <div class="form-group full">
+              <div class="file-drop">
+                <input type="file" id="attachment" name="attachment" accept=".pdf,.doc,.docx,.jpg,.png">
+                <div class="file-drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <div style="font-weight:600;color:var(--text-dark);">Click to upload or drag & drop</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:5px;">PDF, DOC, JPG (Optional)</div>
+                <div id="fileName" style="font-size:0.85rem;color:var(--primary);font-weight:700;margin-top:10px;display:none;"></div>
+              </div>
+            </div>
+            <div class="form-group full"><textarea id="message" name="message" class="form-control" placeholder=" " required></textarea><label for="message" class="form-label">Message *</label></div>
+          </div>
+          <button type="submit" class="submit-btn">Send Message <i class="fa-solid fa-paper-plane" style="margin-left:8px;"></i></button>
+        </form>
       </div>
+    </div>
+  </section>
 
-      <div class="info-card">
-        <h3>Quick Links</h3>
-        <div class="info-row">
-          <div class="info-icon" style="background:#faf5ff;color:#7c3aed;"><i class="fa-solid fa-paper-plane"></i></div>
-          <div class="info-text"><a href="/submit" style="color:#2563eb;font-weight:600;text-decoration:none;">Submit a Manuscript</a><br/><span style="font-size:0.8rem;color:#94a3b8;">Start your submission here</span></div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon" style="background:#f0fdf4;color:#16a34a;"><i class="fa-solid fa-book-open"></i></div>
-          <div class="info-text"><a href="/guidelines" style="color:#2563eb;font-weight:600;text-decoration:none;">Author Guidelines</a><br/><span style="font-size:0.8rem;color:#94a3b8;">Formatting & submission rules</span></div>
-        </div>
-      </div>
+  <section class="support-topics gs-reveal-up">
+    <h2 class="section-title">You Can Contact Us For</h2>
+    <div class="topics-grid">
+      <div class="topic-card"><div class="topic-icon"><i class="fa-solid fa-file-pen"></i></div><h4>Manuscript submission queries</h4></div>
+      <div class="topic-card"><div class="topic-icon"><i class="fa-solid fa-book-open-reader"></i></div><h4>Publication guideline clarification</h4></div>
+      <div class="topic-card"><div class="topic-icon"><i class="fa-solid fa-barcode"></i></div><h4>ISSN compliance guidance</h4></div>
+      <div class="topic-card"><div class="topic-icon"><i class="fa-solid fa-pen-nib"></i></div><h4>Publishing & editing services</h4></div>
+      <div class="topic-card"><div class="topic-icon"><i class="fa-solid fa-handshake"></i></div><h4>Editorial board collaborations</h4></div>
+      <div class="topic-card"><div class="topic-icon"><i class="fa-solid fa-building-columns"></i></div><h4>Institutional publishing support</h4></div>
+    </div>
+  </section>
 
-      <div style="background:linear-gradient(135deg,#1e40af,#2563eb);border-radius:14px;padding:24px;color:#fff;text-align:center;">
-        <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:8px;">Ready to Publish?</div>
-        <p style="font-size:0.85rem;color:rgba(255,255,255,0.8);margin-bottom:16px;">Join thousands of researchers published in our ISSN-supported journals.</p>
-        <a href="/submit" style="display:inline-block;background:#fbbf24;color:#1e3a8a;font-weight:700;font-size:0.85rem;padding:10px 20px;border-radius:8px;text-decoration:none;">Submit Paper →</a>
-      </div>
-    </aside>
+  <section class="map-section gs-reveal">
+    <iframe src="https://maps.google.com/maps?q=Begumpur,New+Delhi&t=&z=13&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <div class="map-overlay-card">
+      <h3>Our Office Location</h3>
+      <p>Plot No. 1, Kh. No. 17/23, Ground Floor, Begumpur Village, New Delhi - 110086</p>
+      <a href="https://maps.google.com/?q=Begumpur,New+Delhi" target="_blank" class="btn-direction"><i class="fa-solid fa-location-arrow"></i> Get Directions</a>
+    </div>
+  </section>
+
+  <section class="quick-actions gs-reveal-up">
+    <div class="qa-grid">
+      <a href="/submit" class="qa-card"><i class="fa-solid fa-file-arrow-up qa-icon"></i><h4>Submit Paper</h4></a>
+      <a href="/journals" class="qa-card alt"><i class="fa-solid fa-book-journal-whills qa-icon"></i><h4>Explore Journals</h4></a>
+      <a href="/contact" class="qa-card alt"><i class="fa-solid fa-calendar-check qa-icon"></i><h4>Schedule Consultation</h4></a>
+      <a href="https://wa.me/919899916683" target="_blank" class="qa-card" style="background:#25D366;"><i class="fa-brands fa-whatsapp qa-icon"></i><h4>Live WhatsApp Support</h4></a>
+    </div>
+  </section>
+
+  <section class="trust-section gs-reveal-up">
+    <h2 class="section-title">Why Researchers Trust ScriptHive</h2>
+    <div class="trust-grid">
+      <div class="trust-item"><i class="fa-solid fa-bolt"></i> Fast editorial response</div>
+      <div class="trust-item"><i class="fa-solid fa-comments"></i> Transparent communication</div>
+      <div class="trust-item"><i class="fa-solid fa-user-shield"></i> Dedicated author support</div>
+      <div class="trust-item"><i class="fa-solid fa-scale-balanced"></i> Ethical publishing standards</div>
+      <div class="trust-item"><i class="fa-solid fa-globe"></i> International publishing assistance</div>
+      <div class="trust-item"><i class="fa-solid fa-list-check"></i> Professional editorial workflow</div>
+    </div>
+  </section>
+
+  <section class="final-cta gs-reveal">
+    <h2>Need Academic Publishing Assistance?</h2>
+    <p>Our editorial team is ready to support your research and publishing journey.</p>
+    <div>
+      <a href="tel:+919899916683" class="btn-white"><i class="fa-solid fa-phone"></i> Contact Editorial Team</a>
+      <a href="/submit" class="btn-outline-white"><i class="fa-solid fa-file-arrow-up"></i> Submit Manuscript</a>
+    </div>
+  </section>
+
+  <!-- MODALS -->
+  <div class="modal-overlay" id="loading-modal-overlay">
+    <div class="premium-modal"><div class="modal-glow"></div><div class="modal-content">
+      <div class="loader-spinner"></div>
+      <div class="modal-title" id="loading-title">Sending Message</div>
+      <div class="modal-message" id="loading-message">Please wait...</div>
+      <div class="progress-container" id="loading-progress-container"><div class="progress-bar" id="loading-progress-bar"></div></div>
+      <div id="loading-percentage" style="font-weight:700;color:var(--primary);font-size:0.95rem;"></div>
+    </div></div>
   </div>
-</div>
 
-<script>
-document.getElementById('contact-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const btn = document.getElementById('submit-btn');
-  const successBox = document.getElementById('success-box');
-  const errorBox   = document.getElementById('error-box');
-  successBox.style.display = 'none';
-  errorBox.style.display   = 'none';
+  <div class="modal-overlay" id="success-modal-overlay">
+    <div class="premium-modal" style="max-width:600px;"><div class="modal-glow"></div><div class="modal-content">
+      <div class="success-checkmark"><i class="fa-solid fa-check"></i></div>
+      <div class="modal-title">Message Sent!</div>
+      <div class="modal-message">Your message has been received. Our team will review your inquiry and get back to you shortly.</div>
+      <div class="submission-id-container"><i class="fa-solid fa-fingerprint"></i> <span id="success-query-id">QRY-XXXXX</span></div>
+      <div style="background:rgba(0,0,0,0.02);border:1px solid rgba(0,0,0,0.05);border-radius:16px;padding:20px;text-align:left;margin-bottom:30px;font-size:0.95rem;line-height:1.6;">
+        <div style="margin-bottom:8px;"><strong>Name:</strong> <span id="success-name"></span></div>
+        <div style="margin-bottom:8px;"><strong>Subject:</strong> <span id="success-subject"></span></div>
+        <div><strong>Response Timeline:</strong> <span style="color:#10b981;font-weight:700;">24-48 Hours</span></div>
+      </div>
+      <div class="modal-btn-group">
+        <button class="modal-btn primary" id="download-receipt-btn"><i class="fa-solid fa-download"></i> Download Receipt</button>
+        <button class="modal-btn secondary" id="close-success-btn">Close</button>
+      </div>
+    </div></div>
+  </div>
 
-  const name    = document.getElementById('c-name').value.trim();
-  const email   = document.getElementById('c-email').value.trim();
-  const phone   = document.getElementById('c-phone').value.trim();
-  const subject = document.getElementById('c-subject').value;
-  const message = document.getElementById('c-message').value.trim();
+  <div class="modal-overlay" id="error-modal-overlay">
+    <div class="premium-modal"><div class="modal-glow danger"></div><div class="modal-content">
+      <div class="error-cross"><i class="fa-solid fa-xmark"></i></div>
+      <div class="modal-title">Submission Failed</div>
+      <div class="modal-message" id="error-modal-message">An error occurred.</div>
+      <div class="modal-btn-group"><button class="modal-btn danger" id="close-error-btn">Dismiss</button></div>
+    </div></div>
+  </div>
 
-  if (!name || !email || !subject || !message) {
-    errorBox.style.display = 'block';
-    document.getElementById('error-msg-display').textContent = 'Please fill in all required fields.';
-    return;
-  }
-  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRe.test(email)) {
-    errorBox.style.display = 'block';
-    document.getElementById('error-msg-display').textContent = 'Please enter a valid email address.';
-    return;
-  }
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.gs-reveal').forEach(el => gsap.from(el,{scrollTrigger:{trigger:el,start:"top 85%"},y:50,opacity:0,duration:1,ease:"power3.out"}));
+    gsap.utils.toArray('.gs-reveal-up').forEach(el => gsap.from(el,{scrollTrigger:{trigger:el,start:"top 85%"},y:30,opacity:0,duration:0.8,ease:"power2.out"}));
 
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Sending…';
-
-  try {
-    const res = await fetch('/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, subject, message })
+    const fileInput = document.getElementById('attachment');
+    const fileNameDisplay = document.getElementById('fileName');
+    fileInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) { fileNameDisplay.style.display='block'; fileNameDisplay.innerHTML='<i class="fa-solid fa-file-check"></i> Selected: '+this.files[0].name; }
+      else { fileNameDisplay.style.display='none'; }
     });
-    const data = await res.json();
-    if (res.ok && data.status === 'success') {
-      successBox.style.display = 'block';
-      document.getElementById('query-id-display').textContent = 'Reference ID: ' + data.query_id;
-      e.target.reset();
-    } else {
-      throw new Error(data.message || 'Something went wrong.');
-    }
-  } catch(err) {
-    errorBox.style.display = 'block';
-    document.getElementById('error-msg-display').textContent = err.message || 'Network error. Please try again.';
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
-  }
-});
-</script>
+
+    const loadingOverlay=document.getElementById('loading-modal-overlay');
+    const loadingTitle=document.getElementById('loading-title');
+    const loadingMessage=document.getElementById('loading-message');
+    const loadingProgressContainer=document.getElementById('loading-progress-container');
+    const loadingProgressBar=document.getElementById('loading-progress-bar');
+    const loadingPercentage=document.getElementById('loading-percentage');
+    const successOverlay=document.getElementById('success-modal-overlay');
+    const successQueryId=document.getElementById('success-query-id');
+    const successSubject=document.getElementById('success-subject');
+    const successName=document.getElementById('success-name');
+    const errorOverlay=document.getElementById('error-modal-overlay');
+    const errorModalMessage=document.getElementById('error-modal-message');
+
+    function showError(msg){ errorModalMessage.innerText=msg; errorOverlay.classList.add('active'); }
+    document.getElementById('close-success-btn').addEventListener('click',()=>successOverlay.classList.remove('active'));
+    document.getElementById('close-error-btn').addEventListener('click',()=>errorOverlay.classList.remove('active'));
+
+    let currentQueryDetails=null;
+
+    document.getElementById('contactForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      if(!this.checkValidity()){ this.reportValidity(); return; }
+      const name=document.getElementById('name').value.trim();
+      const email=document.getElementById('email').value.trim();
+      const subject=document.getElementById('subject').value;
+      const message=document.getElementById('message').value.trim();
+      if(!name||!email||!subject||!message){ showError("Please fill out all required fields."); return; }
+
+      loadingTitle.innerText='Sending Message';
+      loadingMessage.innerText='Processing your inquiry...';
+      loadingProgressContainer.style.display='block';
+      loadingProgressBar.style.width='0%';
+      loadingPercentage.innerText='0%';
+      loadingOverlay.classList.add('active');
+
+      const formData=new FormData(this);
+      const xhr=new XMLHttpRequest();
+      xhr.open('POST','/contact',true);
+      xhr.upload.addEventListener('progress',function(e){
+        if(e.lengthComputable){
+          const p=Math.min(99,Math.round((e.loaded/e.total)*100));
+          loadingProgressBar.style.width=p+'%'; loadingPercentage.innerText=p+'%';
+          if(p>=99) loadingTitle.innerText='Finalizing';
+        }
+      });
+      xhr.onload=function(){
+        loadingOverlay.classList.remove('active');
+        let resp={};
+        try{ resp=JSON.parse(xhr.responseText); }catch(e){ resp={status:'error',message:'Unexpected response.'}; }
+        if(xhr.status===200&&resp.status==='success'){
+          currentQueryDetails={query_id:resp.query_id,timestamp:resp.timestamp,name,email,subject,message};
+          successQueryId.innerText=resp.query_id;
+          successSubject.innerText=subject;
+          successName.innerText=name;
+          successOverlay.classList.add('active');
+          document.getElementById('contactForm').reset();
+          fileNameDisplay.style.display='none';
+        } else { showError(resp.message||'Failed to send message. Please try again.'); }
+      };
+      xhr.onerror=function(){ loadingOverlay.classList.remove('active'); showError('A network error occurred.'); };
+      xhr.send(formData);
+    });
+
+    document.getElementById('download-receipt-btn').addEventListener('click',function(){
+      if(!currentQueryDetails) return;
+      const {jsPDF}=window.jspdf;
+      const doc=new jsPDF();
+      const {query_id,timestamp,name,email,subject,message}=currentQueryDetails;
+      doc.setFillColor(15,23,42); doc.rect(0,0,210,40,'F');
+      doc.setTextColor(255,255,255); doc.setFont('Helvetica','bold'); doc.setFontSize(22); doc.text('SCRIPTHIVE PUBLICATION',20,18);
+      doc.setTextColor(251,191,36); doc.setFont('Helvetica','normal'); doc.setFontSize(10); doc.text('OFFICIAL QUERY RECEIPT',20,26);
+      doc.setTextColor(255,255,255); doc.setFontSize(8); doc.text('Date: '+timestamp,150,26);
+      doc.setTextColor(15,23,42); doc.setFont('Helvetica','bold'); doc.setFontSize(14); doc.text('Query Metadata',20,55);
+      doc.setDrawColor(226,232,240); doc.setLineWidth(0.5); doc.line(20,58,190,58);
+      let y=68;
+      [['Query ID',query_id],['Name',name],['Email',email],['Subject',subject],['Date',timestamp],['Status','Received']].forEach(row=>{
+        doc.setFont('Helvetica','bold'); doc.setTextColor(100,116,139); doc.setFontSize(10); doc.text(row[0]+':',20,y);
+        doc.setFont(row[0]==='Query ID'?'Helvetica bold':'Helvetica','normal'); doc.setTextColor(15,23,42);
+        const s=doc.splitTextToSize(row[1],120); doc.text(s,70,y); y+=(s.length*5)+3;
+      });
+      y+=10; doc.setFont('Helvetica','bold'); doc.setFontSize(12); doc.setTextColor(15,23,42); doc.text('Message Transcript',20,y);
+      y+=3; doc.line(20,y,190,y); y+=8;
+      doc.setFont('Helvetica','normal'); doc.setFontSize(10); doc.setTextColor(71,85,105);
+      doc.text(doc.splitTextToSize(message,170),20,y);
+      doc.setTextColor(15,23,42); doc.text('Sincerely,',20,250); doc.setFont('Helvetica','bold'); doc.text('Editorial Support Team',20,256);
+      doc.setFont('Helvetica','normal'); doc.text('ScriptHive Publication',20,262);
+      doc.setFontSize(9); doc.setTextColor(100,116,139); doc.text('www.scripthive.org | info@scripthive.org',20,268);
+      doc.save('ScriptHive_Query_'+query_id+'.pdf');
+    });
+  });
+  </script>
 
 <%- include('../partials/footer') %>

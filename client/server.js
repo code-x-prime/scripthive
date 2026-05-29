@@ -490,7 +490,7 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
 
 // POST Routes
 
-app.post('/contact', async (req, res) => {
+app.post('/contact', upload.single('attachment'), async (req, res) => {
     try {
         const { name, email, phone, subject, message } = req.body;
         if (!name || !email || !subject || !message) {
