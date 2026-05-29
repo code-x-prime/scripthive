@@ -37,7 +37,7 @@ export const updateJournalIssn = async (req: Request, res: Response): Promise<vo
 export const updateJournalDoi = async (req: Request, res: Response): Promise<void> => {
   const journalId = String(req.params.journalId);
   const { doiPrefix, websiteDoiLink } = req.body as { doiPrefix?: string | null; websiteDoiLink?: string | null };
-  const data: Prisma.JournalUpdateInput = {};
+  const data: Record<string, unknown> = {};
   if (doiPrefix !== undefined) data.doiPrefix = doiPrefix || null;
   if (websiteDoiLink !== undefined) data.websiteDoiLink = websiteDoiLink || null;
   const updated = await prisma.journal.update({ where: { id: journalId }, data });

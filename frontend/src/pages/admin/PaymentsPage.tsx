@@ -9,25 +9,12 @@ import type { Invoice, PaymentStats } from "@/types";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { usePermissions } from "@/hooks/usePermissions";
 
-function formatMoney(total: number, currency: string): string {
-  if (currency === "INR") return `₹${total.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
-  return `$${total.toFixed(2)}`;
-}
-
 function formatDate(iso?: string | null): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
 
 const STATUS_OPTIONS = ["Draft", "Pending", "Paid"] as const;
-
-function currencyFlag(currency: string): string {
-  if (currency === "INR") return "🇮🇳";
-  if (currency === "USD") return "🇺🇸";
-  if (currency === "EUR") return "🇪🇺";
-  if (currency === "GBP") return "🇬🇧";
-  return "💱";
-}
 
 export const PaymentsPage = () => {
   const { pathname } = useLocation();
