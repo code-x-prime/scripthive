@@ -52,20 +52,22 @@
   const iss = art.part?.issue;
   const jid = art.journalId || '';
   const apiBase = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
-  const pdfUrl = art.pdfPublicPath ? (apiBase + '/' + art.pdfPublicPath) : null;
+  const pdfUrl = art.pdfPublicPath
+    ? (art.pdfPublicPath.startsWith('http') ? art.pdfPublicPath : (apiBase + '/' + art.pdfPublicPath))
+    : null;
   const doiUrl = art.doiRecord?.doi ? ('https://www.doi.org/' + art.doiRecord.doi) : null;
   const partName = art.part?.name || 'A';
   const partLetter = partName.toLowerCase();
   const citation = vol && iss ? (jid + '; ' + vol.year + '; ' + vol.number + '(' + iss.number + partLetter + ')' + (art.pageStart ? (':' + String(art.pageStart).padStart(2,'0') + (art.pageEnd ? '-' + String(art.pageEnd).padStart(2,'0') : '')) : '')) : '';
   const issueLabel = vol && iss ? ('Vol. ' + vol.number + ', Issue ' + iss.number + (partName !== 'A' ? ' Part ' + partName : '') + ' (' + vol.year + ')') : '';
-  const journalUrl = '/' + jid;
+  const journalUrl = '/' + jid + '/archives';
 %>
 
 <div class="art-page">
   <!-- Hero -->
   <div class="art-hero">
     <div class="art-hero-inner">
-      <a href="<%= journalUrl %>#archives" class="art-journal-badge">
+      <a href="<%= journalUrl %>" class="art-journal-badge">
         <i class="fa-solid fa-arrow-left" style="font-size:0.7rem;"></i>
         <%= art.journal?.name || jid %> — Back to Archives
       </a>
@@ -86,7 +88,7 @@
   <!-- Body -->
   <div class="art-body">
     <main>
-      <a href="<%= journalUrl %>#archives" class="back-link"><i class="fa-solid fa-chevron-left"></i> Back to Archives</a>
+      <a href="<%= journalUrl %>" class="back-link"><i class="fa-solid fa-chevron-left"></i> Back to Archives</a>
 
       <!-- DOI -->
       <% if (doiUrl) { %>
