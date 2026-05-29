@@ -71,7 +71,7 @@ export function AuthorAuthProvider({ children }: { children: React.ReactNode }) 
 
     // Only attempt author session restore on author routes
     if (!window.location.pathname.startsWith("/author")) {
-      setIsLoading(false);
+      queueMicrotask(() => setIsLoading(false));
       return;
     }
 
