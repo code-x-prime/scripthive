@@ -57,7 +57,9 @@
                 const ps = art.pageStart, pe = art.pageEnd;
                 const pageRange = (ps && pe) ? (String(ps).padStart(2,'0') + '-' + String(pe).padStart(2,'0')) : '';
                 const citation = journalAbbr + '; ' + item.vol.year + '; ' + item.vol.number + '(' + item.iss.number + item.pl + '):' + pageRange;
-                const pdfUrl = art.pdfPublicPath ? (backendBase + '/' + art.pdfPublicPath.replace(/^uploads\//, 'uploads/')) : null;
+                const pdfUrl = art.pdfPublicPath
+                  ? (art.pdfPublicPath.startsWith('http') ? art.pdfPublicPath : (backendBase + '/' + art.pdfPublicPath.replace(/^uploads\//, 'uploads/')))
+                  : null;
               %>
               <tr style="border-bottom:1px solid #f1f5f9;">
                 <td style="padding:14px 12px;text-align:center;font-weight:700;color:#64748b;vertical-align:top;"><%= idx+1 %></td>
