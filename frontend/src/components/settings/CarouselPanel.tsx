@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import {
   ArrowDown,
@@ -12,6 +12,7 @@ import {
   Plus,
   Save,
   Trash2,
+  Upload,
   X
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -57,8 +58,30 @@ function SlideForm({
 }) {
   const [form, setForm] = useState<FormState>(initial);
   const [showPicker, setShowPicker] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const images = mediaFiles.filter((f) => f.mimeType.startsWith("image/"));
+
+  const uploadImageFile = async (file: File) => {
+    if (!file.type.startsWith("image/")) { toast.error("Only image files allowed"); return; }
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("files", file);
+      const res = await fetch("/api/media/upload", { method: "POST", body: fd, credentials: "include" });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json() as { files: { url: string }[] };
+      const url = data.files?.[0]?.url ?? "";
+      if (url) setForm((f) => ({ ...f, imageUrl: url }));
+      toast.success("Image uploaded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="space-y-4 rounded-xl border border-green-200 bg-green-50/40 p-5">
@@ -81,14 +104,35 @@ function SlideForm({
             </button>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => setShowPicker((v) => !v)}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 py-8 text-sm text-gray-500 hover:border-green-400 hover:text-green-700"
+          <div
+            className={`rounded-xl border-2 border-dashed transition-colors ${dragOver ? "border-green-400 bg-green-50" : "border-gray-300"}`}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) void uploadImageFile(f); }}
           >
-            <ImagePlus className="h-5 w-5" />
-            Pick from media library
-          </button>
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) void uploadImageFile(f); }} />
+            <div className="flex flex-col items-center gap-3 py-6">
+              {uploading ? (
+                <Loader2 className="h-6 w-6 animate-spin text-green-600" />
+              ) : (
+                <Upload className="h-6 w-6 text-gray-400" />
+              )}
+              <p className="text-sm text-gray-500">
+                {uploading ? "Uploading…" : "Drag & drop image here, or"}
+              </p>
+              <div className="flex gap-2">
+                <button type="button" disabled={uploading} onClick={() => fileInputRef.current?.click()}
+                  className="rounded-lg border border-green-300 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-100 disabled:opacity-50">
+                  Upload from PC
+                </button>
+                <button type="button" disabled={uploading} onClick={() => setShowPicker((v) => !v)}
+                  className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50">
+                  <ImagePlus className="mr-1 inline h-3.5 w-3.5" />
+                  Media library
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         {showPicker && !form.imageUrl && (
