@@ -69,6 +69,12 @@ export function AuthorAuthProvider({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     let cancelled = false;
 
+    // Only attempt author session restore on author routes
+    if (!window.location.pathname.startsWith("/author")) {
+      setIsLoading(false);
+      return;
+    }
+
     (async () => {
       try {
         const res = await fetch("/api/author/auth/refresh", { method: "GET", credentials: "include" });
