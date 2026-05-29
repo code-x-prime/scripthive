@@ -36,7 +36,7 @@ async function markInvoicePaid(
   });
   await prisma.submission.updateMany({
     where: { id: invoice.submissionId },
-    data: { paymentStatus: "Paid", paymentMethod: method, paymentId, paidAt: new Date() }
+    data: { paymentStatus: "Paid", paymentMethod: method, paymentId, paidAt: new Date(), productionStatus: "ReadyForPreparation" }
   });
   void writeAuditLog({
     action: "payment_received",

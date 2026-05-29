@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Mail, Send, Star, X } from "lucide-react";
+import { Mail, Search, Send, Star, X } from "lucide-react";
 import { apiJson } from "@/services/api";
 import { paymentService } from "@/services/payment.service";
 import { apcAmountForCurrency } from "@/utils/apcAmounts";
@@ -52,6 +52,8 @@ export const PaymentsPage = () => {
   const [saving, setSaving] = useState(false);
   const [apcRates, setApcRates] = useState({ usd: 140, inr: 11500 });
 
+  const [search, setSearch] = useState("");
+
   // inline amount editing state: invoiceId -> draft value
   const [editingAmount, setEditingAmount] = useState<Record<string, string>>({});
 
@@ -78,11 +80,17 @@ export const PaymentsPage = () => {
   }, [load]);
 
   const tableRows = useMemo(() => {
-    const filtered = isCompleted
-      ? invoices.filter((i) => i.status === "Paid")
-      : invoices.filter((i) => i.status === "Draft" || i.status === "Pending");
+    const q = search.trim().toLowerCase();
+    const filtered = invoices
+      .filter((i) => isCompleted ? i.status === "Paid" : (i.status === "Draft" || i.status === "Pending"))
+      .filter((i) => !q || (
+        i.submissionId?.toLowerCase().includes(q) ||
+        i.submission?.title?.toLowerCase().includes(q) ||
+        i.customerName?.toLowerCase().includes(q) ||
+        i.customerEmail?.toLowerCase().includes(q)
+      ));
     return [...filtered].sort((a, b) => (b.submission?.priority ? 1 : 0) - (a.submission?.priority ? 1 : 0));
-  }, [invoices, isCompleted]);
+  }, [invoices, isCompleted, search]);
 
   const onPriorityToggle = async (submissionId: string, current: boolean) => {
     try {
@@ -236,6 +244,18 @@ export const PaymentsPage = () => {
         </div>
       )}
 
+      {/* Search bar */}
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search by ID, title, author..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+      </div>
+
       {loading ? (
         <div className="animate-pulse space-y-3 rounded-xl border border-gray-200 bg-white p-4">
           <div className="h-8 w-full rounded bg-gray-100" />
@@ -256,7 +276,7 @@ export const PaymentsPage = () => {
                 <th className="px-3 py-3">Submission ID</th>
                 <th className="px-3 py-3">Customer</th>
                 <th className="px-3 py-3">Amount</th>
-                <th className="px-3 py-3">Currency</th>
+                {isCompleted && <th className="px-3 py-3">Transaction ID</th>}
                 <th className="px-3 py-3">Date</th>
                 <th className="px-3 py-3">Status</th>
                 <th className="px-3 py-3 text-right">Actions</th>
@@ -287,27 +307,30 @@ export const PaymentsPage = () => {
                   {/* inline editable amount */}
                   <td className="whitespace-nowrap px-3 py-2">
                     {inv.status !== "Paid" && canWriteInvoice ? (
-                      <input
-                        type="number"
-                        min={0}
-                        step="0.01"
-                        value={editingAmount[inv.id] ?? inv.total}
-                        onChange={(e) => setEditingAmount((p) => ({ ...p, [inv.id]: e.target.value }))}
-                        onBlur={() => void onAmountBlur(inv)}
-                        className="w-28 rounded border border-gray-200 px-2 py-1 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          value={editingAmount[inv.id] ?? inv.total}
+                          onChange={(e) => setEditingAmount((p) => ({ ...p, [inv.id]: e.target.value }))}
+                          onBlur={() => void onAmountBlur(inv)}
+                          className="w-24 rounded border border-gray-200 px-2 py-1 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                        <span className="text-xs font-semibold text-gray-500">{inv.currency}</span>
+                      </div>
                     ) : (
-                      <span className="font-medium text-gray-900">{formatMoney(inv.total, inv.currency)}</span>
+                      <span className="font-medium text-gray-900">
+                        {inv.total} <span className="text-xs font-semibold text-gray-500">{inv.currency}</span>
+                      </span>
                     )}
-                    <span className="ml-1 text-xs text-gray-400">{inv.currency}</span>
                   </td>
-                  {/* currency */}
-                  <td className="px-3 py-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-base leading-none">{currencyFlag(inv.currency)}</span>
-                      <span className="text-xs font-semibold text-gray-700">{inv.currency}</span>
-                    </div>
-                  </td>
+                  {/* transaction ID — completed only */}
+                  {isCompleted && (
+                    <td className="px-3 py-2 font-mono text-xs text-gray-600">
+                      {inv.gatewayPayId || inv.gatewayOrderId || "—"}
+                    </td>
+                  )}
                   <td className="whitespace-nowrap px-3 py-2 text-gray-600">{formatDate(inv.createdAt)}</td>
                   {/* status + tracking */}
                   <td className="px-3 py-2">

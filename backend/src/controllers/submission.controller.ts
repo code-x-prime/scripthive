@@ -18,6 +18,38 @@ import { writeAuditLog } from "../utils/auditLog.js";
 import type { AuthRequest } from "../middlewares/auth.middleware.js";
 import { uploadToR2 } from "../utils/r2Upload.js";
 
+export const listPublishedArticles = async (_req: Request, res: Response): Promise<void> => {
+  const rows = await prisma.submission.findMany({
+    where: { status: "Published" },
+    include: { journal: true, doiRecord: true },
+    orderBy: { updatedAt: "desc" }
+  });
+  res.json(rows);
+};
+
+export const updatePublishedArticle = async (req: Request, res: Response): Promise<void> => {
+  const id = String(req.params.id);
+  const { title, authorName, abstract, keywords, pdfPublicPath } = req.body as {
+    title?: string; authorName?: string; abstract?: string; keywords?: string; pdfPublicPath?: string;
+  };
+  const data: Record<string, unknown> = {};
+  if (title !== undefined) data.title = title;
+  if (authorName !== undefined) data.authorName = authorName;
+  if (abstract !== undefined) data.abstract = abstract;
+  if (keywords !== undefined) data.keywords = keywords;
+  if (pdfPublicPath !== undefined) data.pdfPublicPath = pdfPublicPath;
+  const updated = await prisma.submission.update({ where: { id }, data });
+  void writeAuditLog({
+    adminId: (req as AuthRequest).admin?.adminId,
+    action: "update_published_article",
+    resource: "submission",
+    resourceId: id,
+    details: data,
+    ipAddress: req.ip
+  });
+  res.json(updated);
+};
+
 export const createSubmission = async (req: Request, res: Response): Promise<void> => {
   const count = await prisma.submission.count();
   const data = req.body as Record<string, string>;
@@ -194,6 +226,11 @@ export const downloadManuscript = async (req: Request, res: Response): Promise<v
     return;
   }
   const raw = s.manuscriptPath;
+  // R2 URL — redirect directly
+  if (raw.startsWith("http://") || raw.startsWith("https://")) {
+    res.redirect(raw);
+    return;
+  }
   const abs = path.normalize(path.isAbsolute(raw) ? raw : path.resolve(process.cwd(), raw));
   const root = path.normalize(path.resolve(process.cwd(), "uploads", "manuscripts"));
   if (!abs.toLowerCase().startsWith(root.toLowerCase())) {
@@ -327,6 +364,10 @@ export const downloadProductionFile = async (req: Request, res: Response): Promi
   if (!s?.pdfPublicPath) { res.status(404).json({ message: "Production file not found" }); return; }
 
   const raw = s.pdfPublicPath;
+  if (raw.startsWith("http://") || raw.startsWith("https://")) {
+    res.redirect(raw);
+    return;
+  }
   const abs = path.normalize(path.isAbsolute(raw) ? raw : path.resolve(process.cwd(), raw));
   const root = path.normalize(path.resolve(process.cwd(), "uploads"));
   if (!abs.toLowerCase().startsWith(root.toLowerCase())) { res.status(403).json({ message: "Forbidden" }); return; }
@@ -357,12 +398,6 @@ export const downloadManuscriptAndAdvance = async (req: Request, res: Response):
   const s = await prisma.submission.findUnique({ where: { id } });
   if (!s?.manuscriptPath) { res.status(404).json({ message: "Manuscript not found" }); return; }
 
-  const raw = s.manuscriptPath;
-  const abs = path.normalize(path.isAbsolute(raw) ? raw : path.resolve(process.cwd(), raw));
-  const root = path.normalize(path.resolve(process.cwd(), "uploads", "manuscripts"));
-  if (!abs.toLowerCase().startsWith(root.toLowerCase())) { res.status(403).json({ message: "Forbidden" }); return; }
-  if (!fs.existsSync(abs)) { res.status(404).json({ message: "File missing on server" }); return; }
-
   // auto-advance from ReadyForPreparation → ReadyForUpload
   if (s.productionStatus === "ReadyForPreparation") {
     await prisma.submission.update({ where: { id }, data: { productionStatus: "ReadyForUpload" } });
@@ -375,6 +410,17 @@ export const downloadManuscriptAndAdvance = async (req: Request, res: Response):
       ipAddress: req.ip
     });
   }
+
+  const raw = s.manuscriptPath;
+  // R2 URL — redirect directly
+  if (raw.startsWith("http://") || raw.startsWith("https://")) {
+    res.redirect(raw);
+    return;
+  }
+  const abs = path.normalize(path.isAbsolute(raw) ? raw : path.resolve(process.cwd(), raw));
+  const root = path.normalize(path.resolve(process.cwd(), "uploads", "manuscripts"));
+  if (!abs.toLowerCase().startsWith(root.toLowerCase())) { res.status(403).json({ message: "Forbidden" }); return; }
+  if (!fs.existsSync(abs)) { res.status(404).json({ message: "File missing on server" }); return; }
 
   res.download(abs, path.basename(abs));
 };

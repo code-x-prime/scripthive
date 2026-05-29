@@ -26,7 +26,7 @@
     </style>
 
     <div class="carousel-strip-heading">
-      <h3>Featured Research &amp; Highlights</h3>
+      <h3>Indexing</h3>
       <p>Explore published work and milestones from our journals</p>
     </div>
     <div class="carousel-strip" style="padding: 12px 0 24px;">
@@ -53,7 +53,9 @@
       const div = document.createElement('div');
       div.className = 'carousel-slide';
       if (s.linkUrl) { div.style.cursor = 'pointer'; div.onclick = function(){ window.open(s.linkUrl, '_blank'); }; }
-      const imgSrc = (API + '/' + s.imageUrl).replace(/([^:]\/)\/+/g,'$1');
+      const imgSrc = (s.imageUrl && (s.imageUrl.startsWith('http://') || s.imageUrl.startsWith('https://')))
+        ? s.imageUrl
+        : (API + '/' + s.imageUrl).replace(/([^:]\/)\/+/g,'$1');
       div.innerHTML = '<img src="' + imgSrc + '" alt="' + (s.title||'') + '" loading="lazy">' +
         '<div class="carousel-slide-overlay">' +
         (s.title    ? '<div class="carousel-slide-title">' + s.title + '</div>' : '') +

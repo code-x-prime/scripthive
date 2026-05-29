@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import JoditEditor from "jodit-react";
 import toast from "react-hot-toast";
@@ -134,11 +134,12 @@ export const PublishArticlePage = () => {
     }
   }, []);
 
-  // reload volumes whenever journal filter changes
+  // reload volumes + reset selection when journal filter changes
   useEffect(() => {
-    setForm((p) => ({ ...p, volumeId: "", issueId: "", partId: "" }));
-    void loadVolumes(filterJournalId);
-  }, [filterJournalId, loadVolumes]);
+    startTransition(() => setForm((p) => ({ ...p, volumeId: "", issueId: "", partId: "" })));
+    queueMicrotask(() => void loadVolumes(filterJournalId));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterJournalId]);
 
   const fetchNextArticleNo = async (journalId: string) => {
     try {
@@ -428,7 +429,7 @@ export const PublishArticlePage = () => {
                 className={inputClass} disabled={!selectedIssue}>
                 <option value="">Select</option>
                 {(selectedIssue?.parts ?? []).map((p) => (
-                  <option key={p.id} value={String(p.id)}>Part {p.name}</option>
+                  <option key={p.id} value={String(p.id)}>{/^part\s/i.test(p.name) ? p.name : `Part ${p.name}`}</option>
                 ))}
               </select>
             </div>

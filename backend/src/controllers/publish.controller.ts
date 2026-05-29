@@ -102,7 +102,11 @@ export const deletePart = async (req: Request, res: Response): Promise<void> => 
 
 export const listApprovedUnpublished = async (_req: Request, res: Response): Promise<void> => {
   const rows = await prisma.submission.findMany({
-    where: { status: "Accepted", paymentStatus: "Paid" },
+    where: {
+      status: "Accepted",
+      paymentStatus: "Paid",
+      productionStatus: "ReadyToPublished"
+    },
     include: { journal: true, doiRecord: true },
     orderBy: { updatedAt: "desc" }
   });

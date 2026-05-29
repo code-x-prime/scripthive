@@ -32,7 +32,7 @@ export const upload = multer({
       cb(null, `tmp_${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`);
     }
   }),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: docFilter
 });
 

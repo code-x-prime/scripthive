@@ -8,10 +8,12 @@ import {
   downloadProductionFile,
   downloadSample,
   getSubmission,
+  listPublishedArticles,
   listSubmissions,
   trackSubmission,
   updatePriority,
   updateProductionStatus,
+  updatePublishedArticle,
   updateRemark,
   updateReviewNotes,
   updateSubmissionStatus,
@@ -22,6 +24,8 @@ import { upload, uploadProduction } from "../middlewares/upload.middleware.js";
 
 export const submissionRouter = Router();
 
+submissionRouter.get("/published", requireAuth, requirePermission("submissions", "read"), listPublishedArticles);
+submissionRouter.patch("/:id/published", requireAuth, requirePermission("submissions", "write"), updatePublishedArticle);
 submissionRouter.post("/", upload.single("manuscript"), createSubmission);
 submissionRouter.get("/track/:id", trackSubmission);
 submissionRouter.get("/", requireAuth, requirePermission("submissions", "read"), listSubmissions);

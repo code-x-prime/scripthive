@@ -263,9 +263,9 @@ export function AuthorSubmitPage() {
                       </div>
                       <span className={`font-medium ${checked ? "text-green-900" : "text-slate-800"}`}>{addon.label}</span>
                     </div>
-                    <span className={`shrink-0 font-mono text-sm font-semibold ${checked ? "text-green-700" : "text-slate-500"}`}>
-                      ₹{addon.price.toLocaleString("en-IN")}
-                    </span>
+                    {checked && (
+                      <span className="shrink-0 font-mono text-sm font-semibold text-green-700">✓</span>
+                    )}
                   </button>
                 );
               })}

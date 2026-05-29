@@ -8,7 +8,9 @@ import {
   listJournals,
   listJournalsAdmin,
   removeEditorialMember,
+  toggleJournalStatus,
   updateEditorialMember,
+  updateJournalDoi,
   updateJournalIssn
 } from "../controllers/journal.controller.js";
 import {
@@ -27,6 +29,18 @@ journalRouter.put(
   requireAuth,
   requirePermission("journals", "write"),
   updateJournalIssn
+);
+journalRouter.patch(
+  "/admin/:journalId/toggle-status",
+  requireAuth,
+  requirePermission("journals", "write"),
+  toggleJournalStatus
+);
+journalRouter.put(
+  "/admin/:journalId/doi",
+  requireAuth,
+  requirePermission("journals", "write"),
+  updateJournalDoi
 );
 
 journalRouter.get("/:journalId/editorial-board", requireAuth, requirePermission("journals", "read"), listEditorialBoard);

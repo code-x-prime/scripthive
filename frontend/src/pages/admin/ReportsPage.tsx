@@ -5,8 +5,10 @@ import {
   Line, LineChart, Pie, PieChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis
 } from "recharts";
-import { BookOpen, DollarSign, FileSpreadsheet, FileText, Hash, Loader2, Printer, Activity, Users, X, Download } from "lucide-react";
+import { BookOpen, DollarSign, FileSpreadsheet, FileText, Hash, Loader2, Printer, Activity, Users, X, Download, Check, Pencil } from "lucide-react";
 import { reportsService, type ReportsPayload, type ActivityPayload, type UserActivitySummary, type AuditLogEntry } from "@/services/reports.service";
+import { apiJson } from "@/services/api";
+import type { Submission } from "@/types";
 
 const STATUS_COLORS: Record<string, string> = {
   Pending: "#3b82f6",
@@ -531,12 +533,17 @@ function ActivityTab({ activityData }: { activityData: ActivityPayload }) {
 
 /* ── main page ───────────────────────────────────────────────────────────── */
 export const ReportsPage = () => {
-  const [activeTab, setActiveTab]   = useState<"analytics" | "activity">("analytics");
+  const [activeTab, setActiveTab]   = useState<"analytics" | "activity" | "published">("analytics");
   const [data, setData]             = useState<ReportsPayload | null>(null);
   const [activityData, setActivityData] = useState<ActivityPayload | null>(null);
   const [loading, setLoading]       = useState(true);
   const [activityLoading, setActivityLoading] = useState(false);
   const [activityDays, setActivityDays] = useState(30);
+  const [publishedArticles, setPublishedArticles] = useState<Submission[]>([]);
+  const [publishedLoading, setPublishedLoading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<{ title: string; authorName: string; abstract: string; keywords: string; pdfPublicPath: string }>({ title: "", authorName: "", abstract: "", keywords: "", pdfPublicPath: "" });
+  const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -552,11 +559,33 @@ export const ReportsPage = () => {
     finally { setActivityLoading(false); }
   }, []);
 
+  const loadPublished = useCallback(async () => {
+    setPublishedLoading(true);
+    try { setPublishedArticles(await apiJson<Submission[]>("/submissions/published")); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "Failed to load published articles"); }
+    finally { setPublishedLoading(false); }
+  }, []);
+
+  const saveEdit = async (id: string) => {
+    setSaving(true);
+    try {
+      await apiJson(`/submissions/${encodeURIComponent(id)}/published`, { method: "PATCH", body: JSON.stringify(editForm) });
+      toast.success("Article updated");
+      setEditingId(null);
+      void loadPublished();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   useEffect(() => { queueMicrotask(() => void load()); }, [load]);
 
   useEffect(() => {
     if (activeTab === "activity") void loadActivity(activityDays);
-  }, [activeTab, activityDays, loadActivity]);
+    if (activeTab === "published") void loadPublished();
+  }, [activeTab, activityDays, loadActivity, loadPublished]);
 
   const handlePrint = () => {
     // add class to body → CSS hides everything except our section
@@ -646,7 +675,7 @@ export const ReportsPage = () => {
 
       {/* Tabs */}
       <div className="flex gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1 w-fit">
-        {([["analytics", "Analytics", FileText], ["activity", "User Activity", Activity]] as const).map(([id, label, Icon]) => (
+        {([["analytics", "Analytics", FileText], ["activity", "User Activity", Activity], ["published", "Published Articles", BookOpen]] as const).map(([id, label, Icon]) => (
           <button key={id} type="button"
             onClick={() => setActiveTab(id)}
             className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
@@ -840,6 +869,77 @@ export const ReportsPage = () => {
       </div>
 
       </> /* end analytics tab */}
+
+      {activeTab === "published" && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-slate-800">Published Articles</h2>
+            <button type="button" onClick={() => void loadPublished()}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
+              Refresh
+            </button>
+          </div>
+          {publishedLoading ? (
+            <div className="flex items-center gap-2 text-slate-500"><Loader2 className="h-5 w-5 animate-spin" /> Loading…</div>
+          ) : publishedArticles.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-slate-200 bg-white py-12 text-center text-sm text-slate-400">No published articles yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {publishedArticles.map((art) => (
+                <div key={art.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                  {editingId === art.id ? (
+                    <div className="space-y-3">
+                      <input value={editForm.title} onChange={(e) => setEditForm((p) => ({ ...p, title: e.target.value }))}
+                        placeholder="Title" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                      <input value={editForm.authorName} onChange={(e) => setEditForm((p) => ({ ...p, authorName: e.target.value }))}
+                        placeholder="Author Name" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                      <textarea value={editForm.abstract} onChange={(e) => setEditForm((p) => ({ ...p, abstract: e.target.value }))}
+                        placeholder="Abstract" rows={4} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                      <input value={editForm.keywords} onChange={(e) => setEditForm((p) => ({ ...p, keywords: e.target.value }))}
+                        placeholder="Keywords" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                      <input value={editForm.pdfPublicPath} onChange={(e) => setEditForm((p) => ({ ...p, pdfPublicPath: e.target.value }))}
+                        placeholder="PDF URL" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500" />
+                      <div className="flex gap-2">
+                        <button type="button" disabled={saving} onClick={() => void saveEdit(art.id)}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-4 py-2 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50">
+                          <Check size={12} /> {saving ? "Saving…" : "Save"}
+                        </button>
+                        <button type="button" onClick={() => setEditingId(null)}
+                          className="rounded-lg border border-slate-200 px-4 py-2 text-xs text-slate-600 hover:bg-slate-50">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-xs text-green-700">{art.id}</span>
+                          <span className="rounded-full bg-green-50 border border-green-200 px-2 py-0.5 text-xs text-green-700">{art.journalId}</span>
+                        </div>
+                        <p className="font-semibold text-slate-800 line-clamp-2">{art.title}</p>
+                        <p className="mt-0.5 text-xs text-slate-500">{art.authorName}</p>
+                        {art.keywords && <p className="mt-1 text-xs text-slate-400 line-clamp-1">🏷 {art.keywords}</p>}
+                        {art.pdfPublicPath && (
+                          <a href={art.pdfPublicPath} target="_blank" rel="noreferrer"
+                            className="mt-1 inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
+                            <Download size={11} /> PDF
+                          </a>
+                        )}
+                      </div>
+                      <button type="button"
+                        onClick={() => { setEditingId(art.id); setEditForm({ title: art.title, authorName: art.authorName, abstract: art.abstract, keywords: art.keywords, pdfPublicPath: art.pdfPublicPath ?? "" }); }}
+                        className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50">
+                        <Pencil size={12} /> Edit
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 };

@@ -104,6 +104,8 @@ model Journal {
   scope          String?
   status         String                @default("Active")
   sortOrder      Int                   @default(0)
+  doiPrefix      String?
+  websiteDoiLink String?
   createdAt      DateTime              @default(now())
   volumes        Volume[]
   submissions    Submission[]

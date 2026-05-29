@@ -34,6 +34,25 @@ export const updateJournalIssn = async (req: Request, res: Response): Promise<vo
   res.json(updated);
 };
 
+export const updateJournalDoi = async (req: Request, res: Response): Promise<void> => {
+  const journalId = String(req.params.journalId);
+  const { doiPrefix, websiteDoiLink } = req.body as { doiPrefix?: string | null; websiteDoiLink?: string | null };
+  const data: Prisma.JournalUpdateInput = {};
+  if (doiPrefix !== undefined) data.doiPrefix = doiPrefix || null;
+  if (websiteDoiLink !== undefined) data.websiteDoiLink = websiteDoiLink || null;
+  const updated = await prisma.journal.update({ where: { id: journalId }, data });
+  res.json(updated);
+};
+
+export const toggleJournalStatus = async (req: Request, res: Response): Promise<void> => {
+  const journalId = String(req.params.journalId);
+  const journal = await prisma.journal.findUnique({ where: { id: journalId } });
+  if (!journal) { res.status(404).json({ message: "Journal not found" }); return; }
+  const newStatus = journal.status === "Active" ? "Inactive" : "Active";
+  const updated = await prisma.journal.update({ where: { id: journalId }, data: { status: newStatus } });
+  res.json(updated);
+};
+
 export const listJournals = async (_req: Request, res: Response): Promise<void> => {
   const [journals, publishedCounts] = await Promise.all([
     prisma.journal.findMany({
