@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Check, Hash, Mail, Pencil, Phone, Plus, Trash2, Upload, Users } from "lucide-react";
 import { apiJson } from "@/services/api";
+import { uploadMediaFile } from "@/services/media.service";
 
 interface EditorialMember {
   id: string;
@@ -76,17 +77,9 @@ export const JournalsManagePage = () => {
   const uploadPhoto = async (file: File) => {
     setUploadingPhoto(true);
     try {
-      const fd = new FormData();
-      fd.append("files", file);
-      const res = await fetch("/api/media/upload", {
-        method: "POST",
-        body: fd,
-        credentials: "include"
-      });
-      if (!res.ok) throw new Error("Photo upload failed");
-      const data = await res.json() as { files: { url: string }[] };
-      const url = data.files?.[0]?.url ?? "";
-      setMemberForm((p) => ({ ...p, photoUrl: url }));
+      const files = await uploadMediaFile(file, () => {});
+      const url = files?.[0]?.url ?? "";
+      if (url) setMemberForm((p) => ({ ...p, photoUrl: url }));
       toast.success("Photo uploaded");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Upload failed");

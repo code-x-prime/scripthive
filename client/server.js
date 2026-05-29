@@ -282,7 +282,7 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
 
             // Forward to ScriptHive backend (PostgreSQL + media storage)
             try {
-                const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:5000';
+                const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
                 const fd = new FormData();
                 fd.append('journalId', journal);
                 fd.append('title', paper_title);
