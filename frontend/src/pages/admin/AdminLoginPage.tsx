@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, BookOpen, FileText, Users, Award, Shield, UserCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -209,6 +209,12 @@ export const AdminLoginPage = () => {
                     {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Link to="/admin/forgot-password" className="text-xs text-green-700 hover:underline">
+                  Forgot password?
+                </Link>
               </div>
 
               <button

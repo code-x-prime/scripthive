@@ -14,6 +14,7 @@ import { AuthorEditSubmissionPage } from "./pages/author/AuthorEditSubmissionPag
 import { AuthorProfilePage } from "./pages/author/AuthorProfilePage";
 import { AppProvider } from "./contexts/AppContext";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
+import { ForgotPasswordPage } from "./pages/admin/ForgotPasswordPage";
 import { ProductionPipelinePage } from "./pages/admin/ProductionPipelinePage";
 import { DashboardPage } from "./pages/admin/DashboardPage";
 import { SubmissionsPage } from "./pages/admin/SubmissionsPage";
@@ -79,6 +80,7 @@ const App = () => (
           </Route>
 
           <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
 
           <Route
