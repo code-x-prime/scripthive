@@ -19,7 +19,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 let _activeJournalsCache = [];
 let _activeJournalsCacheAt = 0;
 async function getActiveJournals() {
-  if (Date.now() - _activeJournalsCacheAt < 60000 && _activeJournalsCache.length > 0) return _activeJournalsCache;
+  if (Date.now() - _activeJournalsCacheAt < 5000 && _activeJournalsCache.length > 0) return _activeJournalsCache;
   try {
     const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
     const r = await fetch(`${apiUrl}/api/journals`, { signal: AbortSignal.timeout(3000) });
@@ -135,22 +135,19 @@ const JOURNAL_META = {
 const JOURNAL_IDS_LIST = ['SGJASH','SGJETR','SGJPLS','SGJSSH','SGJVSR','SGMRJ'];
 JOURNAL_IDS_LIST.forEach(jid => {
   app.get(`/${jid}`, async (req, res) => {
-    const active = await getActiveJournals();
-    if (!active.some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
+    if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
     const archive = await fetchArchive(jid);
     res.render(`journals/${jid}`, { archive, journalId: jid });
   });
 
   app.get(`/${jid}/archives`, async (req, res) => {
-    const active = await getActiveJournals();
-    if (!active.some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
+    if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
     const archive = await fetchArchive(jid);
     res.render('journals/journal_archives', { archive, journalId: jid, journal: JOURNAL_META[jid] });
   });
 
   app.get(`/${jid}/archives/:slug`, async (req, res) => {
-    const active = await getActiveJournals();
-    if (!active.some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
+    if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
     const archive = await fetchArchive(jid);
     res.render('journals/journal_archives', { archive, journalId: jid, journal: JOURNAL_META[jid], activeSlug: req.params.slug });
   });
