@@ -514,13 +514,19 @@
               <input type="tel" id="author-phone" name="author_phone" class="form-control" placeholder=" ">
               <label for="author-phone" class="form-label">Phone Number</label>
             </div>
-            <div class="form-group">
-              <select id="author-country" name="country" class="form-control" required>
-                <option value="" disabled selected></option>
-                <option value="India">India (INR)</option>
-                <option value="International">International (USD)</option>
-              </select>
-              <label for="author-country" class="form-label" style="top:-10px;font-size:0.8rem;background:white;padding:0 5px;color:var(--primary);font-weight:600;">Country / Region *</label>
+            <div class="form-group" style="position:relative;">
+              <label style="position:absolute;top:-10px;left:10px;font-size:0.8rem;background:white;padding:0 5px;color:var(--primary);font-weight:600;z-index:2;">Country *</label>
+              <input type="text" id="country-search" autocomplete="off" class="form-control" placeholder="Search country..." required
+                style="cursor:pointer;" readonly onclick="this.removeAttribute('readonly');this.select();">
+              <input type="hidden" id="author-country" name="country" required>
+              <div id="country-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);z-index:100;max-height:220px;overflow-y:auto;">
+                <div style="padding:8px 10px;border-bottom:1px solid #f1f5f9;position:sticky;top:0;background:white;">
+                  <input type="text" id="country-filter" placeholder="Type to search..." autocomplete="off"
+                    style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:0.9rem;outline:none;">
+                </div>
+                <div id="country-list"></div>
+              </div>
+              <span id="country-currency-badge" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);background:#eff6ff;color:#2563eb;font-size:0.75rem;font-weight:700;padding:3px 8px;border-radius:8px;"></span>
             </div>
           </div>
         </div>
@@ -676,6 +682,77 @@
 <!-- Animation & Logic Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Searchable Country Dropdown ──────────────────────────────
+    const COUNTRIES = [
+      'Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia',
+      'Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin',
+      'Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi',
+      'Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia',
+      'Comoros','Congo','Costa Rica','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti','Dominica',
+      'Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini',
+      'Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada',
+      'Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia',
+      'Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati',
+      'Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania',
+      'Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania',
+      'Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique',
+      'Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria',
+      'North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea',
+      'Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis',
+      'Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia',
+      'Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia',
+      'South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland',
+      'Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago',
+      'Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom',
+      'United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'
+    ];
+
+    const countrySearch = document.getElementById('country-search');
+    const countryHidden = document.getElementById('author-country');
+    const countryDropdown = document.getElementById('country-dropdown');
+    const countryFilter = document.getElementById('country-filter');
+    const countryList = document.getElementById('country-list');
+    const currencyBadge = document.getElementById('country-currency-badge');
+
+    function renderCountries(filter) {
+      const f = (filter || '').toLowerCase();
+      countryList.innerHTML = '';
+      COUNTRIES.filter(function(c){ return !f || c.toLowerCase().includes(f); }).forEach(function(c) {
+        const isIndia = c === 'India';
+        const div = document.createElement('div');
+        div.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:0.9rem;display:flex;justify-content:space-between;align-items:center;';
+        div.innerHTML = '<span>' + c + '</span><span style="font-size:0.72rem;font-weight:700;color:' + (isIndia ? '#2563eb' : '#10b981') + ';background:' + (isIndia ? '#eff6ff' : '#f0fdf4') + ';padding:2px 7px;border-radius:6px;">' + (isIndia ? 'INR' : 'USD') + '</span>';
+        div.addEventListener('mouseover', function(){ this.style.background='#f8fafc'; });
+        div.addEventListener('mouseout', function(){ this.style.background=''; });
+        div.addEventListener('click', function() {
+          countrySearch.value = c;
+          countryHidden.value = c;
+          countryDropdown.style.display = 'none';
+          currencyBadge.textContent = isIndia ? '₹ INR' : '$ USD';
+          currencyBadge.style.display = 'inline-block';
+        });
+        countryList.appendChild(div);
+      });
+    }
+
+    renderCountries('');
+
+    countrySearch.addEventListener('focus', function() {
+      countryDropdown.style.display = 'block';
+      renderCountries('');
+      setTimeout(function(){ countryFilter.focus(); }, 100);
+    });
+
+    countryFilter.addEventListener('input', function() { renderCountries(this.value); });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.form-group') || (!e.target.closest('#country-search') && !e.target.closest('#country-dropdown'))) {
+        countryDropdown.style.display = 'none';
+      }
+    });
+    // ── End Country Dropdown ─────────────────────────────────────
+
     // If journal pre-selected via URL param, scroll form into view
     const journalSel = document.getElementById('journal-select');
     if (journalSel && journalSel.value) {
