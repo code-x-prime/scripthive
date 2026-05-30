@@ -508,7 +508,7 @@ export const SubmissionsPage = () => {
             ))}
           </select>
         </label>
-        {!isUnderReview && (
+        {!isUnderReview && !isNewPage && (
           <label className="flex min-w-[200px] flex-col gap-1 text-xs font-medium text-gray-600">
             Production
             <select
