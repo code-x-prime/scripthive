@@ -29,15 +29,23 @@ export const listPublishedArticles = async (_req: Request, res: Response): Promi
 
 export const updatePublishedArticle = async (req: Request, res: Response): Promise<void> => {
   const id = String(req.params.id);
-  const { title, authorName, abstract, keywords, pdfPublicPath } = req.body as {
-    title?: string; authorName?: string; abstract?: string; keywords?: string; pdfPublicPath?: string;
+  const { title, authorName, coAuthors, abstract, keywords, pdfPublicPath, country, affiliations, pageStart, pageEnd, slug } = req.body as {
+    title?: string; authorName?: string; coAuthors?: string; abstract?: string; keywords?: string;
+    pdfPublicPath?: string; country?: string; affiliations?: string;
+    pageStart?: number | null; pageEnd?: number | null; slug?: string;
   };
   const data: Record<string, unknown> = {};
   if (title !== undefined) data.title = title;
   if (authorName !== undefined) data.authorName = authorName;
+  if (coAuthors !== undefined) data.coAuthors = coAuthors || null;
   if (abstract !== undefined) data.abstract = abstract;
   if (keywords !== undefined) data.keywords = keywords;
-  if (pdfPublicPath !== undefined) data.pdfPublicPath = pdfPublicPath;
+  if (pdfPublicPath !== undefined) data.pdfPublicPath = pdfPublicPath || null;
+  if (country !== undefined) data.country = country || null;
+  if (affiliations !== undefined) data.affiliations = affiliations || null;
+  if (pageStart !== undefined) data.pageStart = pageStart;
+  if (pageEnd !== undefined) data.pageEnd = pageEnd;
+  if (slug !== undefined) data.slug = slug || null;
   const updated = await prisma.submission.update({ where: { id }, data });
   void writeAuditLog({
     adminId: (req as AuthRequest).admin?.adminId,

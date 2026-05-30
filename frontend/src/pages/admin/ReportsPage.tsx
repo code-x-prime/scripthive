@@ -542,7 +542,7 @@ export const ReportsPage = () => {
   const [publishedArticles, setPublishedArticles] = useState<Submission[]>([]);
   const [publishedLoading, setPublishedLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<{ title: string; authorName: string; abstract: string; keywords: string; pdfPublicPath: string }>({ title: "", authorName: "", abstract: "", keywords: "", pdfPublicPath: "" });
+  const [editForm, setEditForm] = useState<{ title: string; authorName: string; coAuthors: string; abstract: string; keywords: string; pdfPublicPath: string; country: string; affiliations: string; pageStart: string; pageEnd: string; slug: string; }>({ title: "", authorName: "", coAuthors: "", abstract: "", keywords: "", pdfPublicPath: "", country: "", affiliations: "", pageStart: "", pageEnd: "", slug: "" });
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -569,7 +569,12 @@ export const ReportsPage = () => {
   const saveEdit = async (id: string) => {
     setSaving(true);
     try {
-      await apiJson(`/submissions/${encodeURIComponent(id)}/published`, { method: "PATCH", body: JSON.stringify(editForm) });
+      const payload = {
+        ...editForm,
+        pageStart: editForm.pageStart ? parseInt(editForm.pageStart) : null,
+        pageEnd: editForm.pageEnd ? parseInt(editForm.pageEnd) : null,
+      };
+      await apiJson(`/submissions/${encodeURIComponent(id)}/published`, { method: "PATCH", body: JSON.stringify(payload) });
       toast.success("Article updated");
       setEditingId(null);
       void loadPublished();
@@ -887,56 +892,115 @@ export const ReportsPage = () => {
             <div className="space-y-3">
               {publishedArticles.map((art) => (
                 <div key={art.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                  {editingId === art.id ? (
-                    <div className="space-y-3">
-                      <input value={editForm.title} onChange={(e) => setEditForm((p) => ({ ...p, title: e.target.value }))}
-                        placeholder="Title" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-                      <input value={editForm.authorName} onChange={(e) => setEditForm((p) => ({ ...p, authorName: e.target.value }))}
-                        placeholder="Author Name" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-                      <textarea value={editForm.abstract} onChange={(e) => setEditForm((p) => ({ ...p, abstract: e.target.value }))}
-                        placeholder="Abstract" rows={4} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-                      <input value={editForm.keywords} onChange={(e) => setEditForm((p) => ({ ...p, keywords: e.target.value }))}
-                        placeholder="Keywords" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-                      <input value={editForm.pdfPublicPath} onChange={(e) => setEditForm((p) => ({ ...p, pdfPublicPath: e.target.value }))}
-                        placeholder="PDF URL" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500" />
-                      <div className="flex gap-2">
-                        <button type="button" disabled={saving} onClick={() => void saveEdit(art.id)}
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-4 py-2 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50">
-                          <Check size={12} /> {saving ? "Saving…" : "Save"}
-                        </button>
-                        <button type="button" onClick={() => setEditingId(null)}
-                          className="rounded-lg border border-slate-200 px-4 py-2 text-xs text-slate-600 hover:bg-slate-50">
-                          Cancel
-                        </button>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-mono text-xs text-green-700">{art.id}</span>
+                        <span className="rounded-full bg-green-50 border border-green-200 px-2 py-0.5 text-xs text-green-700">{art.journalId}</span>
+                        {art.country && <span className="text-xs text-slate-400">{art.country}</span>}
                       </div>
+                      <p className="font-semibold text-slate-800 line-clamp-2">{art.title}</p>
+                      <p className="mt-0.5 text-xs text-slate-500">{art.authorName}{art.coAuthors ? `, ${art.coAuthors}` : ""}</p>
+                      {art.keywords && <p className="mt-1 text-xs text-slate-400 line-clamp-1">🏷 {art.keywords}</p>}
+                      {art.pdfPublicPath && (
+                        <a href={art.pdfPublicPath} target="_blank" rel="noreferrer"
+                          className="mt-1 inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
+                          <Download size={11} /> PDF
+                        </a>
+                      )}
                     </div>
-                  ) : (
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-mono text-xs text-green-700">{art.id}</span>
-                          <span className="rounded-full bg-green-50 border border-green-200 px-2 py-0.5 text-xs text-green-700">{art.journalId}</span>
-                        </div>
-                        <p className="font-semibold text-slate-800 line-clamp-2">{art.title}</p>
-                        <p className="mt-0.5 text-xs text-slate-500">{art.authorName}</p>
-                        {art.keywords && <p className="mt-1 text-xs text-slate-400 line-clamp-1">🏷 {art.keywords}</p>}
-                        {art.pdfPublicPath && (
-                          <a href={art.pdfPublicPath} target="_blank" rel="noreferrer"
-                            className="mt-1 inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
-                            <Download size={11} /> PDF
-                          </a>
-                        )}
-                      </div>
-                      <button type="button"
-                        onClick={() => { setEditingId(art.id); setEditForm({ title: art.title, authorName: art.authorName, abstract: art.abstract, keywords: art.keywords, pdfPublicPath: art.pdfPublicPath ?? "" }); }}
-                        className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50">
-                        <Pencil size={12} /> Edit
-                      </button>
-                    </div>
-                  )}
+                    <button type="button"
+                      onClick={() => {
+                        setEditingId(art.id);
+                        setEditForm({
+                          title: art.title, authorName: art.authorName,
+                          coAuthors: art.coAuthors ?? "", abstract: art.abstract,
+                          keywords: art.keywords, pdfPublicPath: art.pdfPublicPath ?? "",
+                          country: art.country ?? "", affiliations: art.affiliations ?? "",
+                          pageStart: art.pageStart != null ? String(art.pageStart) : "",
+                          pageEnd: art.pageEnd != null ? String(art.pageEnd) : "",
+                          slug: art.slug ?? ""
+                        });
+                      }}
+                      className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50">
+                      <Pencil size={12} /> Edit
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
+
+            {/* Edit Modal */}
+            {editingId && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog">
+                <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-slate-200 bg-white p-6 shadow-xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-slate-800">Edit Article</h2>
+                    <button type="button" onClick={() => setEditingId(null)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"><X size={18} /></button>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="block text-xs font-medium text-slate-600">Title
+                      <input value={editForm.title} onChange={(e) => setEditForm((p) => ({ ...p, title: e.target.value }))}
+                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <label className="block text-xs font-medium text-slate-600">Author Name
+                        <input value={editForm.authorName} onChange={(e) => setEditForm((p) => ({ ...p, authorName: e.target.value }))}
+                          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                      </label>
+                      <label className="block text-xs font-medium text-slate-600">Co-Authors
+                        <input value={editForm.coAuthors} onChange={(e) => setEditForm((p) => ({ ...p, coAuthors: e.target.value }))}
+                          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                      </label>
+                    </div>
+                    <label className="block text-xs font-medium text-slate-600">Affiliations
+                      <input value={editForm.affiliations} onChange={(e) => setEditForm((p) => ({ ...p, affiliations: e.target.value }))}
+                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    </label>
+                    <label className="block text-xs font-medium text-slate-600">Abstract
+                      <textarea value={editForm.abstract} onChange={(e) => setEditForm((p) => ({ ...p, abstract: e.target.value }))}
+                        rows={4} className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    </label>
+                    <label className="block text-xs font-medium text-slate-600">Keywords
+                      <input value={editForm.keywords} onChange={(e) => setEditForm((p) => ({ ...p, keywords: e.target.value }))}
+                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                    </label>
+                    <div className="grid grid-cols-3 gap-3">
+                      <label className="block text-xs font-medium text-slate-600">Country
+                        <input value={editForm.country} onChange={(e) => setEditForm((p) => ({ ...p, country: e.target.value }))}
+                          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                      </label>
+                      <label className="block text-xs font-medium text-slate-600">Page Start
+                        <input type="number" value={editForm.pageStart} onChange={(e) => setEditForm((p) => ({ ...p, pageStart: e.target.value }))}
+                          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                      </label>
+                      <label className="block text-xs font-medium text-slate-600">Page End
+                        <input type="number" value={editForm.pageEnd} onChange={(e) => setEditForm((p) => ({ ...p, pageEnd: e.target.value }))}
+                          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                      </label>
+                    </div>
+                    <label className="block text-xs font-medium text-slate-600">Slug (URL)
+                      <input value={editForm.slug} onChange={(e) => setEditForm((p) => ({ ...p, slug: e.target.value }))}
+                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-mono" />
+                    </label>
+                    <label className="block text-xs font-medium text-slate-600">PDF URL / Path
+                      <input value={editForm.pdfPublicPath} onChange={(e) => setEditForm((p) => ({ ...p, pdfPublicPath: e.target.value }))}
+                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-mono" />
+                    </label>
+                    <div className="flex gap-2 pt-2">
+                      <button type="button" disabled={saving} onClick={() => void saveEdit(editingId)}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-5 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50">
+                        <Check size={14} /> {saving ? "Saving…" : "Save Changes"}
+                      </button>
+                      <button type="button" onClick={() => setEditingId(null)}
+                        className="rounded-lg border border-slate-200 px-5 py-2 text-sm text-slate-600 hover:bg-slate-50">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           )}
         </div>
       )}
