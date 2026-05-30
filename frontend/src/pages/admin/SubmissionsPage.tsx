@@ -28,6 +28,14 @@ const PRODUCTION_FILTERS = [
   { id: "ReadyToPublished", label: "Ready to Published" }
 ];
 
+const NEW_PAGE_STATUS_FILTERS = [
+  { id: "", label: "All" },
+  { id: "Pending", label: "New" },
+  { id: "UnderReview", label: "Under Review" },
+  { id: "Accepted", label: "Accepted" },
+  { id: "Rejected", label: "Rejected" }
+];
+
 const STATUS_OPTIONS = ["Pending", "UnderReview", "Revision", "Accepted", "Rejected", "Published"] as const;
 
 function pdfFileName(path?: string | null): string | null {
@@ -519,11 +527,9 @@ export const SubmissionsPage = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="h-10 rounded-lg border border-gray-200 px-3 text-sm"
             >
-              <option value="">All</option>
-              <option value="Pending">New</option>
-              <option value="UnderReview">Under Review</option>
-              <option value="Accepted">Accepted</option>
-              <option value="Rejected">Rejected</option>
+              {NEW_PAGE_STATUS_FILTERS.map((s) => (
+                <option key={s.id || "all"} value={s.id}>{s.label}</option>
+              ))}
             </select>
           </label>
         )}
