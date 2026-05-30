@@ -66,9 +66,11 @@ async function getOrCreateAddonInvoice(submissionId: string, amount: number, cur
 
   const invoice = await prisma.invoice.create({
     data: {
+      id: `INV-ADDON-${submissionId}-${Date.now()}`,
       submissionId,
       customerName: submission.authorName,
       customerEmail: submission.authorEmail,
+      items: [],
       total: amount,
       subtotal: amount,
       currency: currency.toUpperCase(),
