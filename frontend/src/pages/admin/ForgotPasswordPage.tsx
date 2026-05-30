@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BookOpen, Eye, EyeOff, ArrowLeft, Mail, KeyRound, ShieldCheck } from "lucide-react";
 import { apiJson } from "@/services/api";
@@ -31,6 +31,20 @@ export const ForgotPasswordPage = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startResendTimer = () => {
+    setResendTimer(30);
+    timerRef.current = setInterval(() => {
+      setResendTimer(prev => {
+        if (prev <= 1) { clearInterval(timerRef.current!); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
 
   const strength = strengthLabel(newPassword);
 
@@ -42,6 +56,7 @@ export const ForgotPasswordPage = () => {
     try {
       await apiJson("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email: email.trim() }) });
       setStep("otp");
+      startResendTimer();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to send OTP");
     } finally { setLoading(false); }
@@ -191,10 +206,23 @@ export const ForgotPasswordPage = () => {
                     className="h-11 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold text-sm">
                     Verify OTP
                   </button>
-                  <button type="button" onClick={() => { setOtp(""); setError(""); void sendOtp({ preventDefault: () => {} } as React.FormEvent); }}
-                    className="text-xs text-green-700 hover:underline text-center">
-                    Resend OTP
-                  </button>
+                  <div className="text-center">
+                    {resendTimer > 0 ? (
+                      <div className="text-xs text-slate-400 flex items-center justify-center gap-1.5">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border-2 border-slate-300 text-[10px] font-bold font-mono text-slate-500">{resendTimer}</span>
+                        Resend OTP available in <span className="font-mono font-bold text-slate-600">{resendTimer}s</span>
+                      </div>
+                    ) : (
+                      <button type="button"
+                        onClick={() => {
+                          setOtp(""); setError("");
+                          void sendOtp({ preventDefault: () => {} } as unknown as React.FormEvent<HTMLFormElement>);
+                        }}
+                        className="text-xs text-green-700 hover:underline font-medium">
+                        ↺ Resend OTP
+                      </button>
+                    )}
+                  </div>
                 </form>
               )}
 
