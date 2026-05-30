@@ -18,7 +18,7 @@ app.set("trust proxy", 1);
 app.use(helmet());
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin: [env.FRONTEND_URL, "https://scripthive.org", "https://www.scripthive.org"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
   })

@@ -128,6 +128,8 @@
   .sub-check-item i { color: #10b981; font-size: 1.2rem; margin-top: 2px; }
   .sub-check-item p { margin: 0; color: var(--text-dark); font-size: 1rem; line-height: 1.5; font-weight: 500; }
 
+  #addon-total { display: none !important; }
+
   /* Form Container */
   *, *::before, *::after { box-sizing: border-box; }
   .form-container-wrapper { padding: 40px 20px 80px; max-width: 1000px; margin: 0 auto; width: 100%; }
@@ -612,7 +614,7 @@
           <div class="sub-form-section-title"><i class="fa-solid fa-plus-circle"></i> Add-On Services <span style="font-size:0.75rem;font-weight:500;color:#64748b;">(Optional)</span></div>
           <p style="font-size:0.88rem;color:#64748b;margin-bottom:16px;">Select optional paid services for your submission.</p>
           <div id="addon-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;"></div>
-          <div id="addon-total" style="display:none;margin-top:14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
+          <div id="addon-total" style="display:none !important;margin-top:14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 16px;justify-content:space-between;align-items:center;">
             <span style="font-size:0.9rem;font-weight:600;color:#166534;">Total add-ons</span>
             <span id="addon-total-amt" style="font-family:monospace;font-weight:800;color:#15803d;font-size:1rem;"></span>
           </div>
@@ -984,7 +986,7 @@
     document.getElementById('pay-smepay-btn') && document.getElementById('pay-smepay-btn').addEventListener('click', async function() {
       if (!window._paymentSubmissionId) return;
       try {
-        const res = await fetch('/api/payments/smepay/create-order', {
+        const res = await fetch('https://api.scripthive.org/api/payments/smepay/create-order', {
           method: 'POST', headers: {'Content-Type':'application/json'},
           body: JSON.stringify({ invoiceId: null, submissionId: window._paymentSubmissionId, amount: window._paymentAmount, currency: 'INR', addons: window._paymentAddons })
         });
@@ -997,17 +999,19 @@
     document.getElementById('pay-razorpay-btn') && document.getElementById('pay-razorpay-btn').addEventListener('click', async function() {
       if (!window._paymentSubmissionId) return;
       try {
-        const res = await fetch('/api/payments/razorpay/create-order', {
+        const res = await fetch('https://api.scripthive.org/api/payments/razorpay/create-order', {
           method: 'POST', headers: {'Content-Type':'application/json'},
           body: JSON.stringify({ invoiceId: null, submissionId: window._paymentSubmissionId, amount: window._paymentAmount, currency: 'INR' })
         });
         const data = await res.json();
-        if (data.orderId && window.Razorpay) {
+        const orderId = data.orderId || (data.data && data.data.orderId);
+        const keyId = data.keyId || (data.data && data.data.keyId) || '';
+        if (orderId && window.Razorpay) {
           const rzp = new window.Razorpay({
-            key: data.keyId || '',
+            key: keyId,
             amount: window._paymentAmount * 100,
             currency: 'INR',
-            order_id: data.orderId,
+            order_id: orderId,
             name: 'ScriptHive Publication',
             description: 'Add-On Services',
             handler: function(resp) { successOverlay.classList.remove('active'); alert('Payment successful! Transaction ID: ' + resp.razorpay_payment_id); },
@@ -1022,7 +1026,7 @@
       if (!window._paymentSubmissionId) return;
       try {
         const amtUsd = parseFloat((window._paymentAmount / 83).toFixed(2));
-        const res = await fetch('/api/payments/paypal/create-order', {
+        const res = await fetch('https://api.scripthive.org/api/payments/paypal/create-order', {
           method: 'POST', headers: {'Content-Type':'application/json'},
           body: JSON.stringify({ invoiceId: null, submissionId: window._paymentSubmissionId, amount: amtUsd, currency: 'USD' })
         });
@@ -1344,7 +1348,7 @@
 <!-- SUCCESS MODAL -->
 <!-- SUCCESS MODAL -->
 <div class="modal-overlay" id="success-modal-overlay">
-  <div class="premium-modal" style="max-width:680px; padding: 0; overflow:hidden;">
+  <div class="premium-modal" style="max-width:600px; padding: 0; overflow-y:auto; max-height:92vh;">
     <div class="modal-glow"></div>
     <!-- Green top banner -->
     <div style="background: linear-gradient(135deg,#059669 0%,#10b981 100%); padding: 36px 40px 28px; text-align:center; position:relative; z-index:10;">

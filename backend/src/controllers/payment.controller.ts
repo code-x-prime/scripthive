@@ -53,21 +53,49 @@ export const getPaymentConfigController = async (_req: Request, res: Response): 
   res.json({ status: "success", data: config });
 };
 
+/* ── Auto-create addon invoice for submission ──────────────────────────── */
+async function getOrCreateAddonInvoice(submissionId: string, amount: number, currency: string): Promise<string> {
+  // Check if invoice already exists for this submission
+  const existing = await prisma.invoice.findFirst({
+    where: { submissionId, status: { in: ["Draft", "Pending"] } }
+  });
+  if (existing) return existing.id;
+
+  const submission = await prisma.submission.findUnique({ where: { id: submissionId } });
+  if (!submission) throw new Error("Submission not found");
+
+  const invoice = await prisma.invoice.create({
+    data: {
+      submissionId,
+      customerName: submission.authorName,
+      customerEmail: submission.authorEmail,
+      total: amount,
+      subtotal: amount,
+      currency: currency.toUpperCase(),
+      status: "Pending"
+    }
+  });
+  return invoice.id;
+}
+
 /* ── PayPal ─────────────────────────────────────────────────────────────── */
 export const createPayPalOrderController = async (req: Request, res: Response): Promise<void> => {
-  const { invoiceId } = req.body as { invoiceId: string };
-  const check = await assertPayableInvoice(invoiceId);
+  const { invoiceId, submissionId, amount, currency } = req.body as { invoiceId?: string; submissionId?: string; amount?: number; currency?: string };
+  let resolvedInvoiceId = invoiceId;
+  if (!resolvedInvoiceId && submissionId && amount) {
+    try { resolvedInvoiceId = await getOrCreateAddonInvoice(submissionId, amount, currency || "USD"); }
+    catch (e) { res.status(400).json({ message: e instanceof Error ? e.message : "Invoice creation failed" }); return; }
+  }
+  if (!resolvedInvoiceId) { res.status(400).json({ message: "invoiceId or submissionId+amount required" }); return; }
+  const check = await assertPayableInvoice(resolvedInvoiceId);
   if ("error" in check) { res.status(check.error.status).json({ message: check.error.message }); return; }
   const { invoice } = check;
-  if (normalizeCurrency(invoice.currency) !== "USD") {
-    res.status(400).json({ message: "USD invoice required for PayPal" }); return;
-  }
   const orderId = await createPayPalOrder(invoice.id, invoice.total);
   await prisma.invoice.update({
     where: { id: invoice.id },
     data: { method: "PayPal", notes: `paypal_order_id:${orderId}`, gatewayOrderId: orderId }
   });
-  res.json({ status: "success", data: { orderId } });
+  res.json({ status: "success", data: { orderId, invoiceId: invoice.id }, approvalUrl: null });
 };
 
 export const capturePayPalOrderController = async (req: Request, res: Response): Promise<void> => {
@@ -82,19 +110,22 @@ export const capturePayPalOrderController = async (req: Request, res: Response):
 
 /* ── Razorpay ────────────────────────────────────────────────────────────── */
 export const createRazorpayOrderController = async (req: Request, res: Response): Promise<void> => {
-  const { invoiceId } = req.body as { invoiceId: string };
-  const check = await assertPayableInvoice(invoiceId);
+  const { invoiceId, submissionId, amount, currency } = req.body as { invoiceId?: string; submissionId?: string; amount?: number; currency?: string };
+  let resolvedInvoiceId = invoiceId;
+  if (!resolvedInvoiceId && submissionId && amount) {
+    try { resolvedInvoiceId = await getOrCreateAddonInvoice(submissionId, amount, currency || "INR"); }
+    catch (e) { res.status(400).json({ message: e instanceof Error ? e.message : "Invoice creation failed" }); return; }
+  }
+  if (!resolvedInvoiceId) { res.status(400).json({ message: "invoiceId or submissionId+amount required" }); return; }
+  const check = await assertPayableInvoice(resolvedInvoiceId);
   if ("error" in check) { res.status(check.error.status).json({ message: check.error.message }); return; }
   const { invoice } = check;
-  if (normalizeCurrency(invoice.currency) !== "INR") {
-    res.status(400).json({ message: "INR invoice required for Razorpay" }); return;
-  }
   const order = await createRazorpayOrder(invoice.id, Math.round(invoice.total * 100));
   await prisma.invoice.update({
     where: { id: invoice.id },
     data: { method: "Razorpay", notes: `razorpay_order_id:${order.orderId}`, gatewayOrderId: order.orderId }
   });
-  res.json({ status: "success", data: order });
+  res.json({ status: "success", data: { ...order, invoiceId: invoice.id }, keyId: order.keyId });
 };
 
 export const verifyRazorpayPaymentController = async (req: Request, res: Response): Promise<void> => {
@@ -113,13 +144,16 @@ export const verifyRazorpayPaymentController = async (req: Request, res: Respons
 
 /* ── SMEPay ──────────────────────────────────────────────────────────────── */
 export const createSmepayOrderController = async (req: Request, res: Response): Promise<void> => {
-  const { invoiceId } = req.body as { invoiceId: string };
-  const check = await assertPayableInvoice(invoiceId);
+  const { invoiceId, submissionId, amount, currency } = req.body as { invoiceId?: string; submissionId?: string; amount?: number; currency?: string };
+  let resolvedInvoiceId = invoiceId;
+  if (!resolvedInvoiceId && submissionId && amount) {
+    try { resolvedInvoiceId = await getOrCreateAddonInvoice(submissionId, amount, currency || "INR"); }
+    catch (e) { res.status(400).json({ message: e instanceof Error ? e.message : "Invoice creation failed" }); return; }
+  }
+  if (!resolvedInvoiceId) { res.status(400).json({ message: "invoiceId or submissionId+amount required" }); return; }
+  const check = await assertPayableInvoice(resolvedInvoiceId);
   if ("error" in check) { res.status(check.error.status).json({ message: check.error.message }); return; }
   const { invoice } = check;
-  if (normalizeCurrency(invoice.currency) !== "INR") {
-    res.status(400).json({ message: "INR invoice required for SMEPay" }); return;
-  }
   const sub = await prisma.submission.findUnique({
     where: { id: invoice.submissionId },
     select: { authorName: true, authorEmail: true }
