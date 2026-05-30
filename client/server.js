@@ -88,12 +88,12 @@ app.get('/subscription', (req, res) => res.render('pages/subscription'));
 
 // Journal metadata
 const JOURNAL_META = {
-  SGJVSR: { abbr: 'SGJVSR', issn: '3048-6114', name: 'ScriptHive Global Journal of Vedic and Sanskrit Research' },
-  SGMRJ:  { abbr: 'SGMRJ',  issn: '3048-6122', name: 'ScriptHive Global Multidisciplinary Research Journal' },
-  SGJPLS: { abbr: 'SGJPLS', issn: '3048-6130', name: 'ScriptHive Global Journal of Physical and Life Sciences' },
-  SGJETR: { abbr: 'SGJETR', issn: '3048-6149', name: 'ScriptHive Global Journal of Engineering and Technology Research' },
-  SGJSSH: { abbr: 'SGJSSH', issn: '3048-6157', name: 'ScriptHive Global Journal of Social Sciences and Humanities' },
-  SGJASH: { abbr: 'SGJASH', issn: '3048-6165', name: 'ScriptHive Global Journal of Applied Science and Health' }
+  SGJVSR: { abbr: 'SGJVSR', issn: '3048-6114', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Vedic and Sanskrit Research', cover: '/images/SGJVSR - Cover Page.png' },
+  SGMRJ:  { abbr: 'SGMRJ',  issn: '3048-6122', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Multidisciplinary Research Journal', cover: '/images/SGMRJ - Cover Page.png' },
+  SGJPLS: { abbr: 'SGJPLS', issn: '3048-6130', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Physical and Life Sciences', cover: '/images/SGJPLS Cover Page.png' },
+  SGJETR: { abbr: 'SGJETR', issn: '3048-6149', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Engineering and Technology Research', cover: '/images/SGJETR - Cover Page.png' },
+  SGJSSH: { abbr: 'SGJSSH', issn: '3048-6157', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Social Sciences and Humanities', cover: '/images/SGJSSH - Cover Page.png' },
+  SGJASH: { abbr: 'SGJASH', issn: '3048-6165', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Applied Science and Health', cover: '/images/SGJASH Cover Page.png' }
 };
 
 // Journals Routes — pass archive data + journalId for #archives section
