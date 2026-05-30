@@ -461,8 +461,8 @@ export const SubmissionsPage = () => {
   const isNewPage = pathname.includes("/submissions/new");
   const showProduction = false; // production column only in production pipeline pages
   const isUnderReview = pathname.includes("/under-review");
-  const statusOptions = isUnderReview
-    ? (["UnderReview", "Accepted", "Rejected"] as const)
+  const statusOptions = (isUnderReview || isNewPage)
+    ? (["Pending", "UnderReview", "Accepted", "Rejected"] as const)
     : STATUS_OPTIONS;
   const showPriority = true;
 
@@ -508,7 +508,7 @@ export const SubmissionsPage = () => {
             ))}
           </select>
         </label>
-        {!isUnderReview && (
+        {!isUnderReview && !isNewPage && (
           <label className="flex min-w-[200px] flex-col gap-1 text-xs font-medium text-gray-600">
             Production
             <select
