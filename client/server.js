@@ -18,22 +18,22 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 // Cache active journals (refresh every 60s)
 let _activeJournalsCache = [];
 let _activeJournalsCacheAt = 0;
+let _activeJournalsFetched = false; // track if at least one successful fetch done
 async function getActiveJournals() {
-  if (Date.now() - _activeJournalsCacheAt < 5000 && _activeJournalsCache.length > 0) return _activeJournalsCache;
+  if (Date.now() - _activeJournalsCacheAt < 5000 && _activeJournalsFetched) return _activeJournalsCache;
   try {
     const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
     const r = await fetch(`${apiUrl}/api/journals`, { signal: AbortSignal.timeout(3000) });
     if (r.ok) {
       const data = await r.json();
       const list = Array.isArray(data) ? data : (data.data || []);
-      if (list.length > 0) {
-        _activeJournalsCache = list;
-        _activeJournalsCacheAt = Date.now();
-      }
+      _activeJournalsCache = list; // always update — even empty means all inactive
+      _activeJournalsCacheAt = Date.now();
+      _activeJournalsFetched = true;
     }
   } catch { /* non-blocking */ }
-  // Fallback: if API unreachable, show all from JOURNAL_META
-  if (_activeJournalsCache.length === 0) {
+  // Only fallback to JOURNAL_META if API never responded (startup race)
+  if (!_activeJournalsFetched) {
     return Object.values(JOURNAL_META);
   }
   return _activeJournalsCache;
