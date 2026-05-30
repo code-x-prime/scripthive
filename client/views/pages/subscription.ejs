@@ -733,7 +733,7 @@
                 pricing, premium support, and global visibility.</p>
 
             <div class="counters">
-                                <div class="counter-item">
+                <div class="counter-item">
                     <div class="counter-val" data-target="10000">0</div>
                     <div class="counter-label">Researchers</div>
                 </div>
@@ -769,8 +769,12 @@
                 <div class="card-badge">Starter Access</div>
                 <h3 class="card-title">Basic Plan</h3>
                 <p class="card-subtitle">Perfect for first-time researchers</p>
-                <div class="card-price"><span class="currency">₹</span><span class="price-val" data-monthly="0"
-                        data-yearly="0">0</span></div>
+                <div class="card-price">
+                    <span class="currency">&#8377;</span>
+                    <span class="price-val"
+                        data-monthly="0" data-yearly="0"
+                        data-monthly-usd="0" data-yearly-usd="0">0</span>
+                </div>
 
                 <ul class="card-features">
                     <li><i class="fa-solid fa-check"></i> Publish 1 paper only</li>
@@ -795,13 +799,17 @@
 
             <!-- STANDARD PLAN -->
             <div class="pricing-card standard gs-reveal">
-                <div class="card-badge">⭐ Recommended</div>
+                <div class="card-badge">&#11088; Recommended</div>
                 <h3 class="card-title">Standard Plan</h3>
                 <p class="card-subtitle">Best for active researchers</p>
-                <div class="card-price"><span class="currency">₹</span><span class="price-val" data-monthly="1200"
-                        data-yearly="3299">3,299</span></div>
+                <div class="card-price">
+                    <span class="currency">&#8377;</span>
+                    <span class="price-val"
+                        data-monthly="1200" data-yearly="3299"
+                        data-monthly-usd="15" data-yearly-usd="40">3,299</span>
+                </div>
 
-                <div class="highlight-box">🔥 Save 35% compared to individual publishing</div>
+                <div class="highlight-box">&#128293; Save 35% compared to individual publishing</div>
 
                 <ul class="card-features">
                     <li><i class="fa-solid fa-check"></i> Publish up to 3 papers</li>
@@ -823,14 +831,18 @@
 
             <!-- PREMIUM PLAN -->
             <div class="pricing-card premium gs-reveal">
-                <div class="card-badge">🏆 Best Value</div>
+                <div class="card-badge">&#127942; Best Value</div>
                 <h3 class="card-title">Premium Plan</h3>
                 <p class="card-subtitle">For institutions & serious authors</p>
-                <div class="card-price"><span class="currency">₹</span><span class="price-val" data-monthly="2000"
-                        data-yearly="5999">5,999</span></div>
+                <div class="card-price">
+                    <span class="currency">&#8377;</span>
+                    <span class="price-val"
+                        data-monthly="2000" data-yearly="5999"
+                        data-monthly-usd="24" data-yearly-usd="72">5,999</span>
+                </div>
 
-                <div class="highlight-box" style="background: rgba(255,255,255,0.5); border-color:#d97706">🌟 Most
-                    chosen by professional researchers</div>
+                <div class="highlight-box" style="background: rgba(255,255,255,0.5); border-color:#d97706">&#127775;
+                    Most chosen by professional researchers</div>
 
                 <ul class="card-features">
                     <li><i class="fa-solid fa-check"></i> Publish up to 6 papers</li>
@@ -858,7 +870,7 @@
     <!-- BONUS SECTION -->
     <section class="bonus-section gs-reveal-up">
         <div class="bonus-container">
-            <h2 class="bonus-title">🎉 Included in Paid Plans</h2>
+            <h2 class="bonus-title">&#127881; Included in Paid Plans</h2>
             <div class="bonus-grid">
                 <div class="bonus-card"><i class="fa-solid fa-fingerprint"></i> DOI metadata registration</div>
                 <div class="bonus-card"><i class="fa-solid fa-table-columns"></i> Manuscript tracking portal</div>
@@ -887,7 +899,7 @@
             </div>
 
             <div class="addon-card gs-reveal">
-                <div class="addon-highlight">⚡ Fast-track lane</div>
+                <div class="addon-highlight">&#9889; Fast-track lane</div>
                 <i class="fa-solid fa-bolt addon-icon"></i>
                 <h3 class="addon-title">Fast Review</h3>
                 <p class="addon-desc">Priority peer-review workflow for faster editorial decisions.</p>
@@ -902,7 +914,7 @@
             </div>
 
             <div class="addon-card gs-reveal">
-                <div class="addon-highlight">🚚 Speed Post Included</div>
+                <div class="addon-highlight">&#128666; Speed Post Included</div>
                 <i class="fa-solid fa-award addon-icon"></i>
                 <h3 class="addon-title">Certificate Hard Copy</h3>
                 <p class="addon-desc">Printed premium certificate delivered to your address.</p>
@@ -910,7 +922,7 @@
             </div>
 
             <div class="addon-card gs-reveal">
-                <div class="addon-highlight">🔥 High Visibility</div>
+                <div class="addon-highlight">&#128293; High Visibility</div>
                 <i class="fa-solid fa-star addon-icon"></i>
                 <h3 class="addon-title">Featured Paper</h3>
                 <p class="addon-desc">Promote your article on the homepage for maximum visibility and readership.</p>
@@ -918,7 +930,7 @@
             </div>
 
             <div class="addon-card gs-reveal">
-                <div class="addon-highlight">📦 Printed & Bound Edition</div>
+                <div class="addon-highlight">&#128230; Printed & Bound Edition</div>
                 <i class="fa-solid fa-book addon-icon"></i>
                 <h3 class="addon-title">Paper Hard Copy</h3>
                 <p class="addon-desc">Receive a professionally printed journal issue containing your published paper.
@@ -954,8 +966,53 @@
     </section>
 
     <script>
-        // GSAP Animations
-        document.addEventListener("DOMContentLoaded", (event) => {
+        // IP-based currency detection — runs before DOMContentLoaded
+        var _subIsIndia = true; // default to India (INR) until IP check resolves
+        window._subIsIndia = _subIsIndia;
+
+        (function () {
+            fetch('https://ipapi.co/json/')
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    var isIndia = (data && data.country_code === 'IN');
+                    window._subIsIndia = isIndia;
+                    applyCurrency(isIndia);
+                })
+                .catch(function () {
+                    // On failure, keep default (India / INR)
+                    window._subIsIndia = true;
+                    applyCurrency(true);
+                });
+        })();
+
+        function applyCurrency(isIndia) {
+            var symbol = isIndia ? '₹' : '$';
+            var toggle = document.getElementById('pricingToggle');
+            var isMonthly = toggle ? toggle.checked : false;
+
+            // Update all currency symbols
+            document.querySelectorAll('.currency').forEach(function (el) {
+                el.textContent = symbol;
+            });
+
+            // Update all price values
+            document.querySelectorAll('.price-val').forEach(function (el) {
+                var raw;
+                if (isIndia) {
+                    raw = isMonthly
+                        ? parseInt(el.getAttribute('data-monthly') || '0', 10)
+                        : parseInt(el.getAttribute('data-yearly') || '0', 10);
+                    el.textContent = raw > 0 ? raw.toLocaleString('en-IN') : '0';
+                } else {
+                    raw = isMonthly
+                        ? parseInt(el.getAttribute('data-monthly-usd') || '0', 10)
+                        : parseInt(el.getAttribute('data-yearly-usd') || '0', 10);
+                    el.textContent = raw > 0 ? raw.toLocaleString('en-US') : '0';
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
             gsap.registerPlugin(ScrollTrigger);
 
             // Reveal animations
@@ -974,15 +1031,15 @@
             });
 
             // Counters animation
-            const counters = document.querySelectorAll('.counter-val');
-            counters.forEach(counter => {
+            var counters = document.querySelectorAll('.counter-val');
+            counters.forEach(function (counter) {
                 gsap.to(counter, {
                     scrollTrigger: { trigger: counter, start: "top 90%" },
                     innerHTML: counter.getAttribute('data-target'),
                     duration: 2,
                     snap: { innerHTML: 1 },
                     onUpdate: function () {
-                        let val = Math.round(this.targets()[0].innerHTML);
+                        var val = Math.round(this.targets()[0].innerHTML);
                         if (counter.getAttribute('data-target') == 10000) {
                             counter.innerHTML = val.toLocaleString('en-IN') + "+";
                         } else if (counter.getAttribute('data-target') == 99) {
@@ -997,31 +1054,41 @@
             });
 
             // Toggle logic
-            const toggle = document.getElementById('pricingToggle');
-            const prices = document.querySelectorAll('.price-val');
-            const lblMonthly = document.getElementById('label-yearly');
-            const lblYearly = document.getElementById('label-monthly');
+            var toggle = document.getElementById('pricingToggle');
+            var prices = document.querySelectorAll('.price-val');
+            var lblMonthly = document.getElementById('label-monthly');
+            var lblYearly = document.getElementById('label-yearly');
 
-            toggle.addEventListener('change', (e) => {
-                const isMonthly = e.target.checked;
+            toggle.addEventListener('change', function (e) {
+                var isMonthly = e.target.checked;
+                var isIndia = window._subIsIndia !== false; // default true if undefined
 
                 if (isMonthly) {
-                    lblMonthly.classList.add('active');
-                    lblYearly.classList.remove('active');
-                } else {
                     lblYearly.classList.add('active');
                     lblMonthly.classList.remove('active');
+                } else {
+                    lblMonthly.classList.add('active');
+                    lblYearly.classList.remove('active');
                 }
 
-                prices.forEach(price => {
+                prices.forEach(function (price) {
                     gsap.to(price, {
                         opacity: 0,
                         y: -10,
                         duration: 0.2,
-                        onComplete: () => {
-                            price.innerText = isMonthly ? price.getAttribute('data-monthly') : price.getAttribute('data-yearly');
-                            let val = parseInt(price.innerText.replace(/,/g, ''));
-                            if (val > 0) price.innerText = val.toLocaleString('en-IN');
+                        onComplete: function () {
+                            var raw;
+                            if (isIndia) {
+                                raw = isMonthly
+                                    ? parseInt(price.getAttribute('data-monthly') || '0', 10)
+                                    : parseInt(price.getAttribute('data-yearly') || '0', 10);
+                                price.textContent = raw > 0 ? raw.toLocaleString('en-IN') : '0';
+                            } else {
+                                raw = isMonthly
+                                    ? parseInt(price.getAttribute('data-monthly-usd') || '0', 10)
+                                    : parseInt(price.getAttribute('data-yearly-usd') || '0', 10);
+                                price.textContent = raw > 0 ? raw.toLocaleString('en-US') : '0';
+                            }
                             gsap.to(price, { opacity: 1, y: 0, duration: 0.2 });
                         }
                     });
