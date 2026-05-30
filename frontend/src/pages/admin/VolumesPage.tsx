@@ -4,8 +4,12 @@ import { ChevronDown, ChevronRight, Pencil, Plus, Trash2, Check, X } from "lucid
 import { apiJson } from "@/services/api";
 
 const JOURNALS = [
-  { id: "SGJVSR" }, { id: "SGMRJ"  }, { id: "SGJPLS" },
-  { id: "SGJETR" }, { id: "SGJSSH" }, { id: "SGJASH" }
+  { id: "SGJVSR", name: "ScriptHive Global Journal of Vedic and Sanskrit Research" },
+  { id: "SGMRJ",  name: "ScriptHive Global Multidisciplinary Research Journal" },
+  { id: "SGJPLS", name: "ScriptHive Global Journal of Physical and Life Sciences" },
+  { id: "SGJETR", name: "ScriptHive Global Journal of Engineering and Technology Research" },
+  { id: "SGJSSH", name: "ScriptHive Global Journal of Social Sciences and Humanities" },
+  { id: "SGJASH", name: "ScriptHive Global Journal of Applied Science and Health" }
 ];
 
 interface Part   { id: number; name: string; issueId: number }
@@ -163,12 +167,15 @@ export const VolumesPage = () => {
       </div>
 
       {/* Journal selector */}
-      <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">Journal</span>
         <select value={journalId} onChange={(e) => setJournalId(e.target.value)}
           className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
           {JOURNALS.map((j) => <option key={j.id} value={j.id}>{j.id}</option>)}
         </select>
+        <span className="text-sm font-medium text-gray-700">
+          {JOURNALS.find(j => j.id === journalId)?.name}
+        </span>
       </div>
 
       {/* Add volume */}
