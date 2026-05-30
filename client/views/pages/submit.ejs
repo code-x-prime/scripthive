@@ -1346,99 +1346,91 @@
 </div>
 
 <!-- SUCCESS MODAL -->
-<!-- SUCCESS MODAL -->
 <div class="modal-overlay" id="success-modal-overlay">
-  <div class="premium-modal" style="max-width:560px; padding: 0; overflow-y:auto; max-height:95vh;">
+  <div class="premium-modal" style="max-width:700px;padding:0;overflow:hidden;width:95vw;">
     <div class="modal-glow"></div>
-    <!-- Compact green banner -->
-    <div style="background:linear-gradient(135deg,#059669 0%,#10b981 100%);padding:20px 28px 16px;text-align:center;position:relative;z-index:10;">
-      <div style="width:48px;height:48px;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:1.4rem;color:#fff;">
-        <i class="fa-solid fa-check"></i>
-      </div>
-      <div style="font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:3px;">Submission Successful!</div>
-      <div style="color:rgba(255,255,255,0.85);font-size:0.85rem;">Manuscript registered and sent for peer review.</div>
-    </div>
+    <!-- Horizontal layout: left=green info, right=actions -->
+    <div style="display:flex;min-height:300px;">
 
-    <!-- Body -->
-    <div style="padding:20px 24px;position:relative;z-index:10;">
-      <!-- Tracking ID -->
-      <div style="background:#f0fdf4;border:1.5px dashed #10b981;border-radius:12px;padding:12px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
-        <div>
-          <div style="font-size:0.7rem;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Tracking ID</div>
-          <div style="font-family:monospace;font-size:1.3rem;font-weight:800;color:#065f46;" id="success-sub-id">SH-XXXX</div>
+      <!-- LEFT — green side -->
+      <div style="background:linear-gradient(160deg,#059669 0%,#10b981 100%);padding:24px 20px;width:44%;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:10px;">
+        <div style="width:52px;height:52px;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#fff;">
+          <i class="fa-solid fa-check"></i>
         </div>
-        <i class="fa-solid fa-fingerprint" style="font-size:1.6rem;color:#10b981;opacity:0.6;"></i>
-      </div>
-
-      <!-- Details grid compact -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;">
-          <div style="font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:3px;">Paper Title</div>
-          <div style="font-size:0.88rem;font-weight:600;color:#0f172a;line-height:1.3;" id="success-paper-title">—</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;line-height:1.2;">Submission<br>Successful!</div>
+        <div style="color:rgba(255,255,255,0.85);font-size:0.78rem;line-height:1.4;">Manuscript registered &amp; sent for peer review.</div>
+        <div style="background:rgba(255,255,255,0.15);border:1.5px dashed rgba(255,255,255,0.5);border-radius:10px;padding:10px 14px;margin-top:6px;width:100%;">
+          <div style="font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Tracking ID</div>
+          <div style="font-family:monospace;font-size:1.1rem;font-weight:800;color:#fff;" id="success-sub-id">SH-XXXX</div>
         </div>
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;">
-          <div style="font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:3px;">Journal</div>
-          <div style="font-size:0.88rem;font-weight:600;color:#0f172a;line-height:1.3;" id="success-journal-name">—</div>
-        </div>
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;">
-          <div style="font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:3px;">Review Timeline</div>
-          <div style="font-size:0.88rem;font-weight:700;color:#10b981;">7–15 Working Days</div>
-        </div>
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;">
-          <div style="font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:3px;">Support</div>
-          <div style="font-size:0.82rem;font-weight:500;color:#2563eb;">info@scripthive.org</div>
+        <div style="width:100%;margin-top:4px;">
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.75);margin-bottom:3px;">Review: <strong style="color:#fff;">7–15 Working Days</strong></div>
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.75);">Support: <strong style="color:#fff;">info@scripthive.org</strong></div>
         </div>
       </div>
 
-      <!-- Payment Options -->
-      <div id="payment-section" style="display:none;">
-        <div style="background:#fefce8;border:1px solid #fde047;border-radius:12px;padding:14px 18px;margin-bottom:18px;text-align:center;">
-          <div style="font-size:0.78rem;font-weight:700;color:#854d0e;text-transform:uppercase;margin-bottom:6px;">Add-On Payment</div>
-          <div style="font-size:1.4rem;font-weight:800;color:#0f172a;" id="payment-amount-display">₹0</div>
-          <div style="font-size:0.78rem;color:#64748b;margin-top:2px;" id="payment-addons-list"></div>
-        </div>
-
-        <!-- INR payment methods -->
-        <div id="inr-payment-methods" style="display:none;">
-          <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;text-align:center;">Choose payment method:</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-            <button type="button" id="pay-smepay-btn" style="border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;background:#fff;cursor:pointer;transition:0.2s;font-family:inherit;">
-              <div style="font-size:1.2rem;margin-bottom:4px;">📱</div>
-              <div style="font-weight:700;font-size:0.9rem;color:#0f172a;">UPI / SMEPay</div>
-              <div style="font-size:0.75rem;color:#64748b;">PhonePe, GPay, UPI</div>
-            </button>
-            <button type="button" id="pay-razorpay-btn" style="border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;background:#fff;cursor:pointer;transition:0.2s;font-family:inherit;">
-              <div style="font-size:1.2rem;margin-bottom:4px;">💳</div>
-              <div style="font-weight:700;font-size:0.9rem;color:#0f172a;">Card / Net Banking</div>
-              <div style="font-size:0.75rem;color:#64748b;">Razorpay</div>
-            </button>
+      <!-- RIGHT — details + actions -->
+      <div style="flex:1;padding:20px 18px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:90vh;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:9px 11px;grid-column:1/-1;">
+            <div style="font-size:0.65rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:2px;">Paper Title</div>
+            <div style="font-size:0.85rem;font-weight:600;color:#0f172a;line-height:1.3;" id="success-paper-title">—</div>
+          </div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:9px 11px;grid-column:1/-1;">
+            <div style="font-size:0.65rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:2px;">Journal</div>
+            <div style="font-size:0.85rem;font-weight:600;color:#0f172a;line-height:1.3;" id="success-journal-name">—</div>
           </div>
         </div>
 
-        <!-- USD payment method -->
-        <div id="usd-payment-methods" style="display:none;">
-          <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;text-align:center;">Choose payment method:</p>
-          <button type="button" id="pay-paypal-btn" style="width:100%;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;background:#fff;cursor:pointer;transition:0.2s;font-family:inherit;margin-bottom:12px;">
-            <div style="font-size:1.2rem;margin-bottom:4px;">🌐</div>
-            <div style="font-weight:700;font-size:0.9rem;color:#0f172a;">PayPal</div>
-            <div style="font-size:0.75rem;color:#64748b;">International USD Payment</div>
-          </button>
-        </div>
+        <!-- Download Receipt always visible -->
+        <button type="button" class="modal-btn primary" id="download-receipt-btn" style="width:100%;justify-content:center;">
+          <i class="fa-solid fa-file-pdf"></i> Download Receipt
+        </button>
+
+        <!-- Payment Options -->
+        <div id="payment-section" style="display:none;">
+          <div style="background:#fefce8;border:1px solid #fde047;border-radius:10px;padding:10px 14px;text-align:center;margin-bottom:8px;">
+            <div style="font-size:0.7rem;font-weight:700;color:#854d0e;text-transform:uppercase;margin-bottom:3px;">Add-On Payment</div>
+            <div style="font-size:1.2rem;font-weight:800;color:#0f172a;" id="payment-amount-display">₹0</div>
+            <div style="font-size:0.72rem;color:#64748b;margin-top:1px;" id="payment-addons-list"></div>
+          </div>
+          <!-- INR -->
+          <div id="inr-payment-methods" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+              <button type="button" id="pay-smepay-btn" style="border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 8px;background:#fff;cursor:pointer;font-family:inherit;text-align:center;">
+                <div style="font-size:1rem;margin-bottom:2px;">📱</div>
+                <div style="font-weight:700;font-size:0.82rem;color:#0f172a;">UPI / SMEPay</div>
+                <div style="font-size:0.7rem;color:#64748b;">PhonePe, GPay, UPI</div>
+              </button>
+              <button type="button" id="pay-razorpay-btn" style="border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 8px;background:#fff;cursor:pointer;font-family:inherit;text-align:center;">
+                <div style="font-size:1rem;margin-bottom:2px;">💳</div>
+                <div style="font-weight:700;font-size:0.82rem;color:#0f172a;">Card / Net Banking</div>
+                <div style="font-size:0.7rem;color:#64748b;">Razorpay</div>
+              </button>
+            </div>
+          </div>
+          <!-- USD -->
+          <div id="usd-payment-methods" style="display:none;">
+            <button type="button" id="pay-paypal-btn" style="width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px;background:#fff;cursor:pointer;font-family:inherit;text-align:center;margin-bottom:8px;">
+              <div style="font-size:1rem;margin-bottom:2px;">🌐</div>
+              <div style="font-weight:700;font-size:0.82rem;color:#0f172a;">PayPal — USD</div>
+              <div style="font-size:0.7rem;color:#64748b;">International Payment</div>
+            </button>
+          </div>
 
         <div style="text-align:center;margin-top:6px;">
           <button type="button" id="skip-payment-btn" style="background:none;border:none;color:#64748b;font-size:0.85rem;cursor:pointer;text-decoration:underline;">Skip — Pay Later</button>
         </div>
       </div>
 
-      <div class="modal-btn-group" id="receipt-done-btns">
-        <button type="button" class="modal-btn primary" id="download-receipt-btn">
-          <i class="fa-solid fa-file-pdf"></i> Download Receipt
-        </button>
-        <button type="button" class="modal-btn secondary" id="close-success-btn">
+      <div id="receipt-done-btns" style="display:none;"><!-- legacy placeholder -->
+        </div>
+
+        <button type="button" class="modal-btn secondary" id="close-success-btn" style="width:100%;justify-content:center;">
           Done
         </button>
-      </div>
-    </div>
+      </div><!-- end right -->
+    </div><!-- end flex -->
   </div>
 </div>
 
