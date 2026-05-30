@@ -971,6 +971,24 @@
       errorOverlay.classList.remove('active');
     });
 
+    // Load payment config + Razorpay SDK
+    var _pgConfig = null;
+    (async function() {
+      try {
+        var r = await fetch('https://api.scripthive.org/api/payments/config');
+        if (r.ok) {
+          var cfg = await r.json();
+          _pgConfig = cfg.data || cfg;
+          // Load Razorpay SDK if enabled
+          if (_pgConfig.razorpay && _pgConfig.razorpay.enabled && _pgConfig.razorpay.keyId) {
+            var s = document.createElement('script');
+            s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            document.head.appendChild(s);
+          }
+        }
+      } catch(e) { console.warn('Payment config load failed', e); }
+    })();
+
     // Payment button handlers
     document.getElementById('skip-payment-btn') && document.getElementById('skip-payment-btn').addEventListener('click', function() {
       successOverlay.classList.remove('active');
@@ -978,41 +996,59 @@
 
     document.getElementById('pay-smepay-btn') && document.getElementById('pay-smepay-btn').addEventListener('click', async function() {
       if (!window._paymentSubmissionId) return;
+      var btn = this; btn.disabled = true; btn.textContent = 'Redirecting…';
       try {
         const res = await fetch('https://api.scripthive.org/api/payments/smepay/create-order', {
           method: 'POST', headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ invoiceId: null, submissionId: window._paymentSubmissionId, amount: window._paymentAmount, currency: 'INR', addons: window._paymentAddons })
+          body: JSON.stringify({ submissionId: window._paymentSubmissionId, amount: window._paymentAmount, currency: 'INR' })
         });
         const data = await res.json();
-        if (data.paymentUrl) window.location.href = data.paymentUrl;
-        else alert('Payment initiation failed. Please try again.');
-      } catch(e) { alert('Network error. Please try again.'); }
+        if (data.paymentUrl || (data.data && data.data.paymentUrl)) {
+          window.location.href = data.paymentUrl || data.data.paymentUrl;
+        } else {
+          alert(data.message || 'Payment initiation failed. Please try again.');
+          btn.disabled=false; btn.textContent='Pay with SMEPay / UPI';
+        }
+      } catch(e) { alert('Network error. Please try again.'); btn.disabled=false; btn.textContent='Pay with SMEPay / UPI'; }
     });
 
     document.getElementById('pay-razorpay-btn') && document.getElementById('pay-razorpay-btn').addEventListener('click', async function() {
       if (!window._paymentSubmissionId) return;
+      var btn = this; btn.disabled = true; btn.textContent = 'Processing…';
       try {
         const res = await fetch('https://api.scripthive.org/api/payments/razorpay/create-order', {
           method: 'POST', headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ invoiceId: null, submissionId: window._paymentSubmissionId, amount: window._paymentAmount, currency: 'INR' })
+          body: JSON.stringify({ submissionId: window._paymentSubmissionId, amount: window._paymentAmount, currency: 'INR' })
         });
         const data = await res.json();
         const orderId = data.orderId || (data.data && data.data.orderId);
-        const keyId = data.keyId || (data.data && data.data.keyId) || '';
-        if (orderId && window.Razorpay) {
-          const rzp = new window.Razorpay({
-            key: keyId,
-            amount: window._paymentAmount * 100,
-            currency: 'INR',
-            order_id: orderId,
-            name: 'ScriptHive Publication',
-            description: 'Add-On Services',
-            handler: function(resp) { successOverlay.classList.remove('active'); alert('Payment successful! Transaction ID: ' + resp.razorpay_payment_id); },
-            prefill: {}
-          });
-          rzp.open();
-        } else { alert('Payment initiation failed.'); }
-      } catch(e) { alert('Network error. Please try again.'); }
+        const keyId = data.keyId || (data.data && data.data.keyId) || (_pgConfig && _pgConfig.razorpay && _pgConfig.razorpay.keyId) || '';
+        const invoiceId = data.invoiceId || (data.data && data.data.invoiceId);
+        if (!orderId) { alert((data.message || 'Payment initiation failed. Please try again.')); btn.disabled=false; btn.textContent='Pay with Razorpay'; return; }
+        if (!window.Razorpay) { alert('Razorpay SDK not loaded. Please refresh and try again.'); btn.disabled=false; btn.textContent='Pay with Razorpay'; return; }
+        const rzp = new window.Razorpay({
+          key: keyId,
+          amount: window._paymentAmount * 100,
+          currency: 'INR',
+          order_id: orderId,
+          name: 'ScriptHive Publication',
+          description: 'Add-On Services',
+          theme: { color: '#2563eb' },
+          handler: async function(resp) {
+            try {
+              await fetch('https://api.scripthive.org/api/payments/razorpay/verify', {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ razorpay_order_id: resp.razorpay_order_id, razorpay_payment_id: resp.razorpay_payment_id, razorpay_signature: resp.razorpay_signature, invoiceId: invoiceId })
+              });
+            } catch(e) {}
+            successOverlay.classList.remove('active');
+            document.getElementById('payment-section').style.display = 'none';
+          },
+          modal: { ondismiss: function() { btn.disabled=false; btn.textContent='Pay with Razorpay'; } },
+          prefill: {}
+        });
+        rzp.open();
+      } catch(e) { alert('Network error. Please try again.'); btn.disabled=false; btn.textContent='Pay with Razorpay'; }
     });
 
     document.getElementById('pay-paypal-btn') && document.getElementById('pay-paypal-btn').addEventListener('click', async function() {
