@@ -10,8 +10,9 @@
   .j-subnav ul li a { display: block; padding: 14px 20px; font-size: 0.9rem; font-weight: 500; color: #475569; text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; transition: 0.2s; }
   .j-subnav ul li a:hover, .j-subnav ul li a.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 600; }
 
-  .arch-container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; display: grid; grid-template-columns: 260px 1fr; gap: 28px; }
-  @media (max-width: 900px) { .arch-container { grid-template-columns: 1fr; } .arch-sidebar { display: none; } }
+  .arch-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: grid; grid-template-columns: 220px 1fr 240px; gap: 24px; }
+  @media (max-width: 1100px) { .arch-container { grid-template-columns: 200px 1fr; } .arch-journal-info { display: none; } }
+  @media (max-width: 768px) { .arch-container { grid-template-columns: 1fr; } .arch-filter-col { display: none; } }
 
   /* Search bar */
   .arch-search-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
@@ -71,8 +72,8 @@
   /* Empty state */
   .no-articles { text-align: center; padding: 60px 20px; color: #94a3b8; font-size: 1rem; }
 
-  /* Sidebar — left column */
-  .arch-sidebar { order: -1; }
+  .arch-filter-col { position: sticky; top: 160px; align-self: start; }
+  .arch-journal-info { position: sticky; top: 160px; align-self: start; }
   .sidebar-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
   .sidebar-card-title { font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f1f5f9; }
   .sidebar-abbr { font-size: 0.82rem; color: #64748b; font-weight: 600; margin-bottom: 14px; }
@@ -197,7 +198,59 @@
   </nav>
 
   <div class="arch-container">
-    <!-- Main content -->
+
+    <!-- LEFT: Filter Column -->
+    <div class="arch-filter-col">
+      <% if (archive && archive.length > 0) { %>
+      <div class="filter-card">
+        <div class="filter-card-title">
+          Filter Articles
+          <span class="filter-clear" id="filterClearAll">Clear All</span>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Year</div>
+          <% var seenYears = {};
+             issues.forEach(function(i){ seenYears[i.vol.year] = true; });
+             Object.keys(seenYears).map(Number).sort(function(a,b){return b-a;}).forEach(function(y) {
+               var cnt = issues.filter(function(i){return i.vol.year===y;}).reduce(function(s,i){return s+i.articles.length;},0);
+          %>
+          <div class="filter-check-item">
+            <input type="checkbox" id="fy_<%= y %>" class="filter-year" value="<%= y %>">
+            <label for="fy_<%= y %>"><span><%= y %></span><span class="fcount"><%= cnt %></span></label>
+          </div>
+          <% }); %>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Volume</div>
+          <% var seenVols = {};
+             issues.forEach(function(i){ seenVols[i.vol.number] = true; });
+             Object.keys(seenVols).map(Number).sort(function(a,b){return b-a;}).forEach(function(v) {
+               var cnt = issues.filter(function(i){return i.vol.number===v;}).reduce(function(s,i){return s+i.articles.length;},0);
+          %>
+          <div class="filter-check-item">
+            <input type="checkbox" id="fv_<%= v %>" class="filter-vol" value="<%= v %>">
+            <label for="fv_<%= v %>"><span>Vol. <%= v %></span><span class="fcount"><%= cnt %></span></label>
+          </div>
+          <% }); %>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Issue</div>
+          <% var seenIss = {};
+             issues.forEach(function(i){ seenIss[i.iss.number] = true; });
+             Object.keys(seenIss).map(Number).sort(function(a,b){return b-a;}).forEach(function(n) {
+               var cnt = issues.filter(function(i){return i.iss.number===n;}).reduce(function(s,i){return s+i.articles.length;},0);
+          %>
+          <div class="filter-check-item">
+            <input type="checkbox" id="fi_<%= n %>" class="filter-iss" value="<%= n %>">
+            <label for="fi_<%= n %>"><span>Issue <%= n %></span><span class="fcount"><%= cnt %></span></label>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- MIDDLE: Main content -->
     <main>
       <% if (!archive || archive.length === 0) { %>
         <div class="no-articles">
@@ -297,64 +350,8 @@
       <% } %>
     </main>
 
-    <!-- Sidebar -->
-    <aside class="arch-sidebar">
-
-      <!-- Filter Card -->
-      <% if (archive && archive.length > 0) { %>
-      <div class="filter-card">
-        <div class="filter-card-title">
-          Filter Articles
-          <span class="filter-clear" id="filterClearAll">Clear All</span>
-        </div>
-
-        <!-- Year filter -->
-        <div class="filter-group">
-          <div class="filter-group-label">Year</div>
-          <% var seenYears = {};
-             issues.forEach(function(i){ seenYears[i.vol.year] = true; });
-             Object.keys(seenYears).map(Number).sort(function(a,b){return b-a;}).forEach(function(y) {
-               var cnt = issues.filter(function(i){return i.vol.year===y;}).reduce(function(s,i){return s+i.articles.length;},0);
-          %>
-          <div class="filter-check-item">
-            <input type="checkbox" id="fy_<%= y %>" class="filter-year" value="<%= y %>">
-            <label for="fy_<%= y %>"><span><%= y %></span><span class="fcount"><%= cnt %></span></label>
-          </div>
-          <% }); %>
-        </div>
-
-        <!-- Volume filter -->
-        <div class="filter-group">
-          <div class="filter-group-label">Volume</div>
-          <% var seenVols = {};
-             issues.forEach(function(i){ seenVols[i.vol.number] = true; });
-             Object.keys(seenVols).map(Number).sort(function(a,b){return b-a;}).forEach(function(v) {
-               var cnt = issues.filter(function(i){return i.vol.number===v;}).reduce(function(s,i){return s+i.articles.length;},0);
-          %>
-          <div class="filter-check-item">
-            <input type="checkbox" id="fv_<%= v %>" class="filter-vol" value="<%= v %>">
-            <label for="fv_<%= v %>"><span>Vol. <%= v %></span><span class="fcount"><%= cnt %></span></label>
-          </div>
-          <% }); %>
-        </div>
-
-        <!-- Issue filter -->
-        <div class="filter-group">
-          <div class="filter-group-label">Issue</div>
-          <% var seenIss = {};
-             issues.forEach(function(i){ seenIss[i.iss.number] = true; });
-             Object.keys(seenIss).map(Number).sort(function(a,b){return b-a;}).forEach(function(n) {
-               var cnt = issues.filter(function(i){return i.iss.number===n;}).reduce(function(s,i){return s+i.articles.length;},0);
-          %>
-          <div class="filter-check-item">
-            <input type="checkbox" id="fi_<%= n %>" class="filter-iss" value="<%= n %>">
-            <label for="fi_<%= n %>"><span>Issue <%= n %></span><span class="fcount"><%= cnt %></span></label>
-          </div>
-          <% }); %>
-        </div>
-      </div>
-      <% } %>
-
+    <!-- RIGHT: Journal Info -->
+    <aside class="arch-journal-info">
       <div class="sidebar-card">
         <div class="sidebar-card-title">Journal Info</div>
         <div class="sidebar-abbr"><%= journal.abbr %></div>
