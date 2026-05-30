@@ -197,11 +197,32 @@
     </ul>
   </nav>
 
+  <%
+    var issues = [];
+    (archive || []).forEach(function(vol) {
+      (vol.issues || []).forEach(function(iss) {
+        (iss.parts || []).forEach(function(part) {
+          if ((part.articles || []).length > 0) {
+            var partLetter = (part.name || 'A').toLowerCase();
+            var slug = vol.year + '.v' + vol.number + 'i' + iss.number + partLetter;
+            issues.push({ vol: vol, iss: iss, part: part, slug: slug, articles: part.articles });
+          }
+        });
+      });
+    });
+    issues.sort(function(a,b) {
+      if (b.vol.year !== a.vol.year) return b.vol.year - a.vol.year;
+      if (b.vol.number !== a.vol.number) return b.vol.number - a.vol.number;
+      if (b.iss.number !== a.iss.number) return b.iss.number - a.iss.number;
+      return b.part.name.localeCompare(a.part.name);
+    });
+  %>
+
   <div class="arch-container">
 
     <!-- LEFT: Filter Column -->
     <div class="arch-filter-col">
-      <% if (archive && archive.length > 0) { %>
+      <% if (issues.length > 0) { %>
       <div class="filter-card">
         <div class="filter-card-title">
           Filter Articles
@@ -246,6 +267,23 @@
           </div>
           <% }); %>
         </div>
+
+        <% var seenParts = {};
+           issues.forEach(function(i){ seenParts[i.part.name] = true; });
+           var partKeys = Object.keys(seenParts).sort();
+           if (partKeys.length > 1) { %>
+        <div class="filter-group">
+          <div class="filter-group-label">Part</div>
+          <% partKeys.forEach(function(p) {
+               var cnt = issues.filter(function(i){return i.part.name===p;}).reduce(function(s,i){return s+i.articles.length;},0);
+          %>
+          <div class="filter-check-item">
+            <input type="checkbox" id="fp_<%= p %>" class="filter-part" value="<%= p %>">
+            <label for="fp_<%= p %>"><span>Part <%= p %></span><span class="fcount"><%= cnt %></span></label>
+          </div>
+          <% }); %>
+        </div>
+        <% } %>
       </div>
       <% } %>
     </div>
@@ -258,27 +296,6 @@
           <p>No published articles yet. Check back soon.</p>
         </div>
       <% } else { %>
-
-        <%
-          var issues = [];
-          archive.forEach(function(vol) {
-            (vol.issues || []).forEach(function(iss) {
-              (iss.parts || []).forEach(function(part) {
-                if ((part.articles || []).length > 0) {
-                  var partLetter = (part.name || 'A').toLowerCase();
-                  var slug = vol.year + '.v' + vol.number + 'i' + iss.number + partLetter;
-                  issues.push({ vol: vol, iss: iss, part: part, slug: slug, articles: part.articles });
-                }
-              });
-            });
-          });
-          issues.sort(function(a,b) {
-            if (b.vol.year !== a.vol.year) return b.vol.year - a.vol.year;
-            if (b.vol.number !== a.vol.number) return b.vol.number - a.vol.number;
-            if (b.iss.number !== a.iss.number) return b.iss.number - a.iss.number;
-            return b.part.name.localeCompare(a.part.name);
-          });
-        %>
 
         <!-- Search bar -->
         <div class="arch-search-bar">
@@ -315,7 +332,8 @@
                 data-author="<%= ((art.authorName||'') + ' ' + (art.coAuthors||'')).toLowerCase().replace(/"/g,'') %>"
                 data-year="<%= iss.vol.year %>"
                 data-vol="<%= iss.vol.number %>"
-                data-iss="<%= iss.iss.number %>">
+                data-iss="<%= iss.iss.number %>"
+                data-part="<%= iss.part.name %>">
                 <td class="art-sno"><%= idx + 1 %></td>
                 <td>
                   <div class="art-title"><%= art.title %></div>
@@ -415,6 +433,7 @@
     var years = getChecked('filter-year');
     var vols  = getChecked('filter-vol');
     var isss  = getChecked('filter-iss');
+    var parts = getChecked('filter-part');
     var rows = document.querySelectorAll('.art-row');
     var visible = 0;
 
@@ -424,11 +443,13 @@
       var year   = String(row.getAttribute('data-year') || '');
       var vol    = String(row.getAttribute('data-vol') || '');
       var iss    = String(row.getAttribute('data-iss') || '');
+      var part   = String(row.getAttribute('data-part') || '');
       var matchQ = !q || title.indexOf(q) >= 0 || author.indexOf(q) >= 0;
       var matchY = years.length === 0 || years.indexOf(year) >= 0;
       var matchV = vols.length  === 0 || vols.indexOf(vol)   >= 0;
       var matchI = isss.length  === 0 || isss.indexOf(iss)   >= 0;
-      var show = matchQ && matchY && matchV && matchI;
+      var matchP = parts.length === 0 || parts.indexOf(part)  >= 0;
+      var show = matchQ && matchY && matchV && matchI && matchP;
       row.style.display = show ? '' : 'none';
       if (show) visible++;
     });
@@ -460,13 +481,13 @@
     var s = document.getElementById('archSearch');
     if (s) s.addEventListener('input', applyFilters);
 
-    document.querySelectorAll('.filter-year,.filter-vol,.filter-iss').forEach(function(cb) {
+    document.querySelectorAll('.filter-year,.filter-vol,.filter-iss,.filter-part').forEach(function(cb) {
       cb.addEventListener('change', applyFilters);
     });
 
     var clearBtn = document.getElementById('filterClearAll');
     if (clearBtn) clearBtn.addEventListener('click', function() {
-      document.querySelectorAll('.filter-year,.filter-vol,.filter-iss').forEach(function(cb){ cb.checked = false; });
+      document.querySelectorAll('.filter-year,.filter-vol,.filter-iss,.filter-part').forEach(function(cb){ cb.checked = false; });
       if (s) s.value = '';
       applyFilters();
     });

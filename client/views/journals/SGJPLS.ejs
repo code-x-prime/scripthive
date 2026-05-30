@@ -2280,7 +2280,7 @@
 
         navLinks.forEach(link => {
           link.classList.remove('active');
-          if (link.getAttribute('href').includes(current) && current !== '') {
+          if ((link.getAttribute('href').includes(current) && current !== '') || (window.location.pathname.includes('/archives') && link.getAttribute('href') && link.getAttribute('href').includes('archives'))) {
             link.classList.add('active');
           }
         });
