@@ -10,7 +10,7 @@
   .j-subnav ul li a { display: block; padding: 14px 20px; font-size: 0.9rem; font-weight: 500; color: #475569; text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; transition: 0.2s; }
   .j-subnav ul li a:hover, .j-subnav ul li a.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 600; }
 
-  .arch-container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; display: grid; grid-template-columns: 1fr 280px; gap: 32px; }
+  .arch-container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; display: grid; grid-template-columns: 260px 1fr; gap: 28px; }
   @media (max-width: 900px) { .arch-container { grid-template-columns: 1fr; } .arch-sidebar { display: none; } }
 
   /* Search bar */
@@ -20,17 +20,20 @@
   .arch-search-count { font-size: 0.82rem; color: #64748b; white-space: nowrap; }
   .arch-no-results { text-align: center; padding: 40px 20px; color: #94a3b8; font-size: 0.95rem; display: none; }
   /* Sidebar filter card */
-  .filter-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-  .filter-card-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-  .filter-clear { font-size: 0.72rem; color: #2563eb; cursor: pointer; font-weight: 600; text-transform: none; letter-spacing: 0; }
-  .filter-clear:hover { text-decoration: underline; }
-  .filter-group { margin-bottom: 14px; }
-  .filter-group-label { font-size: 0.8rem; font-weight: 700; color: #374151; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #f1f5f9; }
-  .filter-check-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
-  .filter-check-item input[type=checkbox] { width: 15px; height: 15px; accent-color: #2563eb; cursor: pointer; flex-shrink: 0; }
-  .filter-check-item label { font-size: 0.83rem; color: #374151; cursor: pointer; display: flex; justify-content: space-between; width: 100%; }
-  .filter-check-item label .fcount { background: #f1f5f9; color: #64748b; font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
-  .filter-check-item:hover label { color: #2563eb; }
+  .arch-sidebar { position: sticky; top: 160px; align-self: start; }
+  .filter-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+  .filter-card-title { font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #0f172a; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+  .filter-clear { font-size: 0.75rem; color: #2563eb; cursor: pointer; font-weight: 600; text-transform: none; letter-spacing: 0; background: #eff6ff; padding: 3px 10px; border-radius: 20px; }
+  .filter-clear:hover { background: #dbeafe; }
+  .filter-group { margin-bottom: 16px; }
+  .filter-group:last-child { margin-bottom: 0; }
+  .filter-group-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 10px; }
+  .filter-check-item { display: flex; align-items: center; gap: 9px; padding: 6px 8px; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
+  .filter-check-item:hover { background: #f8fafc; }
+  .filter-check-item input[type=checkbox] { width: 16px; height: 16px; accent-color: #2563eb; cursor: pointer; flex-shrink: 0; }
+  .filter-check-item label { font-size: 0.84rem; color: #374151; cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+  .filter-check-item input:checked + label { color: #2563eb; font-weight: 600; }
+  .fcount { background: #f1f5f9; color: #64748b; font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; min-width: 20px; text-align: center; }
 
   /* Issue selector tabs */
   .issue-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
@@ -68,8 +71,8 @@
   /* Empty state */
   .no-articles { text-align: center; padding: 60px 20px; color: #94a3b8; font-size: 1rem; }
 
-  /* Sidebar */
-  .arch-sidebar { }
+  /* Sidebar — left column */
+  .arch-sidebar { order: -1; }
   .sidebar-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
   .sidebar-card-title { font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f1f5f9; }
   .sidebar-abbr { font-size: 0.82rem; color: #64748b; font-weight: 600; margin-bottom: 14px; }
