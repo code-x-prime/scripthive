@@ -13,8 +13,17 @@
   .arch-container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; display: grid; grid-template-columns: 1fr 280px; gap: 32px; }
   @media (max-width: 900px) { .arch-container { grid-template-columns: 1fr; } .arch-sidebar { display: none; } }
 
+  /* Search + filter bar */
+  .arch-search-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+  .arch-search-input { flex: 1; min-width: 200px; padding: 9px 14px 9px 36px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.88rem; color: #0f172a; outline: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center; transition: 0.2s; }
+  .arch-search-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+  .arch-filter-select { padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.85rem; color: #374151; background: #fff; cursor: pointer; outline: none; transition: 0.2s; }
+  .arch-filter-select:focus { border-color: #2563eb; }
+  .arch-search-count { font-size: 0.82rem; color: #64748b; white-space: nowrap; }
+  .arch-no-results { text-align: center; padding: 40px 20px; color: #94a3b8; font-size: 0.95rem; display: none; }
+
   /* Issue selector tabs */
-  .issue-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .issue-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
   .issue-tab { padding: 8px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; background: #fff; color: #475569; transition: 0.2s; text-decoration: none; }
   .issue-tab:hover, .issue-tab.active { background: #2563eb; color: #fff; border-color: #2563eb; }
 
@@ -207,6 +216,24 @@
           const activeIssue = issues.find(i => i.slug === (typeof activeSlug !== 'undefined' ? activeSlug : null)) || issues[0];
         %>
 
+        <!-- Search + Filter bar -->
+        <div class="arch-search-bar">
+          <input type="text" id="archSearch" class="arch-search-input" placeholder="Search by title or author...">
+          <select id="archYearFilter" class="arch-filter-select">
+            <option value="">All Years</option>
+            <% [...new Set(issues.map(i => i.vol.year))].sort((a,b)=>b-a).forEach(y => { %>
+              <option value="<%= y %>"><%= y %></option>
+            <% }); %>
+          </select>
+          <select id="archVolFilter" class="arch-filter-select">
+            <option value="">All Volumes</option>
+            <% [...new Set(issues.map(i => i.vol.number))].sort((a,b)=>b-a).forEach(v => { %>
+              <option value="<%= v %>">Vol. <%= v %></option>
+            <% }); %>
+          </select>
+          <span class="arch-search-count" id="archCount"></span>
+        </div>
+
         <!-- Issue tabs -->
         <% if (issues.length > 1) { %>
         <div class="issue-tabs">
@@ -243,8 +270,8 @@
                   ? (art.pdfPublicPath.startsWith('http') ? art.pdfPublicPath : `/api-files/${art.pdfPublicPath}`)
                   : null;
               %>
-              <tr>
-                <td><%= idx + 1 %></td>
+              <tr class="art-row" data-title="<%= (art.title||'').toLowerCase() %>" data-author="<%= (art.authorName||'').toLowerCase() %> <%= (art.coAuthors||'').toLowerCase() %>" data-year="<%= activeIssue.vol.year %>" data-vol="<%= activeIssue.vol.number %>">
+                <td class="art-sno"><%= idx + 1 %></td>
                 <td>
                   <div class="art-title"><%= art.title %></div>
                   <div class="art-authors"><%= art.authorName %><%= art.coAuthors ? ', ' + art.coAuthors : '' %></div>
@@ -275,6 +302,7 @@
               <% }); %>
             </tbody>
           </table>
+          <div id="archNoResults" class="arch-no-results">No articles match your search.</div>
         <% } %>
 
       <% } %>
@@ -334,6 +362,49 @@
   window.trackDownload = function(id) {
     fetch(API + '/api/archive/download/' + encodeURIComponent(id), { method: 'POST' }).catch(function(){});
   };
+
+  // Search + filter
+  function applyFilters() {
+    var q = (document.getElementById('archSearch').value || '').toLowerCase().trim();
+    var yr = document.getElementById('archYearFilter').value;
+    var vl = document.getElementById('archVolFilter').value;
+    var rows = document.querySelectorAll('.art-row');
+    var visible = 0;
+    rows.forEach(function(row) {
+      var title = row.getAttribute('data-title') || '';
+      var author = row.getAttribute('data-author') || '';
+      var year = row.getAttribute('data-year') || '';
+      var vol = row.getAttribute('data-vol') || '';
+      var matchQ = !q || title.indexOf(q) >= 0 || author.indexOf(q) >= 0;
+      var matchY = !yr || year === yr;
+      var matchV = !vl || vol === vl;
+      var show = matchQ && matchY && matchV;
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    // renumber visible rows
+    var n = 1;
+    rows.forEach(function(row) {
+      if (row.style.display !== 'none') {
+        var sno = row.querySelector('.art-sno');
+        if (sno) sno.textContent = n++;
+      }
+    });
+    var cnt = document.getElementById('archCount');
+    if (cnt) cnt.textContent = visible + ' article' + (visible !== 1 ? 's' : '');
+    var noRes = document.getElementById('archNoResults');
+    if (noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var s = document.getElementById('archSearch');
+    var y = document.getElementById('archYearFilter');
+    var v = document.getElementById('archVolFilter');
+    if (s) s.addEventListener('input', applyFilters);
+    if (y) y.addEventListener('change', applyFilters);
+    if (v) v.addEventListener('change', applyFilters);
+    applyFilters(); // init count
+  });
 })();
 </script>
 
