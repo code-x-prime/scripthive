@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { CreditCard, IndianRupee, ShieldCheck } from "lucide-react";
+import { CreditCard, IndianRupee, ShieldCheck, Wifi, WifiOff, Loader2 } from "lucide-react";
 import { settingsService } from "@/services/settings.service";
+import { apiJson } from "@/services/api";
 
 type PgForm = {
   pg_razorpay_enabled: string;
@@ -60,10 +61,56 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
   );
 }
 
+type TestResult = { ok: boolean; message: string; mode?: string } | null;
+
+function TestConnectionButton({ gateway, testing, testResults, onTest }: {
+  gateway: string;
+  testing: Record<string, boolean>;
+  testResults: Record<string, TestResult>;
+  onTest: (g: string) => void;
+}) {
+  const isLoading = testing[gateway];
+  const result = testResults[gateway];
+  return (
+    <div className="flex items-center gap-3 flex-wrap">
+      <button type="button" disabled={isLoading} onClick={() => onTest(gateway)}
+        className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50">
+        {isLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wifi className="h-3.5 w-3.5" />}
+        {isLoading ? "Testing…" : "Test Connection"}
+      </button>
+      {result && (
+        <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${result.ok ? "text-green-700" : "text-red-600"}`}>
+          {result.ok ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
+          {result.message}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export const PaymentGatewaysPanel = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving]   = useState(false);
   const [form, setForm]       = useState<PgForm>(emptyForm);
+  const [testing, setTesting] = useState<Record<string, boolean>>({});
+  const [testResults, setTestResults] = useState<Record<string, TestResult>>({});
+
+  const testConnection = async (gateway: string) => {
+    setTesting(t => ({ ...t, [gateway]: true }));
+    setTestResults(r => ({ ...r, [gateway]: null }));
+    try {
+      const result = await apiJson<TestResult>(`/payments/test/${gateway}`);
+      setTestResults(r => ({ ...r, [gateway]: result }));
+      if (result?.ok) toast.success(`${gateway} connected ✓`);
+      else toast.error(`${gateway}: ${result?.message}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Test failed";
+      setTestResults(r => ({ ...r, [gateway]: { ok: false, message: msg } }));
+      toast.error(msg);
+    } finally {
+      setTesting(t => ({ ...t, [gateway]: false }));
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -213,6 +260,7 @@ export const PaymentGatewaysPanel = () => {
             placeholder={form.pg_razorpay_key_secret_set ? "••••••••" : "Enter key secret"}
             className="h-10 rounded-lg border border-gray-200 px-3 font-mono text-sm" />
         </label>
+        <TestConnectionButton gateway="razorpay" testing={testing} testResults={testResults} onTest={testConnection} />
       </section>
 
       {/* SMEPay */}
@@ -245,6 +293,7 @@ export const PaymentGatewaysPanel = () => {
             className="h-10 rounded-lg border border-gray-200 px-3 font-mono text-sm" />
         </label>
         <p className="text-xs text-gray-400">Dashboard → Integrations → View API docs to get credentials.</p>
+        <TestConnectionButton gateway="smepay" testing={testing} testResults={testResults} onTest={testConnection} />
       </section>
 
       {/* PayPal */}
@@ -275,6 +324,7 @@ export const PaymentGatewaysPanel = () => {
             placeholder={form.pg_paypal_client_secret_set ? "••••••••" : "Enter client secret"}
             className="h-10 rounded-lg border border-gray-200 px-3 font-mono text-sm" />
         </label>
+        <TestConnectionButton gateway="paypal" testing={testing} testResults={testResults} onTest={testConnection} />
       </section>
 
       <button type="button" disabled={saving} onClick={() => void save()}

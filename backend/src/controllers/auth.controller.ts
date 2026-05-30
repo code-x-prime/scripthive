@@ -148,7 +148,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
   if (!admin || !admin.isActive) { res.json({ message: "If that email exists, an OTP has been sent." }); return; }
   const otp = String(Math.floor(100000 + Math.random() * 900000));
   const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
-  await prisma.adminUser.update({ where: { id: admin.id }, data: { otpCode: otp, otpExpiresAt } });
+  await prisma.$executeRaw`UPDATE "AdminUser" SET "otpCode" = ${otp}, "otpExpiresAt" = ${otpExpiresAt} WHERE id = ${admin.id}`;
   await sendMail({
     to: admin.email!,
     subject: "🔐 Password Reset OTP — ScriptHive Admin",
@@ -184,12 +184,17 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
   const { email, otp, newPassword } = req.body as { email: string; otp: string; newPassword: string };
   if (!email || !otp || !newPassword) { res.status(400).json({ message: "Email, OTP, and new password are required" }); return; }
   if (newPassword.length < 8) { res.status(400).json({ message: "Password must be at least 8 characters" }); return; }
+  // Use raw query to read OTP fields (not yet in Prisma schema on local)
+  const rows = await prisma.$queryRaw<{ id: string; otpCode: string | null; otpExpiresAt: Date | null }[]>`
+    SELECT id, "otpCode", "otpExpiresAt" FROM "AdminUser" WHERE email = ${email.toLowerCase().trim()} LIMIT 1
+  `;
   const admin = await prisma.adminUser.findFirst({ where: { email: email.toLowerCase().trim() } });
-  if (!admin || !admin.otpCode || !admin.otpExpiresAt) { res.status(400).json({ message: "Invalid or expired OTP" }); return; }
-  if (admin.otpCode !== otp.trim()) { res.status(400).json({ message: "Incorrect OTP" }); return; }
-  if (admin.otpExpiresAt < new Date()) { res.status(400).json({ message: "OTP has expired. Please request a new one." }); return; }
+  const otpRow = rows[0];
+  if (!admin || !otpRow?.otpCode || !otpRow?.otpExpiresAt) { res.status(400).json({ message: "Invalid or expired OTP" }); return; }
+  if (otpRow.otpCode !== otp.trim()) { res.status(400).json({ message: "Incorrect OTP" }); return; }
+  if (otpRow.otpExpiresAt < new Date()) { res.status(400).json({ message: "OTP has expired. Please request a new one." }); return; }
   const passwordHash = await bcrypt.hash(newPassword, 12);
-  await prisma.adminUser.update({ where: { id: admin.id }, data: { passwordHash, otpCode: null, otpExpiresAt: null } });
+  await prisma.$executeRaw`UPDATE "AdminUser" SET "passwordHash" = ${passwordHash}, "otpCode" = NULL, "otpExpiresAt" = NULL WHERE id = ${admin.id}`;
   // Invalidate all sessions
   await prisma.refreshToken.deleteMany({ where: { adminId: admin.id } });
   void writeAuditLog({ adminId: admin.id, action: "password_reset", resource: "auth", ipAddress: req.ip });

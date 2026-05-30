@@ -6,6 +6,7 @@ import {
   createSmepayOrderController,
   getPaymentConfigController,
   listPayments,
+  testPaymentConnection,
   verifyRazorpayPaymentController,
   verifySmepayOrderController
 } from "../controllers/payment.controller.js";
@@ -14,6 +15,7 @@ import { authenticate, requirePermission } from "../middlewares/auth.middleware.
 export const paymentRouter = Router();
 
 paymentRouter.get("/config", getPaymentConfigController);
+paymentRouter.get("/test/:gateway", authenticate, requirePermission("payments", "read"), testPaymentConnection);
 paymentRouter.get("/", authenticate, requirePermission("payments", "read"), listPayments);
 paymentRouter.post("/paypal/create-order", createPayPalOrderController);
 paymentRouter.post("/paypal/capture", capturePayPalOrderController);

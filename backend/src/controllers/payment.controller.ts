@@ -5,9 +5,10 @@ import { writeAuditLog } from "../utils/auditLog.js";
 import { capturePayPalOrder, createPayPalOrder } from "../services/paypal.service.js";
 import { createRazorpayOrder, verifyRazorpayPayment } from "../services/razorpay.service.js";
 import { createSmepayOrder, validateSmepayOrder } from "../services/smepay.service.js";
-import { getPublicPaymentConfig } from "../services/paymentGatewaySettings.service.js";
+import { getPublicPaymentConfig, resolvePaymentConfig } from "../services/paymentGatewaySettings.service.js";
 import { sendPaymentReceiptEmail } from "../services/email.service.js";
 import { loadApcRates } from "../services/apcSettings.service.js";
+import Razorpay from "razorpay";
 
 const paidStatuses = new Set(["Paid", "paid", "PAID"]);
 
@@ -51,6 +52,63 @@ async function markInvoicePaid(
 export const getPaymentConfigController = async (_req: Request, res: Response): Promise<void> => {
   const config = await getPublicPaymentConfig();
   res.json({ status: "success", data: config });
+};
+
+export const testPaymentConnection = async (req: Request, res: Response): Promise<void> => {
+  const { gateway } = req.params as { gateway: string };
+  const cfg = await resolvePaymentConfig();
+
+  try {
+    if (gateway === "razorpay") {
+      if (!cfg.razorpay.keyId || !cfg.razorpay.keySecret) {
+        res.json({ ok: false, message: "Razorpay keys not configured" }); return;
+      }
+      const rz = new Razorpay({ key_id: cfg.razorpay.keyId, key_secret: cfg.razorpay.keySecret });
+      // Fetch recent orders — lightweight read call to verify credentials
+      await rz.orders.all({ count: 1 });
+      res.json({ ok: true, message: `Razorpay ${cfg.razorpay.mode} credentials valid ✓`, mode: cfg.razorpay.mode });
+
+    } else if (gateway === "smepay") {
+      if (!cfg.smepay.clientId || !cfg.smepay.clientSecret) {
+        res.json({ ok: false, message: "SMEPay credentials not configured" }); return;
+      }
+      const smepayBase = cfg.smepay.mode === "live" ? "https://extranet.smepay.in" : "https://staging.smepay.in";
+      const r = await fetch(`${smepayBase}/api/wiz/external/auth`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ client_id: cfg.smepay.clientId, client_secret: cfg.smepay.clientSecret })
+      });
+      const json = await r.json() as { access_token?: string; message?: string };
+      if (!r.ok || !json.access_token) {
+        res.json({ ok: false, message: `SMEPay auth failed: ${json.message ?? r.status}` }); return;
+      }
+      res.json({ ok: true, message: `SMEPay ${cfg.smepay.mode} credentials valid ✓`, mode: cfg.smepay.mode });
+
+    } else if (gateway === "paypal") {
+      if (!cfg.paypal.clientId || !cfg.paypal.clientSecret) {
+        res.json({ ok: false, message: "PayPal credentials not configured" }); return;
+      }
+      const ppBase = cfg.paypal.mode === "live" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com";
+      const r = await fetch(`${ppBase}/v1/oauth2/token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Authorization": `Basic ${Buffer.from(`${cfg.paypal.clientId}:${cfg.paypal.clientSecret}`).toString("base64")}`
+        },
+        body: "grant_type=client_credentials"
+      });
+      const json = await r.json() as { access_token?: string; error_description?: string };
+      if (!r.ok || !json.access_token) {
+        res.json({ ok: false, message: `PayPal auth failed: ${json.error_description ?? r.status}` }); return;
+      }
+      res.json({ ok: true, message: `PayPal ${cfg.paypal.mode} credentials valid ✓`, mode: cfg.paypal.mode });
+
+    } else {
+      res.status(400).json({ ok: false, message: "Unknown gateway" });
+    }
+  } catch (e) {
+    res.json({ ok: false, message: e instanceof Error ? e.message : "Connection failed" });
+  }
 };
 
 /* ── Auto-create addon invoice for submission ──────────────────────────── */
