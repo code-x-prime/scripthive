@@ -31,6 +31,7 @@ export const ForgotPasswordPage = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [notFound, setNotFound] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -53,12 +54,19 @@ export const ForgotPasswordPage = () => {
     setError("");
     if (!email.trim()) { setError("Enter your email address."); return; }
     setLoading(true);
+    setNotFound(false);
     try {
       await apiJson("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email: email.trim() }) });
       setStep("otp");
       startResendTimer();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send OTP");
+      const msg = err instanceof Error ? err.message : "Failed to send OTP";
+      if (msg.includes("No admin account") || msg.includes("not found")) {
+        setNotFound(true);
+        setError("");
+      } else {
+        setError(msg);
+      }
     } finally { setLoading(false); }
   };
 
@@ -170,6 +178,18 @@ export const ForgotPasswordPage = () => {
                 ))}
               </div>
 
+              {notFound && step === "email" && (
+                <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 text-red-500 text-xl">⚠️</div>
+                    <div>
+                      <p className="text-sm font-semibold text-red-800">Account not found</p>
+                      <p className="text-sm text-red-700 mt-0.5">No admin account is registered with <strong>{email}</strong>.</p>
+                      <p className="text-xs text-red-500 mt-1">Check the email address or contact your Super Admin.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
               {error && (
                 <div className="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>
               )}
@@ -179,7 +199,7 @@ export const ForgotPasswordPage = () => {
                 <form onSubmit={(e) => void sendOtp(e)} className="flex flex-col gap-4">
                   <label className="text-sm font-medium text-slate-700">
                     Email address
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                    <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setNotFound(false); setError(""); }}
                       placeholder="admin@scripthive.org" autoFocus autoComplete="email"
                       className="mt-1.5 h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                       disabled={loading} />

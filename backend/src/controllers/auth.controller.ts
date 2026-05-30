@@ -144,8 +144,8 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
   const { email } = req.body as { email: string };
   if (!email) { res.status(400).json({ message: "Email is required" }); return; }
   const admin = await prisma.adminUser.findFirst({ where: { email: email.toLowerCase().trim() } });
-  // Always return success to prevent email enumeration
-  if (!admin || !admin.isActive) { res.json({ message: "If that email exists, an OTP has been sent." }); return; }
+  if (!admin) { res.status(404).json({ message: "No admin account found with this email address." }); return; }
+  if (!admin.isActive) { res.status(403).json({ message: "This account is inactive. Contact your system administrator." }); return; }
   const otp = String(Math.floor(100000 + Math.random() * 900000));
   const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
   await prisma.$executeRaw`UPDATE "AdminUser" SET "otpCode" = ${otp}, "otpExpiresAt" = ${otpExpiresAt} WHERE id = ${admin.id}`;
