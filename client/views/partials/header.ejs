@@ -35,12 +35,9 @@
         <div class="nav-dropdown">
           <a href="/journals">Journals</a>
           <div class="dropdown-menu">
-            <a href="/SGJVSR">SGJVSR <span>Vedic &amp; Sanskrit Research</span></a>
-            <a href="/SGMRJ">SGMRJ <span>Multidisciplinary Research</span></a>
-            <a href="/SGJPLS">SGJPLS <span>Physical &amp; Life Sciences</span></a>
-            <a href="/SGJETR">SGJETR <span>Engineering &amp; Technology</span></a>
-            <a href="/SGJSSH">SGJSSH <span>Social Sciences &amp; Humanities</span></a>
-            <a href="/SGJASH">SGJASH <span>Applied Science &amp; Health</span></a>
+            <% (locals.activeJournals || []).forEach(function(j) { %>
+              <a href="/<%= j.abbr %>"><%= j.abbr %> <span><%= j.shortDesc %></span></a>
+            <% }); %>
           </div>
         </div>
         <a href="/services">Services</a>

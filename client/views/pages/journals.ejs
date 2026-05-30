@@ -291,6 +291,7 @@
     </div>
 
     <!-- Journal 1: SGJVSR -->
+    <% if((locals.activeJournals||[]).some(function(j){return j.abbr==='SGJVSR';})) { %>
     <div class="jl-card gs-reveal-up">
       <div class="jl-card-left bg-grad-1">
         <div>
@@ -331,8 +332,10 @@
         <div class="jl-info-item"><i class="fa-solid fa-scale-balanced" style="color:#8b5cf6;"></i> <div><span>Ethical Publishing</span><span class="info-sub">COPE Guidelines</span></div></div>
       </div>
     </div>
+    <% } %>
 
     <!-- Journal 2: SGMRJ -->
+    <% if((locals.activeJournals||[]).some(function(j){return j.abbr==='SGMRJ';})) { %>
     <div class="jl-card gs-reveal-up">
       <div class="jl-card-left bg-grad-2">
         <div>
@@ -374,7 +377,10 @@
       </div>
     </div>
 
+    <% } %>
+
     <!-- Journal 3: SGJPLS -->
+    <% if((locals.activeJournals||[]).some(function(j){return j.abbr==='SGJPLS';})) { %>
     <div class="jl-card gs-reveal-up">
       <div class="jl-card-left bg-grad-3">
         <div>
@@ -416,7 +422,10 @@
       </div>
     </div>
 
+    <% } %>
+
     <!-- Journal 4: SGJETR -->
+    <% if((locals.activeJournals||[]).some(function(j){return j.abbr==='SGJETR';})) { %>
     <div class="jl-card gs-reveal-up">
       <div class="jl-card-left bg-grad-4">
         <div>
@@ -457,7 +466,10 @@
       </div>
     </div>
 
+    <% } %>
+
     <!-- Journal 5: SGJSSH -->
+    <% if((locals.activeJournals||[]).some(function(j){return j.abbr==='SGJSSH';})) { %>
     <div class="jl-card gs-reveal-up">
       <div class="jl-card-left bg-grad-5">
         <div>
@@ -499,7 +511,10 @@
       </div>
     </div>
 
+    <% } %>
+
     <!-- Journal 6: SGJASH -->
+    <% if((locals.activeJournals||[]).some(function(j){return j.abbr==='SGJASH';})) { %>
     <div class="jl-card gs-reveal-up">
       <div class="jl-card-left bg-grad-6">
         <div>
@@ -540,6 +555,7 @@
         <div class="jl-info-item"><i class="fa-solid fa-scale-balanced" style="color:#8b5cf6;"></i> <div><span>Ethical Publishing</span><span class="info-sub">COPE Guidelines</span></div></div>
       </div>
     </div>
+    <% } %>
 
     <!-- CTA Section -->
     <section class="jl-cta gs-reveal">

@@ -538,20 +538,13 @@
           <div class="sub-form-section-title"><i class="fa-solid fa-book-open"></i> Journal Selection</div>
           <div class="form-group full">
             <%
-              const journals = [
-                { id: 'SGJVSR', name: 'ScriptHive Global Journal of Vedic and Sanskrit Research (SGJVSR)' },
-                { id: 'SGMRJ',  name: 'ScriptHive Global Multidisciplinary Research Journal (SGMRJ)' },
-                { id: 'SGJPLS', name: 'ScriptHive Global Journal of Physical and Life Sciences (SGJPLS)' },
-                { id: 'SGJETR', name: 'ScriptHive Global Journal of Engineering and Technology Research (SGJETR)' },
-                { id: 'SGJSSH', name: 'ScriptHive Global Journal of Social Sciences and Humanities (SGJSSH)' },
-                { id: 'SGJASH', name: 'ScriptHive Global Journal of Applied Science and Health (SGJASH)' }
-              ];
-              const preJ = typeof preselectedJournal !== 'undefined' ? preselectedJournal : '';
+              var submitJournals = (locals.activeJournals || []);
+              var preJ = typeof preselectedJournal !== 'undefined' ? preselectedJournal : '';
             %>
             <select id="journal-select" name="journal" class="form-control" required>
               <option value="" disabled <%= preJ ? '' : 'selected' %>></option>
-              <% journals.forEach(function(j){ %>
-                <option value="<%= j.id %>" <%= preJ === j.id ? 'selected' : '' %>><%= j.name %></option>
+              <% submitJournals.forEach(function(j){ %>
+                <option value="<%= j.abbr %>" <%= preJ === j.abbr ? 'selected' : '' %>><%= j.name %> (<%= j.abbr %>)</option>
               <% }); %>
             </select>
             <label for="journal-select" class="form-label">Select Journal *</label>

@@ -15,7 +15,24 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-// Inject carousel slides server-side into every rendered page (avoids CORS)
+// Cache active journals (refresh every 60s)
+let _activeJournalsCache = [];
+let _activeJournalsCacheAt = 0;
+async function getActiveJournals() {
+  if (Date.now() - _activeJournalsCacheAt < 60000) return _activeJournalsCache;
+  try {
+    const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+    const r = await fetch(`${apiUrl}/api/journals`);
+    if (r.ok) {
+      const data = await r.json();
+      _activeJournalsCache = (data.data || data || []).filter(j => j.status === 'Active');
+      _activeJournalsCacheAt = Date.now();
+    }
+  } catch { /* non-blocking */ }
+  return _activeJournalsCache;
+}
+
+// Inject carousel slides + active journals into every rendered page
 app.use(async (req, res, next) => {
   res.locals.carouselSlides = [];
   try {
@@ -23,6 +40,12 @@ app.use(async (req, res, next) => {
     const r = await fetch(`${apiUrl}/api/carousel/public`);
     if (r.ok) res.locals.carouselSlides = await r.json();
   } catch { /* non-blocking */ }
+  const active = await getActiveJournals();
+  // Merge JOURNAL_META shortDesc into active journals for navbar
+  res.locals.activeJournals = active.map(j => ({
+    ...j,
+    shortDesc: (JOURNAL_META[j.abbr] || {}).shortDesc || j.abbr
+  }));
   next();
 });
 
@@ -88,30 +111,34 @@ app.get('/subscription', (req, res) => res.render('pages/subscription'));
 
 // Journal metadata
 const JOURNAL_META = {
-  SGJVSR: { abbr: 'SGJVSR', issn: '3048-6114', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Vedic and Sanskrit Research', cover: '/images/SGJVSR - Cover Page.png' },
-  SGMRJ:  { abbr: 'SGMRJ',  issn: '3048-6122', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Multidisciplinary Research Journal', cover: '/images/SGMRJ - Cover Page.png' },
-  SGJPLS: { abbr: 'SGJPLS', issn: '3048-6130', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Physical and Life Sciences', cover: '/images/SGJPLS Cover Page.png' },
-  SGJETR: { abbr: 'SGJETR', issn: '3048-6149', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Engineering and Technology Research', cover: '/images/SGJETR - Cover Page.png' },
-  SGJSSH: { abbr: 'SGJSSH', issn: '3048-6157', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Social Sciences and Humanities', cover: '/images/SGJSSH - Cover Page.png' },
-  SGJASH: { abbr: 'SGJASH', issn: '3048-6165', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Applied Science and Health', cover: '/images/SGJASH Cover Page.png' }
+  SGJVSR: { abbr: 'SGJVSR', issn: '3048-6114', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Vedic and Sanskrit Research', shortDesc: 'Vedic & Sanskrit Research', cover: '/images/SGJVSR - Cover Page.png' },
+  SGMRJ:  { abbr: 'SGMRJ',  issn: '3048-6122', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Multidisciplinary Research Journal', shortDesc: 'Multidisciplinary Research', cover: '/images/SGMRJ - Cover Page.png' },
+  SGJPLS: { abbr: 'SGJPLS', issn: '3048-6130', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Physical and Life Sciences', shortDesc: 'Physical & Life Sciences', cover: '/images/SGJPLS Cover Page.png' },
+  SGJETR: { abbr: 'SGJETR', issn: '3048-6149', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Engineering and Technology Research', shortDesc: 'Engineering & Technology', cover: '/images/SGJETR - Cover Page.png' },
+  SGJSSH: { abbr: 'SGJSSH', issn: '3048-6157', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Social Sciences and Humanities', shortDesc: 'Social Sciences & Humanities', cover: '/images/SGJSSH - Cover Page.png' },
+  SGJASH: { abbr: 'SGJASH', issn: '3048-6165', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Applied Science and Health', shortDesc: 'Applied Science & Health', cover: '/images/SGJASH Cover Page.png' }
 };
 
 // Journals Routes — pass archive data + journalId for #archives section
 const JOURNAL_IDS_LIST = ['SGJASH','SGJETR','SGJPLS','SGJSSH','SGJVSR','SGMRJ'];
 JOURNAL_IDS_LIST.forEach(jid => {
   app.get(`/${jid}`, async (req, res) => {
+    const active = await getActiveJournals();
+    if (!active.some(j => j.abbr === jid)) { res.status(404).render('pages/404'); return; }
     const archive = await fetchArchive(jid);
     res.render(`journals/${jid}`, { archive, journalId: jid });
   });
 
-  // /SGJVSR/archives dedicated route
   app.get(`/${jid}/archives`, async (req, res) => {
+    const active = await getActiveJournals();
+    if (!active.some(j => j.abbr === jid)) { res.status(404).render('pages/404'); return; }
     const archive = await fetchArchive(jid);
     res.render('journals/journal_archives', { archive, journalId: jid, journal: JOURNAL_META[jid] });
   });
 
-  // /SGJVSR/archives/:slug — specific issue
   app.get(`/${jid}/archives/:slug`, async (req, res) => {
+    const active = await getActiveJournals();
+    if (!active.some(j => j.abbr === jid)) { res.status(404).render('pages/404'); return; }
     const archive = await fetchArchive(jid);
     res.render('journals/journal_archives', { archive, journalId: jid, journal: JOURNAL_META[jid], activeSlug: req.params.slug });
   });
