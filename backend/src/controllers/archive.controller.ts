@@ -3,19 +3,37 @@ import { prisma } from "../config/prisma.js";
 
 export const getArticleBySlug = async (req: Request, res: Response): Promise<void> => {
   const slug = String(req.params.slug).trim();
-  const article = await prisma.submission.findFirst({
+
+  // Try slug first
+  let article = await prisma.submission.findFirst({
     where: { slug, status: "Published" },
-    include: {
-      journal: true,
-      doiRecord: true,
-      part: { include: { issue: { include: { volume: true } } } }
-    }
+    include: { journal: true, doiRecord: true, part: { include: { issue: { include: { volume: true } } } } }
   });
+
+  // Fallback: citation-style lookup — format: YEAR-VOL(ISSUEpart):PAGES e.g. 2026-1(1aa):01-03
+  if (!article) {
+    const m = slug.match(/^(\d{4})-(\d+)\((\d+)([a-z]*)\):(\d+)-(\d+)$/i);
+    if (m) {
+      const year = parseInt(m[1] ?? "0");
+      const vol = parseInt(m[2] ?? "0");
+      const issue = parseInt(m[3] ?? "0");
+      const pageStart = parseInt(m[5] ?? "0");
+      const pageEnd = parseInt(m[6] ?? "0");
+      article = await prisma.submission.findFirst({
+        where: {
+          status: "Published",
+          pageStart,
+          pageEnd,
+          part: { issue: { number: issue, volume: { number: vol, year } } }
+        },
+        include: { journal: true, doiRecord: true, part: { include: { issue: { include: { volume: true } } } } }
+      });
+    }
+  }
+
   if (!article) { res.status(404).json({ message: "Article not found" }); return; }
 
-  // increment view count
   void prisma.submission.update({ where: { id: article.id }, data: { viewCount: { increment: 1 } } });
-
   res.json(article);
 };
 

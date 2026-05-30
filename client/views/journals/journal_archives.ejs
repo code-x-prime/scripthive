@@ -221,7 +221,7 @@
 
         <% if (activeIssue) { %>
           <div class="vol-heading">
-            Vol. <%= activeIssue.vol.number %>, Issue <%= activeIssue.iss.number %><%= activeIssue.part.name !== 'A' ? ` Part ${activeIssue.part.name}` : '' %> (<%= activeIssue.vol.year %>)<%= activeIssue.iss.period ? ` — ${activeIssue.iss.period}` : '' %>
+            Vol. <%= activeIssue.vol.number %>, Issue <%= activeIssue.iss.number %> (<%= activeIssue.vol.year %>)
           </div>
           <div class="vol-divider"></div>
 
@@ -236,7 +236,9 @@
             <tbody>
               <% activeIssue.articles.forEach((art, idx) => {
                 const pageRange = (art.pageStart && art.pageEnd) ? `${String(art.pageStart).padStart(2,'0')}-${String(art.pageEnd).padStart(2,'0')}` : null;
-                const citation = `${journal.abbr}; ${activeIssue.vol.year}; ${activeIssue.vol.number}(${activeIssue.iss.number}${activeIssue.part.name !== 'A' ? activeIssue.part.name.toLowerCase() : ''}):${pageRange || ''}`;
+                const partSuffix = activeIssue.part.name !== 'A' ? activeIssue.part.name.toLowerCase() : '';
+                const citation = `${journal.abbr}; ${activeIssue.vol.year}; ${activeIssue.vol.number}(${activeIssue.iss.number}${partSuffix}):${pageRange || ''}`;
+                const articleSlug = pageRange ? `${activeIssue.vol.year}-${activeIssue.vol.number}(${activeIssue.iss.number}${partSuffix}):${pageRange}` : (art.slug || art.id);
                 const pdfUrl = art.pdfPublicPath
                   ? (art.pdfPublicPath.startsWith('http') ? art.pdfPublicPath : `/api-files/${art.pdfPublicPath}`)
                   : null;
@@ -255,12 +257,12 @@
                   <% } %>
                   <div class="art-cite"><%= citation %></div>
                   <div class="art-links">
-                    <% if (art.slug) { %>
-                      <a href="/article/<%= art.slug %>">Abstract</a>
+                    <% if (art.slug || pageRange) { %>
+                      <a href="/article/<%= encodeURIComponent(articleSlug) %>" onclick="trackView('<%= art.id %>')">Abstract</a>
                       <span class="art-sep">|</span>
                     <% } %>
                     <% if (pdfUrl) { %>
-                      <a href="<%= pdfUrl %>">Download</a>
+                      <a href="<%= pdfUrl %>" target="_blank" rel="noopener" onclick="trackDownload('<%= art.id %>')">Download</a>
                       <span class="art-sep">|</span>
                     <% } %>
                     <span><%= art.viewCount || 0 %> Views</span>
@@ -322,5 +324,17 @@
     </aside>
   </div>
 </div>
+
+<script>
+(function() {
+  const API = '<%= (process.env.SCRIPTHIVE_API_URL || "https://api.scripthive.org") %>';
+  window.trackView = function(id) {
+    fetch(API + '/api/archive/view/' + encodeURIComponent(id), { method: 'POST' }).catch(function(){});
+  };
+  window.trackDownload = function(id) {
+    fetch(API + '/api/archive/download/' + encodeURIComponent(id), { method: 'POST' }).catch(function(){});
+  };
+})();
+</script>
 
 <%- include('../partials/footer') %>
