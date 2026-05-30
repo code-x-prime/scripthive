@@ -19,16 +19,23 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 let _activeJournalsCache = [];
 let _activeJournalsCacheAt = 0;
 async function getActiveJournals() {
-  if (Date.now() - _activeJournalsCacheAt < 60000) return _activeJournalsCache;
+  if (Date.now() - _activeJournalsCacheAt < 60000 && _activeJournalsCache.length > 0) return _activeJournalsCache;
   try {
     const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
-    const r = await fetch(`${apiUrl}/api/journals`);
+    const r = await fetch(`${apiUrl}/api/journals`, { signal: AbortSignal.timeout(3000) });
     if (r.ok) {
       const data = await r.json();
-      _activeJournalsCache = (data.data || data || []).filter(j => j.status === 'Active');
-      _activeJournalsCacheAt = Date.now();
+      const list = Array.isArray(data) ? data : (data.data || []);
+      if (list.length > 0) {
+        _activeJournalsCache = list;
+        _activeJournalsCacheAt = Date.now();
+      }
     }
   } catch { /* non-blocking */ }
+  // Fallback: if API unreachable, show all from JOURNAL_META
+  if (_activeJournalsCache.length === 0) {
+    return Object.values(JOURNAL_META);
+  }
   return _activeJournalsCache;
 }
 
@@ -41,11 +48,16 @@ app.use(async (req, res, next) => {
     if (r.ok) res.locals.carouselSlides = await r.json();
   } catch { /* non-blocking */ }
   const active = await getActiveJournals();
-  // Merge JOURNAL_META shortDesc into active journals for navbar
-  res.locals.activeJournals = active.map(j => ({
-    ...j,
-    shortDesc: (JOURNAL_META[j.abbr] || {}).shortDesc || j.abbr
-  }));
+  // Backend uses j.id as the abbr (e.g. "SGJVSR"). Normalize to abbr field.
+  res.locals.activeJournals = active.map(j => {
+    const abbr = j.abbr || j.id;
+    const meta = JOURNAL_META[abbr] || {};
+    return Object.assign({}, j, {
+      abbr: abbr,
+      shortDesc: meta.shortDesc || abbr,
+      name: j.name || meta.name || abbr
+    });
+  });
   next();
 });
 
@@ -124,21 +136,21 @@ const JOURNAL_IDS_LIST = ['SGJASH','SGJETR','SGJPLS','SGJSSH','SGJVSR','SGMRJ'];
 JOURNAL_IDS_LIST.forEach(jid => {
   app.get(`/${jid}`, async (req, res) => {
     const active = await getActiveJournals();
-    if (!active.some(j => j.abbr === jid)) { res.status(404).render('pages/404'); return; }
+    if (!active.some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
     const archive = await fetchArchive(jid);
     res.render(`journals/${jid}`, { archive, journalId: jid });
   });
 
   app.get(`/${jid}/archives`, async (req, res) => {
     const active = await getActiveJournals();
-    if (!active.some(j => j.abbr === jid)) { res.status(404).render('pages/404'); return; }
+    if (!active.some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
     const archive = await fetchArchive(jid);
     res.render('journals/journal_archives', { archive, journalId: jid, journal: JOURNAL_META[jid] });
   });
 
   app.get(`/${jid}/archives/:slug`, async (req, res) => {
     const active = await getActiveJournals();
-    if (!active.some(j => j.abbr === jid)) { res.status(404).render('pages/404'); return; }
+    if (!active.some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
     const archive = await fetchArchive(jid);
     res.render('journals/journal_archives', { archive, journalId: jid, journal: JOURNAL_META[jid], activeSlug: req.params.slug });
   });
