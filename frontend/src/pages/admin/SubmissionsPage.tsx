@@ -289,6 +289,7 @@ export const SubmissionsPage = () => {
   const debouncedSearch = useDebounce(search, 300);
   const [journalId, setJournalId] = useState("");
   const [productionStatus, setProductionStatus] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [exportOpen, setExportOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -298,7 +299,9 @@ export const SubmissionsPage = () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (fixedStatus) params.set("status", fixedStatus);
+      // On new page: use statusFilter if set, else no status filter (show all)
+      const effectiveStatus = fixedStatus === "Pending" && statusFilter ? statusFilter : fixedStatus;
+      if (effectiveStatus) params.set("status", effectiveStatus);
       if (journalId) params.set("journalId", journalId);
       if (productionStatus) params.set("productionStatus", productionStatus);
       const q = params.toString();
@@ -310,7 +313,7 @@ export const SubmissionsPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [fixedStatus, journalId, productionStatus]);
+  }, [fixedStatus, journalId, productionStatus, statusFilter]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -508,6 +511,22 @@ export const SubmissionsPage = () => {
             ))}
           </select>
         </label>
+        {isNewPage && (
+          <label className="flex min-w-[180px] flex-col gap-1 text-xs font-medium text-gray-600">
+            Status
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="h-10 rounded-lg border border-gray-200 px-3 text-sm"
+            >
+              <option value="">All</option>
+              <option value="Pending">New</option>
+              <option value="UnderReview">Under Review</option>
+              <option value="Accepted">Accepted</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </label>
+        )}
         {!isUnderReview && !isNewPage && (
           <label className="flex min-w-[200px] flex-col gap-1 text-xs font-medium text-gray-600">
             Production
