@@ -172,6 +172,14 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="doi/no-doi"
+              element={
+                <ProtectedRoute permission="doi:read">
+                  <DOIManagePage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="doi" element={<Navigate to="doi/pending" replace />} />
 
             <Route

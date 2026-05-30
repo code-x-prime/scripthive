@@ -80,7 +80,8 @@ const NAV: NavSection[] = [
     section: "DOI Management",
     items: [
       { label: "Pending DOI", icon: Hash, to: "/admin/doi/pending", perm: "doi_pending" },
-      { label: "Minted DOI", icon: Tag, to: "/admin/doi/minted", perm: "doi_minted" }
+      { label: "Minted DOI", icon: Tag, to: "/admin/doi/minted", perm: "doi_minted" },
+      { label: "No DOI", icon: Hash, to: "/admin/doi/no-doi", perm: "doi_minted" }
     ]
   },
   {

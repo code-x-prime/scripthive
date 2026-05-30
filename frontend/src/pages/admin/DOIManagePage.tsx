@@ -11,9 +11,11 @@ import { settingsService } from "@/services/settings.service";
 export const DOIManagePage = () => {
   const { pathname } = useLocation();
   const isMinted = pathname.includes("/minted");
+  const isNoDoi = pathname.includes("/no-doi");
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState<Submission[]>([]);
   const [minted, setMinted] = useState<DoiMintedRow[]>([]);
+  const [noDoi, setNoDoi] = useState<Submission[]>([]);
   const [modal, setModal] = useState<Submission | null>(null);
   const [vol, setVol] = useState("1");
   const [iss, setIss] = useState("1");
@@ -24,15 +26,17 @@ export const DOIManagePage = () => {
     setLoading(true);
     try {
       if (isMinted) setMinted(await doiService.minted());
+      else if (isNoDoi) setNoDoi(await doiService.noDoi());
       else setPending(await doiService.pending());
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to load DOI data");
       if (isMinted) setMinted([]);
+      else if (isNoDoi) setNoDoi([]);
       else setPending([]);
     } finally {
       setLoading(false);
     }
-  }, [isMinted]);
+  }, [isMinted, isNoDoi]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -86,9 +90,11 @@ export const DOIManagePage = () => {
     <section className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-heading text-3xl text-gray-900">{isMinted ? "Minted DOI" : "Pending DOI"}</h1>
+          <h1 className="font-heading text-3xl text-gray-900">
+            {isMinted ? "Minted DOI" : isNoDoi ? "No DOI" : "Pending DOI"}
+          </h1>
           <p className="mt-1 text-sm text-gray-500">
-            {isMinted ? "Assigned DOI records." : "Accepted and paid submissions awaiting DOI assignment."}
+            {isMinted ? "Assigned DOI records." : isNoDoi ? "Published articles without a DOI assigned." : "Accepted and paid submissions awaiting DOI assignment."}
           </p>
         </div>
         {isMinted && minted.length > 0 && (
@@ -156,6 +162,51 @@ export const DOIManagePage = () => {
                       >
                         <Eye className="h-4 w-4" />
                       </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      ) : isNoDoi ? (
+        noDoi.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-gray-200 bg-white py-12 text-center text-sm text-gray-500">All published articles have DOIs assigned.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+            <table className="min-w-[900px] w-full border-collapse text-left text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <th className="px-3 py-3">ID</th>
+                  <th className="px-3 py-3">Title</th>
+                  <th className="px-3 py-3">Authors</th>
+                  <th className="px-3 py-3">Journal</th>
+                  <th className="px-3 py-3">Published</th>
+                  <th className="px-3 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {noDoi.map((s) => (
+                  <tr key={s.id} className="border-b border-gray-100">
+                    <td className="px-3 py-2 font-mono text-green-700">
+                      <Link to={`/admin/submissions/${s.id}`} className="hover:underline">{s.id}</Link>
+                    </td>
+                    <td className="max-w-[200px] px-3 py-2 font-medium text-gray-900">{s.title}</td>
+                    <td className="max-w-[160px] px-3 py-2 text-gray-800">{submissionAuthorsDisplay(s)}</td>
+                    <td className="px-3 py-2">
+                      <span className="rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700">
+                        {s.journal?.id ?? s.journalId}
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2 text-gray-600">{new Date(s.updatedAt).toLocaleDateString()}</td>
+                    <td className="px-3 py-2 text-right">
+                      <button
+                        type="button"
+                        className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700"
+                        onClick={() => { setModal(s); setVol("1"); setIss("1"); }}
+                      >
+                        Assign DOI
+                      </button>
                     </td>
                   </tr>
                 ))}

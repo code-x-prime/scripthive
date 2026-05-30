@@ -64,6 +64,18 @@ export const assignDoi = async (req: Request, res: Response): Promise<void> => {
   res.status(201).json(row);
 };
 
+export const listDoiNone = async (_req: Request, res: Response): Promise<void> => {
+  const rows = await prisma.submission.findMany({
+    where: {
+      status: "Published",
+      OR: [{ doiRecord: null }, { doiRecord: { doi: null } }]
+    },
+    include: { journal: true, doiRecord: true },
+    orderBy: { updatedAt: "desc" }
+  });
+  res.json(rows);
+};
+
 /** @deprecated Prefer GET /pending — kept for older clients */
 export const listDois = async (_req: Request, res: Response): Promise<void> => {
   const rows = await prisma.doiRecord.findMany({ include: { submission: true } });
