@@ -129,15 +129,20 @@
   .sub-check-item p { margin: 0; color: var(--text-dark); font-size: 1rem; line-height: 1.5; font-weight: 500; }
 
   /* Form Container */
-  .form-container-wrapper { padding: 40px 20px 80px; max-width: 1000px; margin: 0 auto; }
+  *, *::before, *::after { box-sizing: border-box; }
+  .form-container-wrapper { padding: 40px 20px 80px; max-width: 1000px; margin: 0 auto; width: 100%; }
   .form-card {
-    background: white; border-radius: 24px; padding: 60px; box-shadow: 0 20px 50px rgba(0,0,0,0.05);
-    border: 1px solid var(--glass-border); position: relative; overflow: hidden;
+    background: white; border-radius: 24px; padding: 48px 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+    border: 1px solid var(--glass-border); position: relative; overflow: hidden; width: 100%;
   }
-  @media (max-width: 768px) {
-    .form-card { padding: 24px 16px; border-radius: 16px; }
-    .form-container-wrapper { padding: 20px 12px 60px; }
-    .sub-form-header h2 { font-size: 1.8rem; }
+  @media (max-width: 900px) {
+    .form-card { padding: 32px 24px; border-radius: 16px; }
+    .form-container-wrapper { padding: 20px 16px 60px; }
+  }
+  @media (max-width: 600px) {
+    .form-card { padding: 20px 14px; border-radius: 12px; }
+    .form-container-wrapper { padding: 16px 10px 50px; }
+    .sub-form-header h2 { font-size: 1.6rem; }
   }
   .form-card::before {
     content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px;
@@ -509,6 +514,14 @@
               <input type="tel" id="author-phone" name="author_phone" class="form-control" placeholder=" ">
               <label for="author-phone" class="form-label">Phone Number</label>
             </div>
+            <div class="form-group">
+              <select id="author-country" name="country" class="form-control" required>
+                <option value="" disabled selected></option>
+                <option value="India">India (INR)</option>
+                <option value="International">International (USD)</option>
+              </select>
+              <label for="author-country" class="form-label" style="top:-10px;font-size:0.8rem;background:white;padding:0 5px;color:var(--primary);font-weight:600;">Country / Region *</label>
+            </div>
           </div>
         </div>
 
@@ -689,7 +702,7 @@
         const picked = addons.filter(function(a){ return selected[a.id]; });
         const sum = picked.reduce(function(s,a){ return s + a.price; }, 0);
         if (input) input.value = picked.length ? JSON.stringify(picked) : '';
-        if (totalBox) totalBox.style.display = picked.length ? 'flex' : 'none';
+        // total box hidden — shown in payment modal instead
         if (totalAmt) totalAmt.textContent = '₹' + sum.toLocaleString('en-IN');
       }
 
@@ -886,6 +899,62 @@
       errorOverlay.classList.remove('active');
     });
 
+    // Payment button handlers
+    document.getElementById('skip-payment-btn') && document.getElementById('skip-payment-btn').addEventListener('click', function() {
+      successOverlay.classList.remove('active');
+    });
+
+    document.getElementById('pay-smepay-btn') && document.getElementById('pay-smepay-btn').addEventListener('click', async function() {
+      if (!window._paymentSubmissionId) return;
+      try {
+        const res = await fetch('/api/payments/smepay/create-order', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ invoiceId: null, submissionId: window._paymentSubmissionId, amount: window._paymentAmount, currency: 'INR', addons: window._paymentAddons })
+        });
+        const data = await res.json();
+        if (data.paymentUrl) window.location.href = data.paymentUrl;
+        else alert('Payment initiation failed. Please try again.');
+      } catch(e) { alert('Network error. Please try again.'); }
+    });
+
+    document.getElementById('pay-razorpay-btn') && document.getElementById('pay-razorpay-btn').addEventListener('click', async function() {
+      if (!window._paymentSubmissionId) return;
+      try {
+        const res = await fetch('/api/payments/razorpay/create-order', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ invoiceId: null, submissionId: window._paymentSubmissionId, amount: window._paymentAmount, currency: 'INR' })
+        });
+        const data = await res.json();
+        if (data.orderId && window.Razorpay) {
+          const rzp = new window.Razorpay({
+            key: data.keyId || '',
+            amount: window._paymentAmount * 100,
+            currency: 'INR',
+            order_id: data.orderId,
+            name: 'ScriptHive Publication',
+            description: 'Add-On Services',
+            handler: function(resp) { successOverlay.classList.remove('active'); alert('Payment successful! Transaction ID: ' + resp.razorpay_payment_id); },
+            prefill: {}
+          });
+          rzp.open();
+        } else { alert('Payment initiation failed.'); }
+      } catch(e) { alert('Network error. Please try again.'); }
+    });
+
+    document.getElementById('pay-paypal-btn') && document.getElementById('pay-paypal-btn').addEventListener('click', async function() {
+      if (!window._paymentSubmissionId) return;
+      try {
+        const amtUsd = parseFloat((window._paymentAmount / 83).toFixed(2));
+        const res = await fetch('/api/payments/paypal/create-order', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ invoiceId: null, submissionId: window._paymentSubmissionId, amount: amtUsd, currency: 'USD' })
+        });
+        const data = await res.json();
+        if (data.approvalUrl) window.location.href = data.approvalUrl;
+        else alert('PayPal payment initiation failed.');
+      } catch(e) { alert('Network error. Please try again.'); }
+    });
+
     let currentSubmissionDetails = null;
 
     // AJAX Form submission
@@ -972,11 +1041,42 @@
           if (xhr.status === 200 && response.status === 'success') {
             // Save submission details for receipt download
             currentSubmissionDetails = response;
-            
+
             // Populate success modal
             successSubId.innerText = response.submission_id;
             successPaperTitle.innerText = response.paper_title;
             successJournalName.innerText = response.journal;
+
+            // Show payment section if addons selected
+            const addonsRaw = document.getElementById('addons-input');
+            const countryVal = document.getElementById('author-country') ? document.getElementById('author-country').value : 'India';
+            const isIndia = countryVal === 'India' || countryVal === '';
+            let selectedAddons = [];
+            try { if (addonsRaw && addonsRaw.value) selectedAddons = JSON.parse(addonsRaw.value); } catch(e) {}
+
+            if (selectedAddons.length > 0) {
+              const total = selectedAddons.reduce(function(s,a){ return s + a.price; }, 0);
+              const paySection = document.getElementById('payment-section');
+              const receiptDoneBtns = document.getElementById('receipt-done-btns');
+              if (paySection) {
+                document.getElementById('payment-amount-display').textContent = isIndia ? ('₹' + total.toLocaleString('en-IN')) : ('$' + (total / 83).toFixed(2));
+                document.getElementById('payment-addons-list').textContent = selectedAddons.map(function(a){ return a.label; }).join(', ');
+                if (isIndia) {
+                  document.getElementById('inr-payment-methods').style.display = 'block';
+                  document.getElementById('usd-payment-methods').style.display = 'none';
+                } else {
+                  document.getElementById('inr-payment-methods').style.display = 'none';
+                  document.getElementById('usd-payment-methods').style.display = 'block';
+                }
+                paySection.style.display = 'block';
+                if (receiptDoneBtns) receiptDoneBtns.style.display = 'none';
+              }
+              // Store for payment
+              window._paymentSubmissionId = response.submission_id;
+              window._paymentAmount = total;
+              window._paymentCurrency = isIndia ? 'INR' : 'USD';
+              window._paymentAddons = selectedAddons;
+            }
 
             // Show Success Modal
             successOverlay.classList.add('active');
@@ -1219,7 +1319,47 @@
         </div>
       </div>
 
-      <div class="modal-btn-group">
+      <!-- Payment Options -->
+      <div id="payment-section" style="display:none;">
+        <div style="background:#fefce8;border:1px solid #fde047;border-radius:12px;padding:14px 18px;margin-bottom:18px;text-align:center;">
+          <div style="font-size:0.78rem;font-weight:700;color:#854d0e;text-transform:uppercase;margin-bottom:6px;">Add-On Payment</div>
+          <div style="font-size:1.4rem;font-weight:800;color:#0f172a;" id="payment-amount-display">₹0</div>
+          <div style="font-size:0.78rem;color:#64748b;margin-top:2px;" id="payment-addons-list"></div>
+        </div>
+
+        <!-- INR payment methods -->
+        <div id="inr-payment-methods" style="display:none;">
+          <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;text-align:center;">Choose payment method:</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+            <button type="button" id="pay-smepay-btn" style="border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;background:#fff;cursor:pointer;transition:0.2s;font-family:inherit;">
+              <div style="font-size:1.2rem;margin-bottom:4px;">📱</div>
+              <div style="font-weight:700;font-size:0.9rem;color:#0f172a;">UPI / SMEPay</div>
+              <div style="font-size:0.75rem;color:#64748b;">PhonePe, GPay, UPI</div>
+            </button>
+            <button type="button" id="pay-razorpay-btn" style="border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;background:#fff;cursor:pointer;transition:0.2s;font-family:inherit;">
+              <div style="font-size:1.2rem;margin-bottom:4px;">💳</div>
+              <div style="font-weight:700;font-size:0.9rem;color:#0f172a;">Card / Net Banking</div>
+              <div style="font-size:0.75rem;color:#64748b;">Razorpay</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- USD payment method -->
+        <div id="usd-payment-methods" style="display:none;">
+          <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;text-align:center;">Choose payment method:</p>
+          <button type="button" id="pay-paypal-btn" style="width:100%;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;background:#fff;cursor:pointer;transition:0.2s;font-family:inherit;margin-bottom:12px;">
+            <div style="font-size:1.2rem;margin-bottom:4px;">🌐</div>
+            <div style="font-weight:700;font-size:0.9rem;color:#0f172a;">PayPal</div>
+            <div style="font-size:0.75rem;color:#64748b;">International USD Payment</div>
+          </button>
+        </div>
+
+        <div style="text-align:center;margin-top:6px;">
+          <button type="button" id="skip-payment-btn" style="background:none;border:none;color:#64748b;font-size:0.85rem;cursor:pointer;text-decoration:underline;">Skip — Pay Later</button>
+        </div>
+      </div>
+
+      <div class="modal-btn-group" id="receipt-done-btns">
         <button type="button" class="modal-btn primary" id="download-receipt-btn">
           <i class="fa-solid fa-file-pdf"></i> Download Receipt
         </button>

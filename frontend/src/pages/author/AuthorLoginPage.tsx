@@ -132,12 +132,6 @@ export function AuthorLoginPage() {
               <Link to="/admin/login" className="text-slate-500 hover:text-green-600 hover:underline">Admin login</Link>
             </p>
           </div>
-
-          <div className="mt-5 rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
-            <p className="text-xs font-semibold text-slate-500 mb-1">Demo account</p>
-            <p className="font-mono text-xs text-slate-600">author.demo@scripthive.org</p>
-            <p className="font-mono text-xs text-slate-600">Author@ScriptHive123</p>
-          </div>
         </div>
       </div>
     </div>
