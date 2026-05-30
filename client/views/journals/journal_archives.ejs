@@ -247,8 +247,13 @@
         <% } %>
 
         <% if (activeIssue) { %>
+          <%
+            // Count how many parts this issue has across all issues list
+            const sameParts = issues.filter(function(i){ return i.vol.number === activeIssue.vol.number && i.iss.number === activeIssue.iss.number; });
+            const showPart = sameParts.length > 1 && activeIssue.part.name !== 'A';
+          %>
           <div class="vol-heading">
-            Vol. <%= activeIssue.vol.number %>, Issue <%= activeIssue.iss.number %> (<%= activeIssue.vol.year %>)
+            Vol. <%= activeIssue.vol.number %>, Issue <%= activeIssue.iss.number %><% if(showPart){ %> — Part <%= activeIssue.part.name %><% } %> (<%= activeIssue.vol.year %>)
           </div>
           <div class="vol-divider"></div>
 
@@ -355,13 +360,14 @@
 
 <script>
 (function() {
-  const API = '<%= (process.env.SCRIPTHIVE_API_URL || "https://api.scripthive.org") %>';
-  window.trackView = function(id) {
-    fetch(API + '/api/archive/view/' + encodeURIComponent(id), { method: 'POST' }).catch(function(){});
-  };
-  window.trackDownload = function(id) {
-    fetch(API + '/api/archive/download/' + encodeURIComponent(id), { method: 'POST' }).catch(function(){});
-  };
+  const API = 'https://api.scripthive.org';
+  function _track(endpoint) {
+    var url = API + endpoint;
+    if (navigator.sendBeacon) { navigator.sendBeacon(url); }
+    else { fetch(url, { method: 'POST', keepalive: true }).catch(function(){}); }
+  }
+  window.trackView = function(id) { _track('/api/archive/view/' + encodeURIComponent(id)); };
+  window.trackDownload = function(id) { _track('/api/archive/download/' + encodeURIComponent(id)); };
 
   // Search + filter
   function applyFilters() {
