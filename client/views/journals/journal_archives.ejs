@@ -4,7 +4,7 @@
   .arch-page { background: #f8fafc; min-height: 100vh; font-family: 'Segoe UI', sans-serif; }
 
   /* Journal sticky nav */
-  .j-subnav { background: #fff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+  .j-subnav { background: #fff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 80px; z-index: 99; }
   .j-subnav ul { display: flex; gap: 0; list-style: none; margin: 0; padding: 0; max-width: 1100px; margin: 0 auto; overflow-x: auto; }
   .j-subnav ul li a { display: block; padding: 14px 20px; font-size: 0.9rem; font-weight: 500; color: #475569; text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; transition: 0.2s; }
   .j-subnav ul li a:hover, .j-subnav ul li a.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 600; }
@@ -63,7 +63,7 @@
   .submit-cta a { display: inline-block; background: #fbbf24; color: #1e3a8a; font-weight: 700; font-size: 0.85rem; padding: 10px 20px; border-radius: 8px; text-decoration: none; }
 
   /* Hero */
-  .arch-hero { background: linear-gradient(135deg,#0b1120 0%,#0f172a 40%,#1a2744 100%); color: #fff; padding: 56px 20px 0; position: relative; overflow: hidden; }
+  .arch-hero { background: linear-gradient(135deg,#0b1120 0%,#0f172a 40%,#1a2744 100%); color: #fff; padding: 56px 20px 0; margin-top: 80px; position: relative; overflow: hidden; }
   .arch-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(37,99,235,0.18) 0%, transparent 70%); pointer-events:none; }
   .arch-hero-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: center; position: relative; z-index: 1; }
   .arch-hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 5px 14px; border-radius: 20px; font-size: 0.78rem; color: #fbbf24; font-weight: 600; margin-bottom: 18px; }
