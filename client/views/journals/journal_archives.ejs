@@ -204,26 +204,24 @@
       <% } else { %>
 
         <%
-          // Build flat list of issues with articles
-          const issues = [];
-          archive.forEach(vol => {
-            (vol.issues || []).forEach(iss => {
-              (iss.parts || []).forEach(part => {
+          var issues = [];
+          archive.forEach(function(vol) {
+            (vol.issues || []).forEach(function(iss) {
+              (iss.parts || []).forEach(function(part) {
                 if ((part.articles || []).length > 0) {
-                  const partLetter = (part.name || 'A').toLowerCase();
-                  const slug = `${vol.year}.v${vol.number}i${iss.number}${partLetter}`;
-                  issues.push({ vol, iss, part, slug, articles: part.articles });
+                  var partLetter = (part.name || 'A').toLowerCase();
+                  var slug = vol.year + '.v' + vol.number + 'i' + iss.number + partLetter;
+                  issues.push({ vol: vol, iss: iss, part: part, slug: slug, articles: part.articles });
                 }
               });
             });
           });
-          issues.sort((a,b) => {
+          issues.sort(function(a,b) {
             if (b.vol.year !== a.vol.year) return b.vol.year - a.vol.year;
             if (b.vol.number !== a.vol.number) return b.vol.number - a.vol.number;
             if (b.iss.number !== a.iss.number) return b.iss.number - a.iss.number;
             return b.part.name.localeCompare(a.part.name);
           });
-          const activeIssue = issues.find(i => i.slug === (typeof activeSlug !== 'undefined' ? activeSlug : null)) || issues[0];
         %>
 
         <!-- Search bar -->
@@ -234,9 +232,9 @@
 
         <!-- All issues rendered, filtered by JS -->
         <% issues.forEach(function(iss) {
-          const sameParts = issues.filter(function(i){ return i.vol.number === iss.vol.number && i.iss.number === iss.iss.number; });
-          const showPart = sameParts.length > 1;
-          const issLabel = `Vol. ${iss.vol.number}, Issue ${iss.iss.number}${showPart ? ' — Part ' + iss.part.name : ''} (${iss.vol.year})`;
+          var sameParts = issues.filter(function(i){ return i.vol.number === iss.vol.number && i.iss.number === iss.iss.number; });
+          var showPart = sameParts.length > 1;
+          var issLabel = 'Vol. ' + iss.vol.number + ', Issue ' + iss.iss.number + (showPart ? ' — Part ' + iss.part.name : '') + ' (' + iss.vol.year + ')';
         %>
         <div class="issue-block" data-year="<%= iss.vol.year %>" data-vol="<%= iss.vol.number %>" data-iss="<%= iss.iss.number %>">
           <div class="vol-heading"><%= issLabel %></div>
@@ -249,11 +247,12 @@
             </tr></thead>
             <tbody>
               <% iss.articles.forEach(function(art, idx) {
-                const pageRange = (art.pageStart && art.pageEnd) ? (String(art.pageStart).padStart(2,'0') + '-' + String(art.pageEnd).padStart(2,'0')) : null;
-                const partSuffix = iss.part.name !== 'A' ? iss.part.name.toLowerCase() : '';
-                const citation = journal.abbr + '; ' + iss.vol.year + '; ' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + (pageRange || '');
-                const articleSlug = pageRange ? (iss.vol.year + '-' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + pageRange) : (art.slug || art.id);
-                const pdfUrl = art.pdfPublicPath ? (art.pdfPublicPath.startsWith('http') ? art.pdfPublicPath : '/api-files/' + art.pdfPublicPath) : null;
+                var ps = art.pageStart, pe = art.pageEnd;
+                var pageRange = (ps && pe) ? (String(ps).padStart(2,'0') + '-' + String(pe).padStart(2,'0')) : null;
+                var partSuffix = iss.part.name !== 'A' ? iss.part.name.toLowerCase() : '';
+                var citation = journal.abbr + '; ' + iss.vol.year + '; ' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + (pageRange || '');
+                var articleSlug = pageRange ? (iss.vol.year + '-' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + pageRange) : (art.slug || art.id);
+                var pdfUrl = art.pdfPublicPath ? (art.pdfPublicPath.startsWith('http') ? art.pdfPublicPath : '/api-files/' + art.pdfPublicPath) : null;
               %>
               <tr class="art-row"
                 data-title="<%= (art.title||'').toLowerCase().replace(/"/g,'') %>"
@@ -309,8 +308,10 @@
         <!-- Year filter -->
         <div class="filter-group">
           <div class="filter-group-label">Year</div>
-          <% [...new Set(issues.map(function(i){return i.vol.year;}))].sort(function(a,b){return b-a;}).forEach(function(y) {
-            const cnt = issues.filter(function(i){return i.vol.year===y;}).reduce(function(s,i){return s+i.articles.length;},0);
+          <% var seenYears = {};
+             issues.forEach(function(i){ seenYears[i.vol.year] = true; });
+             Object.keys(seenYears).map(Number).sort(function(a,b){return b-a;}).forEach(function(y) {
+               var cnt = issues.filter(function(i){return i.vol.year===y;}).reduce(function(s,i){return s+i.articles.length;},0);
           %>
           <div class="filter-check-item">
             <input type="checkbox" id="fy_<%= y %>" class="filter-year" value="<%= y %>">
@@ -322,8 +323,10 @@
         <!-- Volume filter -->
         <div class="filter-group">
           <div class="filter-group-label">Volume</div>
-          <% [...new Set(issues.map(function(i){return i.vol.number;}))].sort(function(a,b){return b-a;}).forEach(function(v) {
-            const cnt = issues.filter(function(i){return i.vol.number===v;}).reduce(function(s,i){return s+i.articles.length;},0);
+          <% var seenVols = {};
+             issues.forEach(function(i){ seenVols[i.vol.number] = true; });
+             Object.keys(seenVols).map(Number).sort(function(a,b){return b-a;}).forEach(function(v) {
+               var cnt = issues.filter(function(i){return i.vol.number===v;}).reduce(function(s,i){return s+i.articles.length;},0);
           %>
           <div class="filter-check-item">
             <input type="checkbox" id="fv_<%= v %>" class="filter-vol" value="<%= v %>">
@@ -335,8 +338,10 @@
         <!-- Issue filter -->
         <div class="filter-group">
           <div class="filter-group-label">Issue</div>
-          <% [...new Set(issues.map(function(i){return i.iss.number;}))].sort(function(a,b){return b-a;}).forEach(function(n) {
-            const cnt = issues.filter(function(i){return i.iss.number===n;}).reduce(function(s,i){return s+i.articles.length;},0);
+          <% var seenIss = {};
+             issues.forEach(function(i){ seenIss[i.iss.number] = true; });
+             Object.keys(seenIss).map(Number).sort(function(a,b){return b-a;}).forEach(function(n) {
+               var cnt = issues.filter(function(i){return i.iss.number===n;}).reduce(function(s,i){return s+i.articles.length;},0);
           %>
           <div class="filter-check-item">
             <input type="checkbox" id="fi_<%= n %>" class="filter-iss" value="<%= n %>">
