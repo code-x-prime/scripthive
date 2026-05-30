@@ -125,6 +125,19 @@ export const ProductionPipelinePage = () => {
     }
   };
 
+  const changeStage = async (id: string, newStage: string) => {
+    try {
+      await apiJson(`/submissions/${encodeURIComponent(id)}/production-status`, {
+        method: "PUT",
+        body: JSON.stringify({ productionStatus: newStage })
+      });
+      toast.success(`Moved to ${STAGES.find(s => s.key === newStage)?.label ?? newStage}`);
+      void load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Update failed");
+    }
+  };
+
   const display = useMemo(() => {
     const q = debouncedSearch.trim().toLowerCase();
     const filtered = !q
@@ -319,6 +332,18 @@ export const ProductionPipelinePage = () => {
                           </button>
                         </>
                       )}
+                    {/* Manual stage change */}
+                    <select
+                      className="h-9 rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-600 cursor-pointer hover:border-gray-300"
+                      value=""
+                      title="Move to stage"
+                      onChange={(e) => { if (e.target.value) void changeStage(r.id, e.target.value); e.target.value = ""; }}
+                    >
+                      <option value="" disabled>Move to…</option>
+                      {STAGES.filter(s => s.key !== stage.key).map(s => (
+                        <option key={s.key} value={s.key}>{s.label}</option>
+                      ))}
+                    </select>
                     </div>
                   </td>
                 </tr>
