@@ -50,17 +50,26 @@
 
   /* Sidebar */
   .arch-sidebar { }
-  .sidebar-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-  .sidebar-card h4 { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 12px; }
-  .sidebar-info-row { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px solid #f1f5f9; color: #374151; }
+  .sidebar-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .sidebar-card-title { font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f1f5f9; }
+  .sidebar-abbr { font-size: 0.82rem; color: #64748b; font-weight: 600; margin-bottom: 14px; }
+  .sidebar-info-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; padding: 9px 0; border-bottom: 1px solid #f8fafc; color: #374151; }
   .sidebar-info-row:last-child { border-bottom: none; }
-  .sidebar-info-row span:first-child { color: #64748b; }
-  .sidebar-info-row span:last-child { font-weight: 600; }
-
-  .submit-cta { background: linear-gradient(135deg,#1e40af,#2563eb); color: #fff; border-radius: 12px; padding: 24px; text-align: center; }
-  .submit-cta h4 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: #fff; }
-  .submit-cta p { font-size: 0.82rem; color: rgba(255,255,255,0.8); margin-bottom: 16px; }
-  .submit-cta a { display: inline-block; background: #fbbf24; color: #1e3a8a; font-weight: 700; font-size: 0.85rem; padding: 10px 20px; border-radius: 8px; text-decoration: none; }
+  .sidebar-info-row-left { display: flex; align-items: center; gap: 8px; color: #64748b; }
+  .sidebar-info-row-left i { width: 16px; text-align: center; color: #94a3b8; font-size: 0.82rem; }
+  .sidebar-info-row-val { font-weight: 700; color: #0f172a; font-size: 0.85rem; }
+  .sidebar-info-row-val.green { background: #dcfce7; color: #16a34a; padding: 2px 10px; border-radius: 20px; font-size: 0.78rem; }
+  .sidebar-badges { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .sidebar-badge { border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 8px; text-align: center; font-size: 0.75rem; font-weight: 700; color: #374151; }
+  .sidebar-badge i { display: block; font-size: 1.3rem; margin-bottom: 5px; }
+  .sidebar-badge.green i { color: #16a34a; }
+  .sidebar-badge.blue i { color: #2563eb; }
+  .sidebar-badge.amber i { color: #d97706; }
+  .sidebar-badge.purple i { color: #7c3aed; }
+  .sidebar-btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #1e40af; color: #fff; font-weight: 700; font-size: 0.88rem; padding: 13px; border-radius: 10px; text-decoration: none; margin-top: 16px; transition: 0.2s; }
+  .sidebar-btn-primary:hover { background: #1d4ed8; }
+  .sidebar-btn-outline { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #fff; color: #374151; font-weight: 600; font-size: 0.85rem; padding: 11px; border-radius: 10px; text-decoration: none; margin-top: 10px; border: 1.5px solid #e2e8f0; transition: 0.2s; }
+  .sidebar-btn-outline:hover { border-color: #2563eb; color: #2563eb; }
 
   /* Hero */
   .arch-hero { background: linear-gradient(135deg,#0b1120 0%,#0f172a 40%,#1a2744 100%); color: #fff; padding: 56px 20px 0; margin-top: 80px; position: relative; overflow: hidden; }
@@ -271,18 +280,43 @@
     <!-- Sidebar -->
     <aside class="arch-sidebar">
       <div class="sidebar-card">
-        <h4>Journal Info</h4>
-        <div class="sidebar-info-row"><span>ISSN (Print)</span><span><%= journal.issn %></span></div>
-        <div class="sidebar-info-row"><span>Frequency</span><span>Quarterly</span></div>
-        <div class="sidebar-info-row"><span>Access</span><span>Open Access</span></div>
-        <div class="sidebar-info-row"><span>Review</span><span>Double Blind</span></div>
-        <div class="sidebar-info-row"><span>DOI</span><span>Supported</span></div>
-      </div>
+        <div class="sidebar-card-title">Journal Info</div>
+        <div class="sidebar-abbr"><%= journal.abbr %></div>
 
-      <div class="submit-cta">
-        <h4>Submit Your Research</h4>
-        <p>Join researchers worldwide. Fast peer review, ISSN-indexed, DOI assigned.</p>
-        <a href="/submit">Submit Paper →</a>
+        <div class="sidebar-info-row">
+          <div class="sidebar-info-row-left"><i class="fa-solid fa-print"></i> ISSN (Print)</div>
+          <div class="sidebar-info-row-val"><%= journal.issn || 'XXXX-XXXX' %></div>
+        </div>
+        <div class="sidebar-info-row">
+          <div class="sidebar-info-row-left"><i class="fa-solid fa-wifi"></i> ISSN (Online)</div>
+          <div class="sidebar-info-row-val">XXXX-XXXX</div>
+        </div>
+        <div class="sidebar-info-row">
+          <div class="sidebar-info-row-left"><i class="fa-solid fa-calendar-days"></i> Frequency</div>
+          <div class="sidebar-info-row-val">Quarterly</div>
+        </div>
+        <div class="sidebar-info-row">
+          <div class="sidebar-info-row-left"><i class="fa-solid fa-lock-open"></i> Access</div>
+          <div class="sidebar-info-row-val green">Open Access</div>
+        </div>
+        <div class="sidebar-info-row">
+          <div class="sidebar-info-row-left"><i class="fa-solid fa-user-secret"></i> Review</div>
+          <div class="sidebar-info-row-val">Double Blind</div>
+        </div>
+
+        <div class="sidebar-badges">
+          <div class="sidebar-badge green"><i class="fa-solid fa-certificate"></i>ISSN Verified</div>
+          <div class="sidebar-badge blue"><i class="fa-solid fa-fingerprint"></i>DOI Support</div>
+          <div class="sidebar-badge amber"><i class="fa-solid fa-scale-balanced"></i>COPE Ethics</div>
+          <div class="sidebar-badge purple"><i class="fa-solid fa-box-archive"></i>Archived</div>
+        </div>
+
+        <a href="/submit?journal=<%= journal.abbr %>" class="sidebar-btn-primary">
+          <i class="fa-solid fa-paper-plane"></i> Submit Paper
+        </a>
+        <a href="/guidelines" class="sidebar-btn-outline">
+          <i class="fa-solid fa-book-open"></i> Author Guidelines
+        </a>
       </div>
     </aside>
   </div>
