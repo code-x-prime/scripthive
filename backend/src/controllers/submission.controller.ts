@@ -245,6 +245,23 @@ export const downloadManuscript = async (req: Request, res: Response): Promise<v
   res.download(abs, filename);
 };
 
+export const uploadManuscript = async (req: Request, res: Response): Promise<void> => {
+  const id = String(req.params.id);
+  if (!req.file) { res.status(400).json({ message: "No file uploaded" }); return; }
+  const s = await prisma.submission.findUnique({ where: { id } });
+  if (!s) { res.status(404).json({ message: "Submission not found" }); return; }
+  const ext = path.extname(req.file.originalname).toLowerCase() || ".pdf";
+  const r2Key = `manuscripts/${id}${ext}`;
+  let manuscriptPath: string;
+  try {
+    manuscriptPath = await uploadToR2(req.file.path, r2Key);
+  } catch {
+    manuscriptPath = req.file.path.replace(/\\/g, "/");
+  }
+  await prisma.submission.update({ where: { id }, data: { manuscriptPath } });
+  res.json({ success: true, manuscriptPath });
+};
+
 export const updateProductionStatus = async (req: Request, res: Response): Promise<void> => {
   const { productionStatus } = req.body as { productionStatus: string | null };
   const allowed = ["ReadyForPreparation", "ReadyForUpload", "ReadyToPublished"];

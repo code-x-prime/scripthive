@@ -17,6 +17,7 @@ import {
   updateRemark,
   updateReviewNotes,
   updateSubmissionStatus,
+  uploadManuscript,
   uploadProductionFile
 } from "../controllers/submission.controller.js";
 import { requireAuth, requirePermission } from "../middlewares/auth.middleware.js";
@@ -53,6 +54,13 @@ submissionRouter.get(
   requireAuth,
   requirePermission("submissions", "read"),
   downloadProductionFile
+);
+submissionRouter.post(
+  "/:id/upload-manuscript",
+  requireAuth,
+  requirePermission("submissions", "write"),
+  upload.single("manuscript"),
+  uploadManuscript
 );
 submissionRouter.post(
   "/:id/upload-production",

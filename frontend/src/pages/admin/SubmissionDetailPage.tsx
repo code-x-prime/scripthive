@@ -9,6 +9,7 @@ import {
   FileText,
   Mail,
   MapPin,
+  Upload,
   User
 } from "lucide-react";
 import { apiFetch, apiJson } from "@/services/api";
@@ -169,6 +170,20 @@ export const SubmissionDetailPage = () => {
       toast.success("Download started");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Download failed");
+    }
+  };
+
+  const uploadManuscriptFile = async (file: File) => {
+    if (!row) return;
+    const fd = new FormData();
+    fd.append("manuscript", file);
+    try {
+      const res = await apiFetch(`/submissions/${encodeURIComponent(row.id)}/upload-manuscript`, { method: "POST", body: fd });
+      if (!res.ok) { const b = await res.json().catch(() => ({})) as { message?: string }; throw new Error(b.message ?? "Upload failed"); }
+      toast.success("Manuscript uploaded");
+      void load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed");
     }
   };
 
@@ -416,6 +431,12 @@ export const SubmissionDetailPage = () => {
                 <p className="mt-2 text-sm text-gray-500">No manuscript uploaded</p>
               </div>
             )}
+            <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">
+              <Upload className="h-4 w-4" />
+              {manuscript ? "Replace manuscript" : "Upload manuscript"}
+              <input type="file" accept=".pdf,.doc,.docx" className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) void uploadManuscriptFile(f); e.target.value = ""; }} />
+            </label>
             {row.pdfPublicPath ? (
               <a
                 href={row.pdfPublicPath.startsWith("/") ? row.pdfPublicPath : `/${row.pdfPublicPath}`}
