@@ -929,9 +929,9 @@ export const ReportsPage = () => {
                 </div>
               ))}
             </div>
+          )}
 
-            {/* Edit Modal */}
-            {editingId && (
+          {editingId && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog">
                 <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-slate-200 bg-white p-6 shadow-xl">
                   <div className="flex items-center justify-between mb-4">
@@ -1000,7 +1000,6 @@ export const ReportsPage = () => {
                   </div>
                 </div>
               </div>
-            )}
           )}
         </div>
       )}
