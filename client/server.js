@@ -259,7 +259,7 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
         }
 
         try {
-            const { author_name, author_email, author_phone, journal, paper_title, abstract, keywords, author_names } = req.body;
+            const { author_name, author_email, author_phone, journal, paper_title, abstract, keywords, author_names, country, addons } = req.body;
             const file = req.file;
 
             // Basic Field Validations
@@ -329,9 +329,14 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
                 fd.append('abstract', abstract);
                 fd.append('keywords', keywords);
                 fd.append('articleType', 'Research');
+                if (country) fd.append('country', country);
+                if (addons) fd.append('addons', typeof addons === 'string' ? addons : JSON.stringify(addons));
                 // attach file as Blob from disk
                 const fileBuffer = fs.readFileSync(file.path);
-                const blob = new Blob([fileBuffer], { type: file.mimetype });
+                const ext = (file.originalname || '').split('.').pop().toLowerCase();
+                const mimeMap = { pdf: 'application/pdf', doc: 'application/msword', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
+                const mime = mimeMap[ext] || file.mimetype || 'application/octet-stream';
+                const blob = new Blob([fileBuffer], { type: mime });
                 fd.append('manuscript', blob, file.originalname);
 
                 const apiRes = await fetch(`${apiUrl}/api/submissions`, {
