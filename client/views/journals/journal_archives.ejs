@@ -13,14 +13,24 @@
   .arch-container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; display: grid; grid-template-columns: 1fr 280px; gap: 32px; }
   @media (max-width: 900px) { .arch-container { grid-template-columns: 1fr; } .arch-sidebar { display: none; } }
 
-  /* Search + filter bar */
+  /* Search bar */
   .arch-search-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
   .arch-search-input { flex: 1; min-width: 200px; padding: 9px 14px 9px 36px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.88rem; color: #0f172a; outline: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center; transition: 0.2s; }
   .arch-search-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-  .arch-filter-select { padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.85rem; color: #374151; background: #fff; cursor: pointer; outline: none; transition: 0.2s; }
-  .arch-filter-select:focus { border-color: #2563eb; }
   .arch-search-count { font-size: 0.82rem; color: #64748b; white-space: nowrap; }
   .arch-no-results { text-align: center; padding: 40px 20px; color: #94a3b8; font-size: 0.95rem; display: none; }
+  /* Sidebar filter card */
+  .filter-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .filter-card-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .filter-clear { font-size: 0.72rem; color: #2563eb; cursor: pointer; font-weight: 600; text-transform: none; letter-spacing: 0; }
+  .filter-clear:hover { text-decoration: underline; }
+  .filter-group { margin-bottom: 14px; }
+  .filter-group-label { font-size: 0.8rem; font-weight: 700; color: #374151; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #f1f5f9; }
+  .filter-check-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+  .filter-check-item input[type=checkbox] { width: 15px; height: 15px; accent-color: #2563eb; cursor: pointer; flex-shrink: 0; }
+  .filter-check-item label { font-size: 0.83rem; color: #374151; cursor: pointer; display: flex; justify-content: space-between; width: 100%; }
+  .filter-check-item label .fcount { background: #f1f5f9; color: #64748b; font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+  .filter-check-item:hover label { color: #2563eb; }
 
   /* Issue selector tabs */
   .issue-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
@@ -216,76 +226,47 @@
           const activeIssue = issues.find(i => i.slug === (typeof activeSlug !== 'undefined' ? activeSlug : null)) || issues[0];
         %>
 
-        <!-- Search + Filter bar -->
+        <!-- Search bar -->
         <div class="arch-search-bar">
           <input type="text" id="archSearch" class="arch-search-input" placeholder="Search by title or author...">
-          <select id="archYearFilter" class="arch-filter-select">
-            <option value="">All Years</option>
-            <% [...new Set(issues.map(i => i.vol.year))].sort((a,b)=>b-a).forEach(y => { %>
-              <option value="<%= y %>"><%= y %></option>
-            <% }); %>
-          </select>
-          <select id="archVolFilter" class="arch-filter-select">
-            <option value="">All Volumes</option>
-            <% [...new Set(issues.map(i => i.vol.number))].sort((a,b)=>b-a).forEach(v => { %>
-              <option value="<%= v %>">Vol. <%= v %></option>
-            <% }); %>
-          </select>
           <span class="arch-search-count" id="archCount"></span>
         </div>
 
-        <!-- Issue tabs -->
-        <% if (issues.length > 1) { %>
-        <div class="issue-tabs">
-          <% issues.forEach(i => { %>
-            <a href="/<%= journal.abbr %>/archives/<%= i.slug %>"
-               class="issue-tab <%= (activeIssue && activeIssue.slug === i.slug) ? 'active' : '' %>">
-              Vol. <%= i.vol.number %>, Issue <%= i.iss.number %><%= i.part.name !== 'A' ? ` Part ${i.part.name}` : '' %> (<%= i.vol.year %>)
-            </a>
-          <% }); %>
-        </div>
-        <% } %>
-
-        <% if (activeIssue) { %>
-          <%
-            // Count how many parts this issue has across all issues list
-            const sameParts = issues.filter(function(i){ return i.vol.number === activeIssue.vol.number && i.iss.number === activeIssue.iss.number; });
-            const showPart = sameParts.length > 1 && activeIssue.part.name !== 'A';
-          %>
-          <div class="vol-heading">
-            Vol. <%= activeIssue.vol.number %>, Issue <%= activeIssue.iss.number %><% if(showPart){ %> — Part <%= activeIssue.part.name %><% } %> (<%= activeIssue.vol.year %>)
-          </div>
+        <!-- All issues rendered, filtered by JS -->
+        <% issues.forEach(function(iss) {
+          const sameParts = issues.filter(function(i){ return i.vol.number === iss.vol.number && i.iss.number === iss.iss.number; });
+          const showPart = sameParts.length > 1;
+          const issLabel = `Vol. ${iss.vol.number}, Issue ${iss.iss.number}${showPart ? ' — Part ' + iss.part.name : ''} (${iss.vol.year})`;
+        %>
+        <div class="issue-block" data-year="<%= iss.vol.year %>" data-vol="<%= iss.vol.number %>" data-iss="<%= iss.iss.number %>">
+          <div class="vol-heading"><%= issLabel %></div>
           <div class="vol-divider"></div>
-
           <table class="art-table">
-            <thead>
-              <tr>
-                <th>S. No.</th>
-                <th>Title and Authors Name</th>
-                <th>Country</th>
-              </tr>
-            </thead>
+            <thead><tr>
+              <th>S. No.</th>
+              <th>Title and Authors Name</th>
+              <th>Country</th>
+            </tr></thead>
             <tbody>
-              <% activeIssue.articles.forEach((art, idx) => {
-                const pageRange = (art.pageStart && art.pageEnd) ? `${String(art.pageStart).padStart(2,'0')}-${String(art.pageEnd).padStart(2,'0')}` : null;
-                const partSuffix = activeIssue.part.name !== 'A' ? activeIssue.part.name.toLowerCase() : '';
-                const citation = `${journal.abbr}; ${activeIssue.vol.year}; ${activeIssue.vol.number}(${activeIssue.iss.number}${partSuffix}):${pageRange || ''}`;
-                const articleSlug = pageRange ? `${activeIssue.vol.year}-${activeIssue.vol.number}(${activeIssue.iss.number}${partSuffix}):${pageRange}` : (art.slug || art.id);
-                const pdfUrl = art.pdfPublicPath
-                  ? (art.pdfPublicPath.startsWith('http') ? art.pdfPublicPath : `/api-files/${art.pdfPublicPath}`)
-                  : null;
+              <% iss.articles.forEach(function(art, idx) {
+                const pageRange = (art.pageStart && art.pageEnd) ? (String(art.pageStart).padStart(2,'0') + '-' + String(art.pageEnd).padStart(2,'0')) : null;
+                const partSuffix = iss.part.name !== 'A' ? iss.part.name.toLowerCase() : '';
+                const citation = journal.abbr + '; ' + iss.vol.year + '; ' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + (pageRange || '');
+                const articleSlug = pageRange ? (iss.vol.year + '-' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + pageRange) : (art.slug || art.id);
+                const pdfUrl = art.pdfPublicPath ? (art.pdfPublicPath.startsWith('http') ? art.pdfPublicPath : '/api-files/' + art.pdfPublicPath) : null;
               %>
-              <tr class="art-row" data-title="<%= (art.title||'').toLowerCase() %>" data-author="<%= (art.authorName||'').toLowerCase() %> <%= (art.coAuthors||'').toLowerCase() %>" data-year="<%= activeIssue.vol.year %>" data-vol="<%= activeIssue.vol.number %>">
+              <tr class="art-row"
+                data-title="<%= (art.title||'').toLowerCase().replace(/"/g,'') %>"
+                data-author="<%= ((art.authorName||'') + ' ' + (art.coAuthors||'')).toLowerCase().replace(/"/g,'') %>"
+                data-year="<%= iss.vol.year %>"
+                data-vol="<%= iss.vol.number %>"
+                data-iss="<%= iss.iss.number %>">
                 <td class="art-sno"><%= idx + 1 %></td>
                 <td>
                   <div class="art-title"><%= art.title %></div>
                   <div class="art-authors"><%= art.authorName %><%= art.coAuthors ? ', ' + art.coAuthors : '' %></div>
                   <% if (art.doiRecord && art.doiRecord.doi) { %>
-                  <div class="art-doi">
-                    <a href="https://www.doi.org/<%= art.doiRecord.doi %>" target="_blank" rel="noopener">
-                      DOI: https://www.doi.org/<%= art.doiRecord.doi %>
-                    </a>
-                  </div>
+                  <div class="art-doi"><a href="https://www.doi.org/<%= art.doiRecord.doi %>" target="_blank" rel="noopener">DOI: https://www.doi.org/<%= art.doiRecord.doi %></a></div>
                   <% } %>
                   <div class="art-cite"><%= citation %></div>
                   <div class="art-links">
@@ -307,14 +288,65 @@
               <% }); %>
             </tbody>
           </table>
-          <div id="archNoResults" class="arch-no-results">No articles match your search.</div>
-        <% } %>
+        </div>
+        <% }); %>
+        <div id="archNoResults" class="arch-no-results">No articles match your search.</div>
 
       <% } %>
     </main>
 
     <!-- Sidebar -->
     <aside class="arch-sidebar">
+
+      <!-- Filter Card -->
+      <% if (archive && archive.length > 0) { %>
+      <div class="filter-card">
+        <div class="filter-card-title">
+          Filter Articles
+          <span class="filter-clear" id="filterClearAll">Clear All</span>
+        </div>
+
+        <!-- Year filter -->
+        <div class="filter-group">
+          <div class="filter-group-label">Year</div>
+          <% [...new Set(issues.map(function(i){return i.vol.year;}))].sort(function(a,b){return b-a;}).forEach(function(y) {
+            const cnt = issues.filter(function(i){return i.vol.year===y;}).reduce(function(s,i){return s+i.articles.length;},0);
+          %>
+          <div class="filter-check-item">
+            <input type="checkbox" id="fy_<%= y %>" class="filter-year" value="<%= y %>">
+            <label for="fy_<%= y %>"><span><%= y %></span><span class="fcount"><%= cnt %></span></label>
+          </div>
+          <% }); %>
+        </div>
+
+        <!-- Volume filter -->
+        <div class="filter-group">
+          <div class="filter-group-label">Volume</div>
+          <% [...new Set(issues.map(function(i){return i.vol.number;}))].sort(function(a,b){return b-a;}).forEach(function(v) {
+            const cnt = issues.filter(function(i){return i.vol.number===v;}).reduce(function(s,i){return s+i.articles.length;},0);
+          %>
+          <div class="filter-check-item">
+            <input type="checkbox" id="fv_<%= v %>" class="filter-vol" value="<%= v %>">
+            <label for="fv_<%= v %>"><span>Vol. <%= v %></span><span class="fcount"><%= cnt %></span></label>
+          </div>
+          <% }); %>
+        </div>
+
+        <!-- Issue filter -->
+        <div class="filter-group">
+          <div class="filter-group-label">Issue</div>
+          <% [...new Set(issues.map(function(i){return i.iss.number;}))].sort(function(a,b){return b-a;}).forEach(function(n) {
+            const cnt = issues.filter(function(i){return i.iss.number===n;}).reduce(function(s,i){return s+i.articles.length;},0);
+          %>
+          <div class="filter-check-item">
+            <input type="checkbox" id="fi_<%= n %>" class="filter-iss" value="<%= n %>">
+            <label for="fi_<%= n %>"><span>Issue <%= n %></span><span class="fcount"><%= cnt %></span></label>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+
       <div class="sidebar-card">
         <div class="sidebar-card-title">Journal Info</div>
         <div class="sidebar-abbr"><%= journal.abbr %></div>
@@ -369,33 +401,50 @@
   window.trackView = function(id) { _track('/api/archive/view/' + encodeURIComponent(id)); };
   window.trackDownload = function(id) { _track('/api/archive/download/' + encodeURIComponent(id)); };
 
-  // Search + filter
+  function getChecked(cls) {
+    return Array.from(document.querySelectorAll('.' + cls + ':checked')).map(function(c){ return String(c.value); });
+  }
+
   function applyFilters() {
-    var q = (document.getElementById('archSearch').value || '').toLowerCase().trim();
-    var yr = document.getElementById('archYearFilter').value;
-    var vl = document.getElementById('archVolFilter').value;
+    var q = (document.getElementById('archSearch') ? document.getElementById('archSearch').value : '').toLowerCase().trim();
+    var years = getChecked('filter-year');
+    var vols  = getChecked('filter-vol');
+    var isss  = getChecked('filter-iss');
     var rows = document.querySelectorAll('.art-row');
     var visible = 0;
+
     rows.forEach(function(row) {
-      var title = row.getAttribute('data-title') || '';
+      var title  = row.getAttribute('data-title') || '';
       var author = row.getAttribute('data-author') || '';
-      var year = row.getAttribute('data-year') || '';
-      var vol = row.getAttribute('data-vol') || '';
+      var year   = String(row.getAttribute('data-year') || '');
+      var vol    = String(row.getAttribute('data-vol') || '');
+      var iss    = String(row.getAttribute('data-iss') || '');
       var matchQ = !q || title.indexOf(q) >= 0 || author.indexOf(q) >= 0;
-      var matchY = !yr || year === yr;
-      var matchV = !vl || vol === vl;
-      var show = matchQ && matchY && matchV;
+      var matchY = years.length === 0 || years.indexOf(year) >= 0;
+      var matchV = vols.length  === 0 || vols.indexOf(vol)   >= 0;
+      var matchI = isss.length  === 0 || isss.indexOf(iss)   >= 0;
+      var show = matchQ && matchY && matchV && matchI;
       row.style.display = show ? '' : 'none';
       if (show) visible++;
     });
-    // renumber visible rows
-    var n = 1;
-    rows.forEach(function(row) {
-      if (row.style.display !== 'none') {
-        var sno = row.querySelector('.art-sno');
-        if (sno) sno.textContent = n++;
-      }
+
+    // hide issue blocks with no visible rows
+    document.querySelectorAll('.issue-block').forEach(function(block) {
+      var hasVisible = Array.from(block.querySelectorAll('.art-row')).some(function(r){ return r.style.display !== 'none'; });
+      block.style.display = hasVisible ? '' : 'none';
     });
+
+    // renumber per block
+    document.querySelectorAll('.issue-block').forEach(function(block) {
+      var n = 1;
+      block.querySelectorAll('.art-row').forEach(function(row) {
+        if (row.style.display !== 'none') {
+          var sno = row.querySelector('.art-sno');
+          if (sno) sno.textContent = n++;
+        }
+      });
+    });
+
     var cnt = document.getElementById('archCount');
     if (cnt) cnt.textContent = visible + ' article' + (visible !== 1 ? 's' : '');
     var noRes = document.getElementById('archNoResults');
@@ -404,12 +453,20 @@
 
   document.addEventListener('DOMContentLoaded', function() {
     var s = document.getElementById('archSearch');
-    var y = document.getElementById('archYearFilter');
-    var v = document.getElementById('archVolFilter');
     if (s) s.addEventListener('input', applyFilters);
-    if (y) y.addEventListener('change', applyFilters);
-    if (v) v.addEventListener('change', applyFilters);
-    applyFilters(); // init count
+
+    document.querySelectorAll('.filter-year,.filter-vol,.filter-iss').forEach(function(cb) {
+      cb.addEventListener('change', applyFilters);
+    });
+
+    var clearBtn = document.getElementById('filterClearAll');
+    if (clearBtn) clearBtn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-year,.filter-vol,.filter-iss').forEach(function(cb){ cb.checked = false; });
+      if (s) s.value = '';
+      applyFilters();
+    });
+
+    applyFilters();
   });
 })();
 </script>
