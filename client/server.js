@@ -276,12 +276,6 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
                 return res.status(400).json({ status: 'error', message: 'Please upload your manuscript file (.pdf, .doc, or .docx).' });
             }
 
-            // Generate unique Submission ID — Format: SH-YYYY-XXXX
-            const year = new Date().getFullYear();
-            const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let randomChars = '';
-            for (let i = 0; i < 4; i++) randomChars += CHARS[Math.floor(Math.random() * CHARS.length)];
-            const submissionId = `SH-${year}-${randomChars}`;
             const timestamp = new Date().toLocaleString();
             const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown';
 
@@ -298,25 +292,8 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
                 authorsList.push(author_names.trim());
             }
 
-            // Create record
-            const record = {
-                id: submissionId,
-                author_name,
-                email: author_email,
-                phone: author_phone || '',
-                journal,
-                title: paper_title,
-                abstract,
-                keywords,
-                filename: file.filename,
-                status: 'Submitted',
-                submitted_at: timestamp
-            };
-
-            // Save to local SQLite (fallback/backup)
-            await db.saveSubmission(record);
-
-            // Forward to ScriptHive backend (PostgreSQL + media storage)
+            // Forward to ScriptHive backend (PostgreSQL) — BLOCKING to get real submission ID
+            let submissionId = null;
             try {
                 const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
                 const fd = new FormData();
@@ -331,7 +308,6 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
                 fd.append('articleType', 'Research');
                 if (country) fd.append('country', country);
                 if (addons) fd.append('addons', typeof addons === 'string' ? addons : JSON.stringify(addons));
-                // attach file as Blob from disk
                 const fileBuffer = fs.readFileSync(file.path);
                 const ext = (file.originalname || '').split('.').pop().toLowerCase();
                 const mimeMap = { pdf: 'application/pdf', doc: 'application/msword', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
@@ -339,20 +315,44 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
                 const blob = new Blob([fileBuffer], { type: mime });
                 fd.append('manuscript', blob, file.originalname);
 
-                const apiRes = await fetch(`${apiUrl}/api/submissions`, {
-                    method: 'POST',
-                    body: fd
-                });
-                if (!apiRes.ok) {
+                const apiRes = await fetch(`${apiUrl}/api/submissions`, { method: 'POST', body: fd });
+                if (apiRes.ok) {
+                    const apiData = await apiRes.json();
+                    submissionId = apiData.id || apiData.submission_id || apiData.data?.id || null;
+                    console.log('[ScriptHive API] Submission created, ID:', submissionId);
+                } else {
                     const errBody = await apiRes.json().catch(() => ({}));
                     console.warn('[ScriptHive API] Forward failed:', errBody.message || apiRes.status);
-                } else {
-                    console.log('[ScriptHive API] Submission forwarded successfully');
                 }
             } catch (fwdErr) {
-                // non-blocking — local save already done
-                console.warn('[ScriptHive API] Forward error (non-fatal):', fwdErr.message);
+                console.warn('[ScriptHive API] Forward error:', fwdErr.message);
             }
+
+            // Fallback: generate local ID only if backend failed
+            if (!submissionId) {
+                const year = new Date().getFullYear();
+                const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let randomChars = '';
+                for (let i = 0; i < 4; i++) randomChars += CHARS[Math.floor(Math.random() * CHARS.length)];
+                submissionId = `SH-${year}-${randomChars}`;
+                console.warn('[ScriptHive] Using fallback local ID:', submissionId);
+            }
+
+            // Save to local SQLite with correct ID
+            const record = {
+                id: submissionId,
+                author_name,
+                email: author_email,
+                phone: author_phone || '',
+                journal,
+                title: paper_title,
+                abstract,
+                keywords,
+                filename: file.filename,
+                status: 'Submitted',
+                submitted_at: timestamp
+            };
+            await db.saveSubmission(record);
 
             // Construct journal title mapping
             const journalTitles = {
