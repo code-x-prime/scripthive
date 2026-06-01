@@ -1,11 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { AdminSidebar } from "./AdminSidebar";
 import { TopBar } from "./TopBar";
+import toast from "react-hot-toast";
 
 export const AdminLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const onIdle = () => {
+      toast.error("You were logged out due to 10 minutes of inactivity.", { duration: 6000 });
+    };
+    window.addEventListener("auth:idle-logout", onIdle);
+    return () => window.removeEventListener("auth:idle-logout", onIdle);
+  }, []);
 
   return (
     <div className="flex h-screen bg-slate-50">

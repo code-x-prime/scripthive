@@ -44,6 +44,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   const permissions = admin.role.permissions.map(
     (rolePermission) => `${rolePermission.permission.resource}:${rolePermission.permission.action}`
   );
+  // Single session: kill all existing sessions before creating new one
+  await prisma.refreshToken.deleteMany({ where: { adminId: admin.id } });
   const refreshToken = uuidv4();
   await prisma.refreshToken.create({
     data: { adminId: admin.id, token: refreshToken, expiresAt: new Date(Date.now() + 7 * 86400000) }

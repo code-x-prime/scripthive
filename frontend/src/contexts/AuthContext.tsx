@@ -104,6 +104,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, [accessToken, logout]);
 
+  // 10 min idle auto-logout
+  useEffect(() => {
+    if (!accessToken) return;
+    const IDLE_MS = 10 * 60 * 1000;
+    let timer: ReturnType<typeof setTimeout>;
+    const reset = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        void logout();
+        window.dispatchEvent(new CustomEvent("auth:idle-logout"));
+      }, IDLE_MS);
+    };
+    const events = ["mousemove", "keydown", "mousedown", "touchstart", "scroll", "click"];
+    events.forEach(e => window.addEventListener(e, reset, { passive: true }));
+    reset(); // start timer immediately
+    return () => {
+      clearTimeout(timer);
+      events.forEach(e => window.removeEventListener(e, reset));
+    };
+  }, [accessToken, logout]);
+
   const login = async (login: string, password: string) => {
     const res = await fetch("/api/auth/login", {
       method: "POST",
