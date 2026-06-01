@@ -37,7 +37,7 @@ const SETTINGS = [
   { key: "doi_prefix", value: "10.55662" },
   { key: "apc_usd", value: "140" },
   { key: "apc_inr", value: "11500" },
-  { key: "site_name", value: "ScriptHive Publication House" },
+  { key: "site_name", value: "ScriptHive Publication " },
   { key: "site_email", value: "info@scripthive.org" }
 ] as const;
 

@@ -1,4 +1,4 @@
-# ScriptHive Publication House
+# ScriptHive Publication
 
 Production-grade monorepo rebuild:
 

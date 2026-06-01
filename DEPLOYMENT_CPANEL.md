@@ -144,7 +144,7 @@ SMTP_HOST=mail.scripthive.org
 SMTP_PORT=587
 SMTP_USER=article@scripthive.org
 SMTP_PASS=TUMHARI_EMAIL_PASSWORD
-SMTP_FROM=ScriptHive Publication House <noreply@scripthive.org>
+SMTP_FROM=ScriptHive Publication  <noreply@scripthive.org>
 ADMIN_EMAIL=info@scripthive.org
 
 DOI_PREFIX=10.55662

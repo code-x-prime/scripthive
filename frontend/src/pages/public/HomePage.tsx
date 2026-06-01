@@ -122,7 +122,7 @@ export const HomePage = () => (
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-green-600">
             <BookOpen className="h-4 w-4 text-white" />
           </div>
-          <span className="font-display text-sm text-gray-300">ScriptHive Publication House</span>
+          <span className="font-display text-sm text-gray-300">ScriptHive Publication </span>
         </div>
         <p className="text-xs text-gray-600">© {new Date().getFullYear()} ScriptHive. All rights reserved.</p>
         <Link to="/admin/login" className="text-xs text-gray-600 transition-colors hover:text-gray-400">

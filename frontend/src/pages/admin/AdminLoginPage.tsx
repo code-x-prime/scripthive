@@ -68,7 +68,7 @@ export const AdminLoginPage = () => {
             </div>
             <span className="text-white font-heading text-xl font-semibold">ScriptHive</span>
           </div>
-          <p className="text-green-200 text-sm">Publication House</p>
+          <p className="text-green-200 text-sm">Publication </p>
         </div>
 
         <div className="relative z-10">
@@ -99,7 +99,7 @@ export const AdminLoginPage = () => {
         </div>
 
         <p className="relative z-10 text-green-400 text-xs">
-          © {new Date().getFullYear()} ScriptHive Publication House
+          © {new Date().getFullYear()} ScriptHive Publication
         </p>
       </div>
 
@@ -122,11 +122,10 @@ export const AdminLoginPage = () => {
               <button
                 type="button"
                 onClick={() => switchMode("team")}
-                className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
-                  mode === "team"
-                    ? "bg-white text-green-700 shadow-sm ring-1 ring-slate-200"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
+                className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${mode === "team"
+                  ? "bg-white text-green-700 shadow-sm ring-1 ring-slate-200"
+                  : "text-slate-600 hover:text-slate-900"
+                  }`}
               >
                 <UserCircle className="h-4 w-4 shrink-0" />
                 Team Member
@@ -134,11 +133,10 @@ export const AdminLoginPage = () => {
               <button
                 type="button"
                 onClick={() => switchMode("superadmin")}
-                className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
-                  mode === "superadmin"
-                    ? "bg-white text-green-700 shadow-sm ring-1 ring-slate-200"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
+                className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${mode === "superadmin"
+                  ? "bg-white text-green-700 shadow-sm ring-1 ring-slate-200"
+                  : "text-slate-600 hover:text-slate-900"
+                  }`}
               >
                 <Shield className="h-4 w-4 shrink-0" />
                 Super Admin
@@ -146,11 +144,10 @@ export const AdminLoginPage = () => {
             </div>
 
             <div
-              className={`mt-4 rounded-lg border px-3 py-2.5 text-xs leading-relaxed ${
-                mode === "team"
-                  ? "border-green-100 bg-green-50 text-green-800"
-                  : "border-slate-200 bg-slate-50 text-slate-600"
-              }`}
+              className={`mt-4 rounded-lg border px-3 py-2.5 text-xs leading-relaxed ${mode === "team"
+                ? "border-green-100 bg-green-50 text-green-800"
+                : "border-slate-200 bg-slate-50 text-slate-600"
+                }`}
             >
               {mode === "team" ? (
                 <>

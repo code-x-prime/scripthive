@@ -27,7 +27,7 @@ export function PublicNavbar() {
           </div>
           <div className="leading-tight">
             <p className="font-display text-sm font-semibold text-gray-900">ScriptHive</p>
-            <p className="-mt-0.5 text-[10px] text-gray-400">Publication House</p>
+            <p className="-mt-0.5 text-[10px] text-gray-400">Publication </p>
           </div>
         </Link>
 
@@ -36,11 +36,10 @@ export function PublicNavbar() {
             <Link
               key={link.label}
               to={link.to}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm transition-colors ${
-                isActive(link.match)
+              className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm transition-colors ${isActive(link.match)
                   ? "bg-green-50 font-medium text-green-700"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              }`}
+                }`}
             >
               {link.label === "Archives" ? <Archive className="h-3.5 w-3.5" /> : null}
               {link.label}
@@ -80,9 +79,8 @@ export function PublicNavbar() {
               key={link.label}
               to={link.to}
               onClick={() => setOpen(false)}
-              className={`rounded-lg px-3 py-2.5 text-sm ${
-                isActive(link.match) ? "bg-green-50 font-medium text-green-700" : "text-gray-700 hover:bg-gray-50"
-              }`}
+              className={`rounded-lg px-3 py-2.5 text-sm ${isActive(link.match) ? "bg-green-50 font-medium text-green-700" : "text-gray-700 hover:bg-gray-50"
+                }`}
             >
               {link.label}
             </Link>

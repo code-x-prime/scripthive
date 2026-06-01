@@ -79,7 +79,7 @@ export const RazorpayButton = ({ invoiceId, razorpayKeyId, onSuccess, onError }:
         key,
         amount: orderJson.data.amount,
         currency: "INR",
-        name: "ScriptHive Publication House",
+        name: "ScriptHive Publication ",
         description: `Invoice ${invoiceId}`,
         order_id: orderJson.data.orderId,
         handler: async (response) => {

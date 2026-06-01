@@ -1,911 +1,1019 @@
 <%- include('../partials/header') %>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
-  <style>
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1e40af;
-      --navy: #0f172a;
-      --gold: #fbbf24;
-      --gold-light: #fef08a;
-      --bg-light: #f8fafc;
-      --text-dark: #1e293b;
-      --text-muted: #64748b;
-      --glass-bg: rgba(255, 255, 255, 0.7);
-      --glass-border: rgba(255, 255, 255, 0.5);
-      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --navy: #0f172a;
+    --gold: #fbbf24;
+    --gold-light: #fef08a;
+    --bg-light: #f8fafc;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  }
+
+  body {
+    background-color: var(--bg-light);
+    font-family: "Inter", sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Common Styles */
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+  }
+
+  .section-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 600px;
+    margin-bottom: 40px;
+  }
+
+  /* Hero Section */
+  .about-hero {
+    background: var(--navy);
+    color: white;
+    padding: 150px 20px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-mesh {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    background:
+      radial-gradient(
+        circle at 20% 50%,
+        rgba(37, 99, 235, 0.2) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 80%,
+        rgba(251, 191, 36, 0.15) 0%,
+        transparent 50%
+      );
+    animation: pulseMesh 10s infinite alternate;
+  }
+
+  @keyframes pulseMesh {
+    0% {
+      transform: scale(1);
+      opacity: 0.8;
     }
 
-    body {
-      background-color: var(--bg-light);
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
+    100% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+  }
+
+  .about-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+  }
+
+  .breadcrumb {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin-bottom: 20px;
+  }
+
+  .breadcrumb a {
+    color: #cbd5e1;
+    text-decoration: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+  }
+
+  .about-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    background: linear-gradient(to right, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .about-hero p {
+    font-size: 1.2rem;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  .hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .hero-stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .stat-val {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--gold);
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    text-transform: uppercase;
+  }
+
+  .hero-visual {
+    position: relative;
+    height: 400px;
+    perspective: 1000px;
+  }
+
+  .floating-card {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .fc-1 {
+    top: 50px;
+    right: 20px;
+    width: 250px;
+    transform: rotateY(-10deg) rotateX(10deg);
+    animation: floatCard 6s infinite alternate ease-in-out;
+  }
+
+  .fc-2 {
+    bottom: 30px;
+    left: 0;
+    width: 220px;
+    transform: rotateY(15deg) rotateX(-5deg);
+    animation: floatCard 5s infinite alternate-reverse ease-in-out;
+  }
+
+  .fc-3 {
+    top: -20px;
+    left: 50px;
+    width: 180px;
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--primary-dark) 100%
+    );
+    animation: floatCard 7s infinite alternate ease-in-out;
+  }
+
+  @keyframes floatCard {
+    0% {
+      transform: translateY(0) rotateY(0) rotateX(0);
     }
 
-    /* Common Styles */
-    .section-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: var(--text-dark);
-      margin-bottom: 20px;
+    100% {
+      transform: translateY(-20px) rotateY(-5deg) rotateX(5deg);
     }
+  }
 
-    .section-subtitle {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-      max-width: 600px;
-      margin-bottom: 40px;
+  /* Who We Are */
+  .who-we-are {
+    padding: 100px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .who-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    padding: 50px;
+    border-radius: 24px;
+    box-shadow: var(--glass-shadow);
+  }
+
+  .who-card p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+  }
+
+  .btn-primary-custom {
+    background: var(--primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+  }
+
+  .btn-primary-custom:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  .btn-outline-custom {
+    background: transparent;
+    color: var(--text-dark);
+    border: 1px solid #cbd5e1;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+
+  .btn-outline-custom:hover {
+    background: #f1f5f9;
+  }
+
+  .who-visual {
+    position: relative;
+    text-align: center;
+  }
+
+  .who-img-wrap {
+    position: relative;
+    display: inline-block;
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  }
+
+  .who-visual img {
+    max-width: 100%;
+    border-radius: 24px;
+    display: block;
+  }
+
+  .who-badge {
+    position: absolute;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    color: var(--text-dark);
+  }
+
+  .wb-1 {
+    top: -20px;
+    right: 10px;
+    animation: floatCard 4s infinite alternate ease-in-out;
+  }
+
+  .wb-2 {
+    bottom: 40px;
+    left: 10px;
+    animation: floatCard 5s infinite alternate-reverse ease-in-out;
+  }
+
+  /* Excellence Highlight */
+  .excellence-section {
+    padding: 80px 20px;
+    background: white;
+  }
+
+  .excellence-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+  }
+
+  .exc-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    transition: 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .exc-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--gold));
+    opacity: 0;
+    transition: 0.3s;
+  }
+
+  .exc-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+  }
+
+  .exc-card:hover::before {
+    opacity: 1;
+  }
+
+  .exc-icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+    display: inline-block;
+    padding: 15px;
+    background: rgba(37, 99, 235, 0.05);
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+
+  .exc-card:hover .exc-icon {
+    transform: scale(1.1) rotate(5deg);
+    background: rgba(37, 99, 235, 0.1);
+  }
+
+  .exc-card h4 {
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+  }
+
+  .exc-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* Mission & Vision */
+  .mv-section {
+    padding: 100px 20px;
+    background: var(--bg-light);
+  }
+
+  .mv-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  .mv-card {
+    background: white;
+    border-radius: 24px;
+    padding: 50px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+    position: relative;
+    overflow: hidden;
+    transition: 0.3s;
+    border: 1px solid var(--glass-border);
+  }
+
+  .mv-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+  }
+
+  .mv-card.mission::after {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(
+      circle,
+      rgba(37, 99, 235, 0.1) 0%,
+      transparent 70%
+    );
+    border-radius: 50%;
+  }
+
+  .mv-card.vision::after {
+    content: "";
+    position: absolute;
+    bottom: -50px;
+    left: -50px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(
+      circle,
+      rgba(251, 191, 36, 0.1) 0%,
+      transparent 70%
+    );
+    border-radius: 50%;
+  }
+
+  .mv-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+
+  .mv-card.mission .mv-icon {
+    color: var(--primary);
+  }
+
+  .mv-card.vision .mv-icon {
+    color: var(--gold);
+  }
+
+  .mv-card h3 {
+    font-size: 2rem;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+  }
+
+  .mv-card p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .mv-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .mv-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+    font-weight: 500;
+  }
+
+  .mv-list li i {
+    color: #10b981;
+  }
+
+  /* Why Publish */
+  .why-publish {
+    padding: 100px 20px;
+    background: white;
+  }
+
+  .why-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+    text-align: left;
+  }
+
+  .why-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .why-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);
+  }
+
+  .why-icon {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+    display: inline-block;
+    padding: 15px;
+    background: rgba(37, 99, 235, 0.05);
+    border-radius: 12px;
+  }
+
+  .why-card h4 {
+    font-size: 1.25rem;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+  }
+
+  .why-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* Open Access */
+  .oa-section {
+    padding: 100px 20px;
+    background: var(--navy);
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .oa-container {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .oa-icon {
+    font-size: 4rem;
+    color: var(--gold);
+    margin-bottom: 20px;
+    animation: spinGlobe 20s linear infinite;
+  }
+
+  @keyframes spinGlobe {
+    100% {
+      transform: rotate(360deg);
     }
+  }
 
-    /* Hero Section */
-    .about-hero {
-      background: var(--navy);
-      color: white;
-      padding: 150px 20px 100px;
-      position: relative;
-      overflow: hidden;
-    }
+  .oa-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
 
-    .hero-mesh {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 0;
-      background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.2) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(251, 191, 36, 0.15) 0%, transparent 50%);
-      animation: pulseMesh 10s infinite alternate;
-    }
+  .oa-section p {
+    font-size: 1.2rem;
+    color: #cbd5e1;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
 
-    @keyframes pulseMesh {
-      0% {
-        transform: scale(1);
-        opacity: 0.8;
-      }
+  /* Final CTA */
+  .final-cta {
+    background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+    padding: 100px 20px;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
 
-      100% {
-        transform: scale(1.1);
-        opacity: 1;
-      }
-    }
+  .final-cta h2 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+  }
 
-    .about-hero-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 50px;
-      align-items: center;
-    }
+  .final-cta p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 40px;
+  }
 
-    .breadcrumb {
-      font-size: 0.9rem;
-      color: #94a3b8;
-      margin-bottom: 20px;
-    }
+  .btn-white {
+    background: white;
+    color: var(--primary);
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.3s;
+    display: inline-block;
+    margin: 0 10px;
+  }
 
-    .breadcrumb a {
-      color: #cbd5e1;
-      text-decoration: none;
-    }
+  .btn-white:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
 
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 8px 16px;
-      border-radius: 30px;
-      font-size: 0.9rem;
-      margin-bottom: 20px;
-      backdrop-filter: blur(10px);
-    }
+  .btn-outline-white {
+    border: 2px solid white;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.3s;
+    display: inline-block;
+    margin: 0 10px;
+  }
 
-    .about-hero h1 {
-      font-size: 3.5rem;
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 20px;
-      background: linear-gradient(to right, #fff, #cbd5e1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+  .btn-outline-white:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 
-    .about-hero p {
-      font-size: 1.2rem;
-      color: #94a3b8;
-      line-height: 1.6;
-      margin-bottom: 40px;
+  @media (max-width: 900px) {
+    .about-hero-content,
+    .who-we-are,
+    .mv-container {
+      grid-template-columns: 1fr;
+      text-align: center;
     }
 
     .hero-stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .hero-stat-card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 15px 20px;
-      border-radius: 12px;
-      backdrop-filter: blur(5px);
-      flex: 1;
-      min-width: 140px;
-    }
-
-    .stat-val {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--gold);
-      margin-bottom: 5px;
-    }
-
-    .stat-label {
-      font-size: 0.8rem;
-      color: #cbd5e1;
-      text-transform: uppercase;
+      justify-content: center;
     }
 
     .hero-visual {
-      position: relative;
-      height: 400px;
-      perspective: 1000px;
-    }
-
-    .floating-card {
-      position: absolute;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 20px;
-      border-radius: 16px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    .fc-1 {
-      top: 50px;
-      right: 20px;
-      width: 250px;
-      transform: rotateY(-10deg) rotateX(10deg);
-      animation: floatCard 6s infinite alternate ease-in-out;
-    }
-
-    .fc-2 {
-      bottom: 30px;
-      left: 0;
-      width: 220px;
-      transform: rotateY(15deg) rotateX(-5deg);
-      animation: floatCard 5s infinite alternate-reverse ease-in-out;
-    }
-
-    .fc-3 {
-      top: -20px;
-      left: 50px;
-      width: 180px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      animation: floatCard 7s infinite alternate ease-in-out;
-    }
-
-    @keyframes floatCard {
-      0% {
-        transform: translateY(0) rotateY(0) rotateX(0);
-      }
-
-      100% {
-        transform: translateY(-20px) rotateY(-5deg) rotateX(5deg);
-      }
-    }
-
-    /* Who We Are */
-    .who-we-are {
-      padding: 100px 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-    }
-
-    .who-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      padding: 50px;
-      border-radius: 24px;
-      box-shadow: var(--glass-shadow);
-    }
-
-    .who-card p {
-      color: var(--text-muted);
-      font-size: 1.1rem;
-      line-height: 1.7;
-      margin-bottom: 20px;
+      display: none;
     }
 
     .btn-group {
-      display: flex;
-      gap: 15px;
-      margin-top: 30px;
-    }
-
-    .btn-primary-custom {
-      background: var(--primary);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: 0.3s;
-      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-    }
-
-    .btn-primary-custom:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-    }
-
-    .btn-outline-custom {
-      background: transparent;
-      color: var(--text-dark);
-      border: 1px solid #cbd5e1;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: 0.3s;
-    }
-
-    .btn-outline-custom:hover {
-      background: #f1f5f9;
-    }
-
-    .who-visual {
-      position: relative;
-      text-align: center;
-    }
-
-    .who-img-wrap {
-      position: relative;
-      display: inline-block;
-      border-radius: 24px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-    }
-
-    .who-visual img {
-      max-width: 100%;
-      border-radius: 24px;
-      display: block;
-    }
-
-    .who-badge {
-      position: absolute;
-      background: white;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      color: var(--text-dark);
-    }
-
-    .wb-1 {
-      top: -20px;
-      right: 10px;
-      animation: floatCard 4s infinite alternate ease-in-out;
-    }
-
-    .wb-2 {
-      bottom: 40px;
-      left: 10px;
-      animation: floatCard 5s infinite alternate-reverse ease-in-out;
-    }
-
-    /* Excellence Highlight */
-    .excellence-section {
-      padding: 80px 20px;
-      background: white;
-    }
-
-    .excellence-grid {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 30px;
-    }
-
-    .exc-card {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 30px;
-      text-align: center;
-      transition: 0.4s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .exc-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--primary), var(--gold));
-      opacity: 0;
-      transition: 0.3s;
-    }
-
-    .exc-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
-    }
-
-    .exc-card:hover::before {
-      opacity: 1;
-    }
-
-    .exc-icon {
-      font-size: 2.5rem;
-      color: var(--primary);
-      margin-bottom: 20px;
-      display: inline-block;
-      padding: 15px;
-      background: rgba(37, 99, 235, 0.05);
-      border-radius: 50%;
-      transition: 0.3s;
-    }
-
-    .exc-card:hover .exc-icon {
-      transform: scale(1.1) rotate(5deg);
-      background: rgba(37, 99, 235, 0.1);
-    }
-
-    .exc-card h4 {
-      font-size: 1.2rem;
-      color: var(--text-dark);
-      margin-bottom: 10px;
-    }
-
-    .exc-card p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    /* Mission & Vision */
-    .mv-section {
-      padding: 100px 20px;
-      background: var(--bg-light);
-    }
-
-    .mv-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-    }
-
-    .mv-card {
-      background: white;
-      border-radius: 24px;
-      padding: 50px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
-      position: relative;
-      overflow: hidden;
-      transition: 0.3s;
-      border: 1px solid var(--glass-border);
-    }
-
-    .mv-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
-    }
-
-    .mv-card.mission::after {
-      content: '';
-      position: absolute;
-      top: -50px;
-      right: -50px;
-      width: 150px;
-      height: 150px;
-      background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
-      border-radius: 50%;
-    }
-
-    .mv-card.vision::after {
-      content: '';
-      position: absolute;
-      bottom: -50px;
-      left: -50px;
-      width: 150px;
-      height: 150px;
-      background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
-      border-radius: 50%;
-    }
-
-    .mv-icon {
-      font-size: 3rem;
-      margin-bottom: 20px;
-    }
-
-    .mv-card.mission .mv-icon {
-      color: var(--primary);
-    }
-
-    .mv-card.vision .mv-icon {
-      color: var(--gold);
-    }
-
-    .mv-card h3 {
-      font-size: 2rem;
-      color: var(--text-dark);
-      margin-bottom: 20px;
-    }
-
-    .mv-card p {
-      color: var(--text-muted);
-      font-size: 1.1rem;
-      line-height: 1.7;
-      margin-bottom: 20px;
-    }
-
-    .mv-list {
-      list-style: none;
-      padding: 0;
+      justify-content: center;
     }
 
     .mv-list li {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-      color: var(--text-dark);
-      font-weight: 500;
+      justify-content: center;
     }
+  }
 
-    .mv-list li i {
-      color: #10b981;
-    }
-
-    /* Why Publish */
-    .why-publish {
-      padding: 100px 20px;
-      background: white;
-    }
-
-    .why-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .why-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      margin-top: 50px;
-      text-align: left;
-    }
-
-    .why-card {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 30px;
-      transition: 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .why-card:hover {
-      transform: translateY(-5px);
-      border-color: var(--primary);
-      box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);
-    }
-
-    .why-icon {
-      font-size: 2rem;
-      color: var(--primary);
-      margin-bottom: 20px;
-      display: inline-block;
-      padding: 15px;
-      background: rgba(37, 99, 235, 0.05);
-      border-radius: 12px;
-    }
-
-    .why-card h4 {
-      font-size: 1.25rem;
-      color: var(--text-dark);
-      margin-bottom: 15px;
-    }
-
-    .why-card p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
-
-    /* Open Access */
-    .oa-section {
-      padding: 100px 20px;
-      background: var(--navy);
-      color: white;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .oa-container {
-      max-width: 800px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    .oa-icon {
-      font-size: 4rem;
-      color: var(--gold);
-      margin-bottom: 20px;
-      animation: spinGlobe 20s linear infinite;
-    }
-
-    @keyframes spinGlobe {
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-
-    .oa-section h2 {
+  @media (max-width: 600px) {
+    .about-hero h1 {
       font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
-
-    .oa-section p {
-      font-size: 1.2rem;
-      color: #cbd5e1;
-      line-height: 1.7;
-      margin-bottom: 40px;
-    }
-
-
-
-    /* Final CTA */
-    .final-cta {
-      background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
-      padding: 100px 20px;
-      text-align: center;
-      color: white;
-      position: relative;
-      overflow: hidden;
     }
 
     .final-cta h2 {
-      font-size: 3rem;
-      font-weight: 800;
-      margin-bottom: 20px;
+      font-size: 2rem;
     }
 
-    .final-cta p {
-      font-size: 1.2rem;
-      opacity: 0.9;
-      margin-bottom: 40px;
-    }
-
-    .btn-white {
-      background: white;
-      color: var(--primary);
-      padding: 15px 30px;
-      border-radius: 12px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: 0.3s;
-      display: inline-block;
-      margin: 0 10px;
-    }
-
-    .btn-white:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-
+    .btn-white,
     .btn-outline-white {
-      border: 2px solid white;
-      color: white;
-      padding: 15px 30px;
-      border-radius: 12px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: 0.3s;
-      display: inline-block;
-      margin: 0 10px;
+      display: block;
+      margin: 10px auto;
+      width: 100%;
+      max-width: 300px;
     }
+  }
+</style>
 
-    .btn-outline-white:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    @media (max-width: 900px) {
-
-      .about-hero-content,
-      .who-we-are,
-      .mv-container {
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
-
-      .hero-stats {
-        justify-content: center;
-      }
-
-      .hero-visual {
-        display: none;
-      }
-
-      .btn-group {
-        justify-content: center;
-      }
-
-      .mv-list li {
-        justify-content: center;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .about-hero h1 {
-        font-size: 2.5rem;
-      }
-
-      .final-cta h2 {
-        font-size: 2rem;
-      }
-
-      .btn-white,
-      .btn-outline-white {
-        display: block;
-        margin: 10px auto;
-        width: 100%;
-        max-width: 300px;
-      }
-    }
-  </style>
-
-  <!-- HERO SECTION -->
-  <section class="about-hero">
-    <div class="hero-mesh"></div>
-    <div class="about-hero-content">
-      <div class="hero-text gs-reveal">
-        <div class="breadcrumb"><a href="/">Home</a> › About Us</div>
-        <div class="hero-badge"><i class="fa-solid fa-building-columns"></i> About ScriptHive Publication</div>
-        <h1>Our Story, Mission, and Commitment to Advancing Global Academic Knowledge</h1>
-        <p>Empowering researchers, scholars, and institutions through high-quality, peer-reviewed, open-access academic
-          publishing.</p>
-
-        <div class="hero-stats">
-          <div class="hero-stat-card">
-            <div class="stat-val counter" data-target="100">0</div>
-            <div class="stat-label">% Peer Reviewed</div>
-          </div>
-          <div class="hero-stat-card">
-            <div class="stat-val">7-15</div>
-            <div class="stat-label">Day Review Time</div>
-          </div>
-          <div class="hero-stat-card">
-            <div class="stat-val"><i class="fa-solid fa-earth-americas"></i></div>
-            <div class="stat-label">Global Network</div>
-          </div>
-        </div>
+<!-- HERO SECTION -->
+<section class="about-hero">
+  <div class="hero-mesh"></div>
+  <div class="about-hero-content">
+    <div class="hero-text gs-reveal">
+      <div class="breadcrumb"><a href="/">Home</a> › About Us</div>
+      <div class="hero-badge">
+        <i class="fa-solid fa-building-columns"></i> About ScriptHive
+        Publication
       </div>
-      <div class="hero-visual">
-        <div class="floating-card fc-1">
-          <i class="fa-solid fa-file-contract" style="font-size:2rem;color:var(--primary);margin-bottom:10px;"></i>
-          <h4 style="color:white;margin-bottom:5px;">Open Access</h4>
-          <p style="color:#cbd5e1;font-size:0.8rem;">Freely available globally</p>
+      <h1>
+        Our Story, Mission, and Commitment to Advancing Global Academic
+        Knowledge
+      </h1>
+      <p>
+        Empowering researchers, scholars, and institutions through high-quality,
+        peer-reviewed, open-access academic publishing.
+      </p>
+
+      <div class="hero-stats">
+        <div class="hero-stat-card">
+          <div class="stat-val counter" data-target="100">0</div>
+          <div class="stat-label">% Peer Reviewed</div>
         </div>
-        <div class="floating-card fc-2">
-          <i class="fa-solid fa-barcode" style="font-size:2rem;color:var(--gold);margin-bottom:10px;"></i>
-          <h4 style="color:white;margin-bottom:5px;">ISSN Verified</h4>
-          <p style="color:#cbd5e1;font-size:0.8rem;">Recognized standards</p>
+        <div class="hero-stat-card">
+          <div class="stat-val">7-15</div>
+          <div class="stat-label">Day Review Time</div>
         </div>
-        <div class="floating-card fc-3">
-          <i class="fa-solid fa-link" style="font-size:2rem;color:white;margin-bottom:10px;"></i>
-          <h4 style="color:white;margin-bottom:5px;">DOI Assigned</h4>
+        <div class="hero-stat-card">
+          <div class="stat-val"><i class="fa-solid fa-earth-americas"></i></div>
+          <div class="stat-label">Global Network</div>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- WHO WE ARE -->
-  <section class="who-we-are">
-    <div class="who-card gs-reveal">
-      <h2 class="section-title">Who We Are</h2>
-      <p>ScriptHive Publication is a forward-thinking, independent academic publishing platform founded with the purpose
-        of supporting researchers, scholars, and academics in disseminating high-quality, peer-reviewed research to the
-        global academic community.</p>
-      <p>We operate six specialised international journals spanning diverse disciplines — from Vedic and Sanskrit
-        studies to engineering, technology, health sciences, and social humanities. Every journal follows international
-        publishing standards and supports open-access knowledge sharing.</p>
-      <p>We believe the free flow of knowledge drives innovation, collaboration, and societal progress worldwide.</p>
-      <div class="btn-group">
-        <a href="/journals" class="btn-primary-custom">Explore Our Journals</a>
-        <a href="/contact" class="btn-outline-custom">Contact Us</a>
+    <div class="hero-visual">
+      <div class="floating-card fc-1">
+        <i
+          class="fa-solid fa-file-contract"
+          style="font-size: 2rem; color: var(--primary); margin-bottom: 10px"
+        ></i>
+        <h4 style="color: white; margin-bottom: 5px">Open Access</h4>
+        <p style="color: #cbd5e1; font-size: 0.8rem">
+          Freely available globally
+        </p>
+      </div>
+      <div class="floating-card fc-2">
+        <i
+          class="fa-solid fa-barcode"
+          style="font-size: 2rem; color: var(--gold); margin-bottom: 10px"
+        ></i>
+        <h4 style="color: white; margin-bottom: 5px">ISSN Verified</h4>
+        <p style="color: #cbd5e1; font-size: 0.8rem">Recognized standards</p>
+      </div>
+      <div class="floating-card fc-3">
+        <i
+          class="fa-solid fa-link"
+          style="font-size: 2rem; color: white; margin-bottom: 10px"
+        ></i>
+        <h4 style="color: white; margin-bottom: 5px">DOI Assigned</h4>
       </div>
     </div>
-    <div class="who-visual gs-reveal">
-      <div class="who-img-wrap">
-        <img src="/images/Journal_Publishing_Offer.png" alt="ScriptHive Logo"
-          style="background:#f1f5f9; padding: 40px;">
-        <div class="who-badge wb-1"><i class="fa-solid fa-check-double" style="color:var(--primary)"></i> Quality
-          Verified</div>
-        <div class="who-badge wb-2"><i class="fa-solid fa-chart-line" style="color:var(--gold)"></i> High Impact</div>
+  </div>
+</section>
+
+<!-- WHO WE ARE -->
+<section class="who-we-are">
+  <div class="who-card gs-reveal">
+    <h2 class="section-title">Who We Are</h2>
+    <p>
+      ScriptHive Publication is a forward-thinking, independent academic
+      publishing platform founded with the purpose of supporting researchers,
+      scholars, and academics in disseminating high-quality, peer-reviewed
+      research to the global academic community.
+    </p>
+    <p>
+      We operate six specialised international journals spanning diverse
+      disciplines — from Vedic and Sanskrit studies to engineering, technology,
+      health sciences, and social humanities. Every journal follows
+      international publishing standards and supports open-access knowledge
+      sharing.
+    </p>
+    <p>
+      We believe the free flow of knowledge drives innovation, collaboration,
+      and societal progress worldwide.
+    </p>
+    <div class="btn-group">
+      <a href="/journals" class="btn-primary-custom">Explore Our Journals</a>
+      <a href="/contact" class="btn-outline-custom">Contact Us</a>
+    </div>
+  </div>
+  <div class="who-visual gs-reveal">
+    <div class="who-img-wrap">
+      <img
+        src="/images/Journal_Publishing_Offer.png"
+        alt="ScriptHive Logo"
+        style="background: #f1f5f9; padding: 40px"
+      />
+      <div class="who-badge wb-1">
+        <i class="fa-solid fa-check-double" style="color: var(--primary)"></i>
+        Quality Verified
+      </div>
+      <div class="who-badge wb-2">
+        <i class="fa-solid fa-chart-line" style="color: var(--gold)"></i> High
+        Impact
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- EXCELLENCE HIGHLIGHT -->
-  <section class="excellence-section">
-    <div class="excellence-grid">
-      <div class="exc-card gs-reveal-up">
-        <i class="fa-solid fa-building-columns exc-icon"></i>
-        <h4>Established for Excellence</h4>
-        <p>ISO Verified operations and quality management.</p>
+<!-- EXCELLENCE HIGHLIGHT -->
+<section class="excellence-section">
+  <div class="excellence-grid">
+    <div class="exc-card gs-reveal-up">
+      <i class="fa-solid fa-building-columns exc-icon"></i>
+      <h4>Established for Excellence</h4>
+      <p>ISO Verified operations and quality management.</p>
+    </div>
+    <div class="exc-card gs-reveal-up" style="transition-delay: 0.1s">
+      <i class="fa-solid fa-bolt exc-icon"></i>
+      <h4>Fast Publishing</h4>
+      <p>7–15 Day initial review time for rapid dissemination.</p>
+    </div>
+    <div class="exc-card gs-reveal-up" style="transition-delay: 0.2s">
+      <i class="fa-solid fa-user-check exc-icon"></i>
+      <h4>Peer Review Standards</h4>
+      <p>100% Peer Reviewed by expert editorial boards.</p>
+    </div>
+    <div class="exc-card gs-reveal-up" style="transition-delay: 0.3s">
+      <i class="fa-solid fa-lock-open exc-icon"></i>
+      <h4>Open Knowledge</h4>
+      <p>Global Open Access for unrestricted readership.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION & VISION -->
+<section class="mv-section">
+  <div class="mv-container">
+    <div class="mv-card mission gs-reveal">
+      <i class="fa-solid fa-bullseye mv-icon"></i>
+      <h3>Our Mission</h3>
+      <p>
+        To provide a credible, accessible, and globally recognised platform for
+        researchers to publish and share knowledge that drives academic progress
+        and societal benefit.
+      </p>
+      <ul class="mv-list">
+        <li><i class="fa-solid fa-check-circle"></i> Timely peer review</li>
+        <li><i class="fa-solid fa-check-circle"></i> Editorial transparency</li>
+        <li><i class="fa-solid fa-check-circle"></i> Ethical publishing</li>
+        <li>
+          <i class="fa-solid fa-check-circle"></i> Supporting authors globally
+        </li>
+      </ul>
+    </div>
+    <div class="mv-card vision gs-reveal">
+      <i class="fa-solid fa-eye mv-icon"></i>
+      <h3>Our Vision</h3>
+      <p>
+        To become a premier international Publication bridging knowledge
+        creation and global academic discourse.
+      </p>
+      <ul class="mv-list">
+        <li>
+          <i class="fa-solid fa-check-circle"></i> Expand journal portfolio
+        </li>
+        <li>
+          <i class="fa-solid fa-check-circle"></i> Build international
+          collaborations
+        </li>
+        <li>
+          <i class="fa-solid fa-check-circle"></i> Strengthen indexing
+          visibility
+        </li>
+        <li>
+          <i class="fa-solid fa-check-circle"></i> Become a trusted academic
+          brand
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- WHY PUBLISH -->
+<section class="why-publish">
+  <div class="why-container">
+    <h2 class="section-title gs-reveal-up">
+      Why Researchers Choose ScriptHive
+    </h2>
+    <p class="section-subtitle gs-reveal-up" style="margin: 0 auto">
+      Built for researchers who value quality, speed, transparency, and global
+      visibility.
+    </p>
+
+    <div class="why-grid">
+      <div class="why-card gs-reveal-up">
+        <i class="fa-solid fa-gauge-high why-icon"></i>
+        <h4>Fast Review Process</h4>
+        <p>
+          Initial review within 7–15 working days with streamlined editorial
+          workflows.
+        </p>
       </div>
-      <div class="exc-card gs-reveal-up" style="transition-delay: 0.1s;">
-        <i class="fa-solid fa-bolt exc-icon"></i>
-        <h4>Fast Publishing</h4>
-        <p>7–15 Day initial review time for rapid dissemination.</p>
+      <div class="why-card gs-reveal-up" style="transition-delay: 0.1s">
+        <i class="fa-solid fa-barcode why-icon"></i>
+        <h4>ISSN-Supported Journals</h4>
+        <p>
+          All journals carry valid ISSN registration for publishing credibility
+          and indexing support.
+        </p>
       </div>
-      <div class="exc-card gs-reveal-up" style="transition-delay: 0.2s;">
-        <i class="fa-solid fa-user-check exc-icon"></i>
-        <h4>Peer Review Standards</h4>
-        <p>100% Peer Reviewed by expert editorial boards.</p>
+      <div class="why-card gs-reveal-up" style="transition-delay: 0.2s">
+        <i class="fa-solid fa-earth-europe why-icon"></i>
+        <h4>Global Visibility</h4>
+        <p>
+          Open-access publishing ensures worldwide accessibility and citation
+          potential.
+        </p>
       </div>
-      <div class="exc-card gs-reveal-up" style="transition-delay: 0.3s;">
-        <i class="fa-solid fa-lock-open exc-icon"></i>
-        <h4>Open Knowledge</h4>
-        <p>Global Open Access for unrestricted readership.</p>
+      <div class="why-card gs-reveal-up" style="transition-delay: 0.3s">
+        <i class="fa-solid fa-scale-balanced why-icon"></i>
+        <h4>Ethical Publishing</h4>
+        <p>
+          Strict plagiarism screening and transparent peer-review standards.
+        </p>
+      </div>
+      <div class="why-card gs-reveal-up" style="transition-delay: 0.4s">
+        <i class="fa-solid fa-paper-plane why-icon"></i>
+        <h4>Easy Submission</h4>
+        <p>Simple online submission workflow with smooth author experience.</p>
+      </div>
+      <div class="why-card gs-reveal-up" style="transition-delay: 0.5s">
+        <i class="fa-solid fa-headset why-icon"></i>
+        <h4>Author Support</h4>
+        <p>
+          Dedicated editorial guidance and responsive communication at every
+          stage.
+        </p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- MISSION & VISION -->
-  <section class="mv-section">
-    <div class="mv-container">
-      <div class="mv-card mission gs-reveal">
-        <i class="fa-solid fa-bullseye mv-icon"></i>
-        <h3>Our Mission</h3>
-        <p>To provide a credible, accessible, and globally recognised platform for researchers to publish and share
-          knowledge that drives academic progress and societal benefit.</p>
-        <ul class="mv-list">
-          <li><i class="fa-solid fa-check-circle"></i> Timely peer review</li>
-          <li><i class="fa-solid fa-check-circle"></i> Editorial transparency</li>
-          <li><i class="fa-solid fa-check-circle"></i> Ethical publishing</li>
-          <li><i class="fa-solid fa-check-circle"></i> Supporting authors globally</li>
-        </ul>
-      </div>
-      <div class="mv-card vision gs-reveal">
-        <i class="fa-solid fa-eye mv-icon"></i>
-        <h3>Our Vision</h3>
-        <p>To become a premier international publication house bridging knowledge creation and global academic
-          discourse.</p>
-        <ul class="mv-list">
-          <li><i class="fa-solid fa-check-circle"></i> Expand journal portfolio</li>
-          <li><i class="fa-solid fa-check-circle"></i> Build international collaborations</li>
-          <li><i class="fa-solid fa-check-circle"></i> Strengthen indexing visibility</li>
-          <li><i class="fa-solid fa-check-circle"></i> Become a trusted academic brand</li>
-        </ul>
-      </div>
-    </div>
-  </section>
+<!-- OPEN ACCESS -->
+<section class="oa-section gs-reveal">
+  <div class="oa-container">
+    <i class="fa-solid fa-earth-americas oa-icon"></i>
+    <h2>Knowledge Without Barriers</h2>
+    <p>
+      Our open-access publishing model ensures that research remains freely
+      accessible to scholars, institutions, students, and readers worldwide —
+      without subscriptions or paywalls.
+    </p>
+  </div>
+</section>
 
-  <!-- WHY PUBLISH -->
-  <section class="why-publish">
-    <div class="why-container">
-      <h2 class="section-title gs-reveal-up">Why Researchers Choose ScriptHive</h2>
-      <p class="section-subtitle gs-reveal-up" style="margin: 0 auto;">Built for researchers who value quality, speed,
-        transparency, and global visibility.</p>
+<!-- FINAL CTA -->
+<section class="final-cta gs-reveal">
+  <h2>Join the Future of Academic Publishing</h2>
+  <p>
+    Publish your research with a trusted international publication platform
+    dedicated to academic excellence.
+  </p>
+  <div class="cta-buttons">
+    <a href="/submit" class="btn-white">Submit Paper</a>
+    <a href="/journals" class="btn-outline-white">Explore Journals</a>
+  </div>
+</section>
 
-      <div class="why-grid">
-        <div class="why-card gs-reveal-up">
-          <i class="fa-solid fa-gauge-high why-icon"></i>
-          <h4>Fast Review Process</h4>
-          <p>Initial review within 7–15 working days with streamlined editorial workflows.</p>
-        </div>
-        <div class="why-card gs-reveal-up" style="transition-delay: 0.1s;">
-          <i class="fa-solid fa-barcode why-icon"></i>
-          <h4>ISSN-Supported Journals</h4>
-          <p>All journals carry valid ISSN registration for publishing credibility and indexing support.</p>
-        </div>
-        <div class="why-card gs-reveal-up" style="transition-delay: 0.2s;">
-          <i class="fa-solid fa-earth-europe why-icon"></i>
-          <h4>Global Visibility</h4>
-          <p>Open-access publishing ensures worldwide accessibility and citation potential.</p>
-        </div>
-        <div class="why-card gs-reveal-up" style="transition-delay: 0.3s;">
-          <i class="fa-solid fa-scale-balanced why-icon"></i>
-          <h4>Ethical Publishing</h4>
-          <p>Strict plagiarism screening and transparent peer-review standards.</p>
-        </div>
-        <div class="why-card gs-reveal-up" style="transition-delay: 0.4s;">
-          <i class="fa-solid fa-paper-plane why-icon"></i>
-          <h4>Easy Submission</h4>
-          <p>Simple online submission workflow with smooth author experience.</p>
-        </div>
-        <div class="why-card gs-reveal-up" style="transition-delay: 0.5s;">
-          <i class="fa-solid fa-headset why-icon"></i>
-          <h4>Author Support</h4>
-          <p>Dedicated editorial guidance and responsive communication at every stage.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    gsap.registerPlugin(ScrollTrigger);
 
-  <!-- OPEN ACCESS -->
-  <section class="oa-section gs-reveal">
-    <div class="oa-container">
-      <i class="fa-solid fa-earth-americas oa-icon"></i>
-      <h2>Knowledge Without Barriers</h2>
-      <p>Our open-access publishing model ensures that research remains freely accessible to scholars, institutions,
-        students, and readers worldwide — without subscriptions or paywalls.</p>
-    </div>
-  </section>
-
-  <!-- FINAL CTA -->
-  <section class="final-cta gs-reveal">
-    <h2>Join the Future of Academic Publishing</h2>
-    <p>Publish your research with a trusted international publication platform dedicated to academic excellence.</p>
-    <div class="cta-buttons">
-      <a href="/submit" class="btn-white">Submit Paper</a>
-      <a href="/journals" class="btn-outline-white">Explore Journals</a>
-    </div>
-  </section>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      gsap.registerPlugin(ScrollTrigger);
-
-      // Reveal animations
-      gsap.utils.toArray('.gs-reveal').forEach(function (elem) {
-        gsap.from(elem, {
-          scrollTrigger: { trigger: elem, start: "top 85%" },
-          y: 50, opacity: 0, duration: 1, ease: "power3.out"
-        });
-      });
-
-      gsap.utils.toArray('.gs-reveal-up').forEach(function (elem) {
-        gsap.from(elem, {
-          scrollTrigger: { trigger: elem, start: "top 85%" },
-          y: 30, opacity: 0, duration: 0.8, ease: "power2.out"
-        });
-      });
-
-      // Counters
-      const counters = document.querySelectorAll('.counter');
-      counters.forEach(counter => {
-        gsap.to(counter, {
-          scrollTrigger: { trigger: counter, start: "top 90%" },
-          innerHTML: counter.getAttribute('data-target'),
-          duration: 2,
-          snap: { innerHTML: 1 },
-          onUpdate: function () {
-            counter.innerHTML = Math.round(this.targets()[0].innerHTML) + (counter.getAttribute('data-target') == 100 ? "%" : "+");
-          }
-        });
+    // Reveal animations
+    gsap.utils.toArray(".gs-reveal").forEach(function (elem) {
+      gsap.from(elem, {
+        scrollTrigger: { trigger: elem, start: "top 85%" },
+        y: 50,
+        opacity: 0,
+        duration: 1,
+        ease: "power3.out",
       });
     });
-  </script>
 
-  <%- include('../partials/footer') %>
+    gsap.utils.toArray(".gs-reveal-up").forEach(function (elem) {
+      gsap.from(elem, {
+        scrollTrigger: { trigger: elem, start: "top 85%" },
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out",
+      });
+    });
+
+    // Counters
+    const counters = document.querySelectorAll(".counter");
+    counters.forEach((counter) => {
+      gsap.to(counter, {
+        scrollTrigger: { trigger: counter, start: "top 90%" },
+        innerHTML: counter.getAttribute("data-target"),
+        duration: 2,
+        snap: { innerHTML: 1 },
+        onUpdate: function () {
+          counter.innerHTML =
+            Math.round(this.targets()[0].innerHTML) +
+            (counter.getAttribute("data-target") == 100 ? "%" : "+");
+        },
+      });
+    });
+  });
+</script>
+
+<%- include('../partials/footer') %>

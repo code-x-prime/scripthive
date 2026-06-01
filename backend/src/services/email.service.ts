@@ -47,7 +47,7 @@ function baseTemplate(title: string, preheader: string, body: string): string {
   <tr>
     <td style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 14px 14px;padding:24px 40px;text-align:center;">
       <p style="margin:0 0 6px;font-size:12px;color:#64748b;">
-        ScriptHive Publication House &nbsp;|&nbsp; <a href="https://scripthive.org" style="color:#2563eb;text-decoration:none;">scripthive.org</a>
+        ScriptHive Publication  &nbsp;|&nbsp; <a href="https://scripthive.org" style="color:#2563eb;text-decoration:none;">scripthive.org</a>
       </p>
       <p style="margin:0;font-size:11px;color:#94a3b8;">
         This email was sent from <a href="mailto:noreply@mail.scripthive.org" style="color:#94a3b8;">noreply@mail.scripthive.org</a>.<br/>
@@ -114,10 +114,10 @@ export const sendSubmissionConfirmationEmail = async (
       Thank you for submitting your manuscript to <strong>ScriptHive Publication</strong>. We have successfully received your submission and it is now queued for editorial pre-screening.
     </p>
     ${infoCard([
-      ["Submission ID", submissionId],
-      ["Status", "Received — Pending Review"],
-      ["Next Step", "Editorial Pre-screening (1–3 days)"],
-    ])}
+    ["Submission ID", submissionId],
+    ["Status", "Received — Pending Review"],
+    ["Next Step", "Editorial Pre-screening (1–3 days)"],
+  ])}
     <p style="margin:0 0 8px;font-size:14px;color:#374151;line-height:1.6;">
       Our editorial team will review your manuscript and you will receive an update within <strong>7–15 working days</strong>.
     </p>
@@ -149,11 +149,11 @@ export const sendPaymentReceiptEmail = async (
       ${badge("Payment Successful", "#16a34a", "#dcfce7")}
     </div>
     ${infoCard([
-      ["Invoice ID", invoiceId],
-      ["Amount Paid", `${currency} ${amount.toFixed(2)}`],
-      ["Transaction ID", transactionId],
-      ["Status", "Paid"],
-    ])}
+    ["Invoice ID", invoiceId],
+    ["Amount Paid", `${currency} ${amount.toFixed(2)}`],
+    ["Transaction ID", transactionId],
+    ["Status", "Paid"],
+  ])}
     <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">Please keep this receipt for your records. If you have questions, reply to this email with your Invoice ID.</p>
   `;
   await sendMail({
@@ -175,11 +175,11 @@ export const sendUnderReviewEmail = async (
       We are pleased to inform you that your manuscript has passed editorial pre-screening and has been sent out for <strong>double-blind peer review</strong>.
     </p>
     ${infoCard([
-      ["Manuscript", title],
-      ["Status", "Under Peer Review"],
-      ["Review Type", "Double-Blind"],
-      ["Expected Decision", "7–15 working days"],
-    ])}
+    ["Manuscript", title],
+    ["Status", "Under Peer Review"],
+    ["Review Type", "Double-Blind"],
+    ["Expected Decision", "7–15 working days"],
+  ])}
     <p style="margin:0;font-size:14px;color:#374151;line-height:1.6;">
       You will receive an email as soon as the editorial decision is made. Thank you for your patience.
     </p>
@@ -204,10 +204,10 @@ export const sendAcceptedEmail = async (
       Congratulations! We are delighted to inform you that your manuscript has been <strong>accepted for publication</strong> in a ScriptHive journal.
     </p>
     ${infoCard([
-      ["Manuscript", title],
-      ["Decision", "Accepted"],
-      ["Next Step", "APC payment & production"],
-    ])}
+    ["Manuscript", title],
+    ["Decision", "Accepted"],
+    ["Next Step", "APC payment & production"],
+  ])}
     <p style="margin:0 0 16px;font-size:14px;color:#374151;line-height:1.6;">
       You will shortly receive instructions regarding the <strong>Article Processing Charge (APC)</strong> and the production process. Please complete the payment to proceed to publication.
     </p>
@@ -233,9 +233,9 @@ export const sendRejectedEmail = async (
       Thank you for submitting your manuscript to ScriptHive Publication. After careful evaluation by our editorial board and peer reviewers, we regret to inform you that we are <strong>unable to accept</strong> your manuscript for publication in its current form.
     </p>
     ${infoCard([
-      ["Manuscript", title],
-      ["Decision", "Not Accepted"],
-    ])}
+    ["Manuscript", title],
+    ["Decision", "Not Accepted"],
+  ])}
     <p style="margin:0 0 16px;font-size:14px;color:#374151;line-height:1.6;">
       This decision does not necessarily reflect the quality of your research. We encourage you to consider the reviewer feedback, revise your manuscript, and resubmit or consider other suitable journals.
     </p>
@@ -262,9 +262,9 @@ export const sendPaymentLinkEmail = async (
       Your manuscript has been accepted! Please complete your <strong>Article Processing Charge (APC)</strong> payment using the secure link below to proceed to publication.
     </p>
     ${infoCard([
-      ["Invoice ID", invoiceId],
-      ["Action Required", "Complete APC Payment"],
-    ])}
+    ["Invoice ID", invoiceId],
+    ["Action Required", "Complete APC Payment"],
+  ])}
     ${ctaButton("💳 Pay Now — Complete APC", paymentUrl)}
     ${divider()}
     <p style="margin:0;font-size:13px;color:#64748b;">This payment link is secure. If you did not expect this email, please contact us at <a href="mailto:support@scripthive.org" style="color:#2563eb;">support@scripthive.org</a>.</p>
@@ -290,10 +290,10 @@ export const sendDoiAssignedEmail = async (
       A <strong>Digital Object Identifier (DOI)</strong> has been successfully registered for your published manuscript.
     </p>
     ${infoCard([
-      ["Manuscript", title],
-      ["DOI", doi],
-      ["DOI Link", `<a href="${doiUrl}" style="color:#2563eb;">${doiUrl}</a>`],
-    ])}
+    ["Manuscript", title],
+    ["DOI", doi],
+    ["DOI Link", `<a href="${doiUrl}" style="color:#2563eb;">${doiUrl}</a>`],
+  ])}
     ${ctaButton("🔗 View Your Article via DOI", doiUrl)}
     <p style="margin:16px 0 0;font-size:13px;color:#64748b;line-height:1.6;">
       You may now use this DOI when citing your article. The identifier is permanently registered and internationally recognised.
@@ -321,11 +321,11 @@ export const sendArticlePublishedEmail = async (
       Congratulations! Your manuscript has been <strong>officially published</strong>${journalName ? ` in <strong>${journalName}</strong>` : ""} and is now available online for the global research community.
     </p>
     ${infoCard([
-      ["Manuscript", title],
-      ["Journal", journalName || "ScriptHive Journal"],
-      ["Status", "Published"],
-      ...(doiLink ? [["DOI", `<a href="${doiLink}" style="color:#2563eb;">${doiLink}</a>`] as [string, string]] : []),
-    ])}
+    ["Manuscript", title],
+    ["Journal", journalName || "ScriptHive Journal"],
+    ["Status", "Published"],
+    ...(doiLink ? [["DOI", `<a href="${doiLink}" style="color:#2563eb;">${doiLink}</a>`] as [string, string]] : []),
+  ])}
     ${doiLink ? ctaButton("📖 View Published Article", doiLink) : ""}
     ${divider()}
     <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">

@@ -10,24 +10,24 @@ import { DEFAULT_APC_INR, DEFAULT_APC_USD, parseApcSettings } from "@/utils/apcA
 interface AddonService { id: string; label: string; price: number; currency: "INR"; enabled: boolean }
 
 const DEFAULT_ADDONS: AddonService[] = [
-  { id: "doi_only",          label: "DOI Only",                          price: 350,  currency: "INR", enabled: true },
-  { id: "fast_review",       label: "Fast Review",                       price: 699,  currency: "INR", enabled: true },
-  { id: "plagiarism_report", label: "Plagiarism Report (350 words)",     price: 150,  currency: "INR", enabled: true },
-  { id: "certificate_soft",  label: "Certificate Soft Copy",             price: 200,  currency: "INR", enabled: true },
-  { id: "certificate_hard",  label: "Certificate Hard Copy (Speed Post)",price: 350,  currency: "INR", enabled: true },
-  { id: "featured_paper",    label: "Featured Paper",                    price: 1000, currency: "INR", enabled: true },
-  { id: "paper_hard_copy",   label: "Paper Hard Copy (Speed Post)",      price: 999,  currency: "INR", enabled: true }
+  { id: "doi_only", label: "DOI Only", price: 350, currency: "INR", enabled: true },
+  { id: "fast_review", label: "Fast Review", price: 699, currency: "INR", enabled: true },
+  { id: "plagiarism_report", label: "Plagiarism Report (350 words)", price: 150, currency: "INR", enabled: true },
+  { id: "certificate_soft", label: "Certificate Soft Copy", price: 200, currency: "INR", enabled: true },
+  { id: "certificate_hard", label: "Certificate Hard Copy (Speed Post)", price: 350, currency: "INR", enabled: true },
+  { id: "featured_paper", label: "Featured Paper", price: 1000, currency: "INR", enabled: true },
+  { id: "paper_hard_copy", label: "Paper Hard Copy (Speed Post)", price: 999, currency: "INR", enabled: true }
 ];
 
 type SettingsTab = "pricing" | "payments" | "doi" | "media" | "carousel" | "addons";
 
 const TABS: { id: SettingsTab; label: string; icon: typeof DollarSign }[] = [
-  { id: "pricing",  label: "APC pricing",       icon: Banknote },
-  { id: "addons",   label: "Add-on services",   icon: Package },
-  { id: "payments", label: "Payment gateways",  icon: CreditCard },
-  { id: "media",    label: "Media library",     icon: FolderOpen },
-  { id: "carousel", label: "Carousel",          icon: SlidersHorizontal },
-  { id: "doi",      label: "DOI & site",        icon: Link2 }
+  { id: "pricing", label: "APC pricing", icon: Banknote },
+  { id: "addons", label: "Add-on services", icon: Package },
+  { id: "payments", label: "Payment gateways", icon: CreditCard },
+  { id: "media", label: "Media library", icon: FolderOpen },
+  { id: "carousel", label: "Carousel", icon: SlidersHorizontal },
+  { id: "doi", label: "DOI & site", icon: Link2 }
 ];
 
 function formatUsd(n: number): string {
@@ -157,11 +157,10 @@ export const SettingsPage = () => {
                 role="tab"
                 aria-selected={active}
                 onClick={() => setActiveTab(id)}
-                className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                  active
+                className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${active
                     ? "bg-green-600 text-white shadow-sm"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
+                  }`}
               >
                 <Icon className="h-4 w-4 shrink-0" />
                 {label}
@@ -340,7 +339,7 @@ export const SettingsPage = () => {
               <input
                 value={siteName}
                 onChange={(e) => setSiteName(e.target.value)}
-                placeholder="ScriptHive Publication House"
+                placeholder="ScriptHive Publication "
                 className="h-11 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </label>

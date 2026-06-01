@@ -103,7 +103,7 @@ export const ForgotPasswordPage = () => {
             </div>
             <span className="text-white font-heading text-xl font-semibold">ScriptHive</span>
           </div>
-          <p className="text-green-200 text-sm">Publication House</p>
+          <p className="text-green-200 text-sm">Publication </p>
         </div>
         <div className="relative z-10">
           <h1 className="font-heading text-4xl text-white leading-tight mb-6">
@@ -119,10 +119,9 @@ export const ForgotPasswordPage = () => {
               { icon: ShieldCheck, label: "Set new strong password" },
             ].map(({ icon: Icon, label }, i) => (
               <div key={label} className="flex items-center gap-3">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                  (step === "email" && i === 0) || (step === "otp" && i === 1) || (step === "reset" && i === 2) || step === "done"
-                    ? "bg-green-500 text-white" : "bg-green-700 text-green-300"
-                }`}>{i + 1}</div>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${(step === "email" && i === 0) || (step === "otp" && i === 1) || (step === "reset" && i === 2) || step === "done"
+                  ? "bg-green-500 text-white" : "bg-green-700 text-green-300"
+                  }`}>{i + 1}</div>
                 <div className="flex items-center gap-2">
                   <Icon className="w-4 h-4 text-green-300" />
                   <span className="text-green-100 text-sm">{label}</span>
@@ -131,7 +130,7 @@ export const ForgotPasswordPage = () => {
             ))}
           </div>
         </div>
-        <p className="relative z-10 text-green-400 text-xs">© {new Date().getFullYear()} ScriptHive Publication House</p>
+        <p className="relative z-10 text-green-400 text-xs">© {new Date().getFullYear()} ScriptHive Publication </p>
       </div>
 
       {/* Right panel */}
@@ -159,22 +158,21 @@ export const ForgotPasswordPage = () => {
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-1">
                   {step === "email" && <><Mail className="w-5 h-5 text-green-600" /><h2 className="font-heading text-2xl font-bold text-slate-900">Forgot Password</h2></>}
-                  {step === "otp"   && <><KeyRound className="w-5 h-5 text-green-600" /><h2 className="font-heading text-2xl font-bold text-slate-900">Enter OTP</h2></>}
+                  {step === "otp" && <><KeyRound className="w-5 h-5 text-green-600" /><h2 className="font-heading text-2xl font-bold text-slate-900">Enter OTP</h2></>}
                   {step === "reset" && <><ShieldCheck className="w-5 h-5 text-green-600" /><h2 className="font-heading text-2xl font-bold text-slate-900">New Password</h2></>}
                 </div>
                 <p className="text-sm text-slate-500">
                   {step === "email" && "Enter the email address registered with your admin account."}
-                  {step === "otp"   && `A 6-digit OTP was sent to ${email}. Enter it below.`}
+                  {step === "otp" && `A 6-digit OTP was sent to ${email}. Enter it below.`}
                   {step === "reset" && "Choose a strong password for your account."}
                 </p>
               </div>
 
               {/* Progress bar */}
               <div className="flex gap-1.5 mb-6">
-                {(["email","otp","reset"] as Step[]).map((s, i) => (
-                  <div key={s} className={`h-1.5 flex-1 rounded-full transition-colors ${
-                    (step === "email" && i === 0) || (step === "otp" && i <= 1) || step === "reset" ? "bg-green-500" : "bg-slate-200"
-                  }`} />
+                {(["email", "otp", "reset"] as Step[]).map((s, i) => (
+                  <div key={s} className={`h-1.5 flex-1 rounded-full transition-colors ${(step === "email" && i === 0) || (step === "otp" && i <= 1) || step === "reset" ? "bg-green-500" : "bg-slate-200"
+                    }`} />
                 ))}
               </div>
 
@@ -236,7 +234,7 @@ export const ForgotPasswordPage = () => {
                       <button type="button"
                         onClick={() => {
                           setOtp(""); setError("");
-                          void sendOtp({ preventDefault: () => {} } as unknown as React.FormEvent<HTMLFormElement>);
+                          void sendOtp({ preventDefault: () => { } } as unknown as React.FormEvent<HTMLFormElement>);
                         }}
                         className="text-xs text-green-700 hover:underline font-medium">
                         ↺ Resend OTP
@@ -281,9 +279,8 @@ export const ForgotPasswordPage = () => {
                       <input type={showConfirm ? "text" : "password"} value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="Re-enter password" autoComplete="new-password"
-                        className={`h-11 w-full rounded-lg border px-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                          confirmPassword && newPassword !== confirmPassword ? "border-red-300 bg-red-50" : "border-slate-200"
-                        }`}
+                        className={`h-11 w-full rounded-lg border px-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 ${confirmPassword && newPassword !== confirmPassword ? "border-red-300 bg-red-50" : "border-slate-200"
+                          }`}
                         disabled={loading} />
                       <button type="button" onClick={() => setShowConfirm(v => !v)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
