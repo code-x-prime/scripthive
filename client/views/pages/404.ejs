@@ -1,0 +1,19 @@
+<%- include('../partials/header') %>
+<style>
+  .not-found { min-height: 70vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 60px 20px; background: #f8fafc; }
+  .not-found-inner { max-width: 500px; }
+  .not-found-code { font-size: 6rem; font-weight: 900; color: #e2e8f0; line-height: 1; margin-bottom: 8px; }
+  .not-found-title { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; }
+  .not-found-msg { color: #64748b; font-size: 1rem; margin-bottom: 32px; line-height: 1.6; }
+  .not-found-btn { display: inline-block; background: #2563eb; color: #fff; font-weight: 700; padding: 12px 28px; border-radius: 10px; text-decoration: none; font-size: 0.95rem; transition: 0.2s; }
+  .not-found-btn:hover { background: #1d4ed8; }
+</style>
+<div class="not-found">
+  <div class="not-found-inner">
+    <div class="not-found-code">404</div>
+    <h1 class="not-found-title">Page Not Found</h1>
+    <p class="not-found-msg">The page you're looking for doesn't exist or may have been moved. If you're looking for a journal, it may be temporarily unavailable.</p>
+    <a href="/" class="not-found-btn">← Back to Home</a>
+  </div>
+</div>
+<%- include('../partials/footer') %>
