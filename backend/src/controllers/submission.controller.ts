@@ -67,6 +67,20 @@ export const createSubmission = async (req: Request, res: Response): Promise<voi
   }
 
   const authorEmail = data.authorEmail.trim().toLowerCase();
+
+  // Duplicate guard: same email + same title within 60 seconds = reject duplicate
+  const recentDuplicate = await prisma.submission.findFirst({
+    where: {
+      authorEmail,
+      title: data.title.trim(),
+      createdAt: { gte: new Date(Date.now() - 60000) }
+    }
+  });
+  if (recentDuplicate) {
+    res.json({ id: recentDuplicate.id, _duplicate: true });
+    return;
+  }
+
   const linkedAuthor = await prisma.author.findUnique({ where: { email: authorEmail } });
 
   const submissionId = generateSubmissionId(new Date(), count + 1);
