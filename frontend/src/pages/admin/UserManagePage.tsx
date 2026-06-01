@@ -299,9 +299,6 @@ export const UserManagePage = () => {
 
             {modal !== "create" && modal && "edit" in modal && modal.edit.role?.name === "super_admin" ? null : (() => {
               const uValid = /^[a-z0-9][a-z0-9._-]{2,31}$/.test(username);
-              const uTooShort = username.length > 0 && username.length < 3;
-              const uBadStart = username.length > 0 && !/^[a-z0-9]/.test(username);
-              const uBadChars = username.length > 0 && /[^a-z0-9._-]/.test(username);
               const rules = [
                 { ok: username.length >= 3, label: "Min 3 characters" },
                 { ok: /^[a-z0-9]/.test(username), label: "Start with letter or number" },
