@@ -1,3 +1,4 @@
+
 import { Router } from "express";
 import { body } from "express-validator";
 import { createUser, deleteUser, listUsers, resetPassword, updateUser } from "../controllers/user.controller.js";
@@ -12,7 +13,7 @@ userRouter.post(
   authenticate,
   requireSuperAdmin,
   body("name").trim().isLength({ min: 2 }),
-  body("email").trim().isEmail(),
+  body("email").optional({ checkFalsy: true }).trim().isEmail(),
   body("password").isLength({ min: 8 }),
   body("roleId").trim().notEmpty(),
   handleValidation,
@@ -23,7 +24,7 @@ userRouter.put(
   authenticate,
   requireSuperAdmin,
   body("name").trim().isLength({ min: 2 }),
-  body("email").trim().isEmail(),
+  body("email").optional({ checkFalsy: true }).trim().isEmail(),
   body("roleId").trim().notEmpty(),
   body("isActive").isBoolean(),
   handleValidation,
