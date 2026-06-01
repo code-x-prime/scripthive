@@ -137,8 +137,11 @@ const JOURNAL_IDS_LIST = ['SGJASH','SGJETR','SGJPLS','SGJSSH','SGJVSR','SGMRJ'];
 JOURNAL_IDS_LIST.forEach(jid => {
   app.get(`/${jid}`, async (req, res) => {
     if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
-    const archive = await fetchArchive(jid);
-    res.render(`journals/${jid}`, { archive, journalId: jid });
+    const [archive, editorialBoard] = await Promise.all([
+      fetchArchive(jid),
+      fetchEditorialBoard(jid)
+    ]);
+    res.render(`journals/${jid}`, { archive, journalId: jid, editorialBoard });
   });
 
   app.get(`/${jid}/archives`, async (req, res) => {
@@ -159,6 +162,16 @@ async function fetchArchive(journalId) {
   try {
     const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
     const resp = await fetch(`${apiUrl}/api/archive/${journalId}`);
+    if (!resp.ok) return [];
+    return await resp.json();
+  } catch { return []; }
+}
+
+// Editorial board public data
+async function fetchEditorialBoard(journalId) {
+  try {
+    const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+    const resp = await fetch(`${apiUrl}/api/journals/${journalId}/editorial-board/public`);
     if (!resp.ok) return [];
     return await resp.json();
   } catch { return []; }

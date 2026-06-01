@@ -43,6 +43,7 @@ journalRouter.put(
   updateJournalDoi
 );
 
+journalRouter.get("/:journalId/editorial-board/public", listEditorialBoard); // public — no auth required
 journalRouter.get("/:journalId/editorial-board", requireAuth, requirePermission("journals", "read"), listEditorialBoard);
 journalRouter.post("/:journalId/editorial-board", requireAuth, requirePermission("journals", "write"), addEditorialMember);
 journalRouter.put("/:journalId/editorial-board/:memberId", requireAuth, requirePermission("journals", "write"), updateEditorialMember);

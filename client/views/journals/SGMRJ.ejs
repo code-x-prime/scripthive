@@ -1844,16 +1844,22 @@
             </div>
             
             <div class="c-box">
-              <p>Our journal is guided by an esteemed international editorial board comprised of experts and scholars
-                from leading academic institutions worldwide.</p>
-              <div class="editor-preview">
-                <div class="editor-img"><i class="fa-solid fa-user-tie"></i></div>
-                <div class="editor-info">
-                  <h4>Editor-in-Chief</h4>
-                  <p><strong>Dr. [Name Placeholder]</strong><br>Professor of Multidisciplinary Studies & Research Methodologies<br>[Institution Name,
-                    Country]</p>
+              <p>Our journal is guided by an esteemed international editorial board comprised of experts and scholars from leading academic institutions worldwide.</p>
+              <% if (typeof editorialBoard !== 'undefined' && editorialBoard.length > 0) { %>
+                <% editorialBoard.forEach(function(m) { %>
+                <div class="editor-preview">
+                  <div class="editor-img"><% if (m.photoUrl) { %><img src="<%= m.photoUrl %>" alt="<%= m.name %>" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" /><% } else { %><i class="fa-solid fa-user-tie"></i><% } %></div>
+                  <div class="editor-info"><h4><%= m.role %></h4><p><strong><%= m.name %></strong><br><%= m.institution %><% if (m.email) { %><br><a href="mailto:<%= m.email %>" style="color:#2563eb;font-size:0.85em;"><%= m.email %></a><% } %></p></div>
                 </div>
+                <% }); %>
+              <% } else { %>
+                <p style="color:#64748b;font-style:italic;margin-top:16px;">Editorial board members will be announced soon.</p>
+              <% } %>
+              <div style="margin-top:24px;padding:18px;border-radius:12px;background:var(--bg-light);border:1px dashed rgba(37,99,235,0.25);text-align:center;">
+                <p style="font-size:0.95rem;margin:0 0 12px 0;">Are you an experienced researcher interested in joining our editorial board?</p>
+                <button class="btn-apply-board-inline" data-bs-toggle="modal" data-bs-target="#applyBoardModal"><i class="fa-solid fa-user-plus"></i> Apply to Join Editorial Board</button>
               </div>
+            </div>
           </section>
 
           <!-- EDITORIAL BOARD APPLICATION POPUP MODAL -->
