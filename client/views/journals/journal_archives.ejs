@@ -74,6 +74,20 @@
 
   .arch-filter-col { position: sticky; top: 160px; align-self: start; }
   .arch-journal-info { position: sticky; top: 160px; align-self: start; }
+  /* Filter card overrides — bigger, cleaner */
+  .filter-card { background: #fff; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 20px 18px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+  .filter-card-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #0f172a; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+  .filter-clear { font-size: 0.7rem; color: #2563eb; cursor: pointer; font-weight: 700; text-transform: none; letter-spacing: 0; background: #eff6ff; padding: 3px 10px; border-radius: 20px; border: none; }
+  .filter-clear:hover { background: #dbeafe; }
+  .filter-group { margin-bottom: 18px; }
+  .filter-group:last-child { margin-bottom: 0; }
+  .filter-group-label { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 10px; }
+  .filter-check-item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 8px; cursor: pointer; transition: background 0.12s; }
+  .filter-check-item:hover { background: #f8fafc; }
+  .filter-check-item input[type=checkbox] { width: 16px; height: 16px; accent-color: #2563eb; cursor: pointer; flex-shrink: 0; }
+  .filter-check-item label { font-size: 0.85rem; color: #374151; cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; font-weight: 500; }
+  .filter-check-item input:checked + label { color: #2563eb; font-weight: 700; }
+  .fcount { background: #f1f5f9; color: #64748b; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; min-width: 22px; text-align: center; }
   .sidebar-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
   .sidebar-card-title { font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f1f5f9; }
   .sidebar-abbr { font-size: 0.82rem; color: #64748b; font-weight: 600; margin-bottom: 14px; }
