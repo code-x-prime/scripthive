@@ -297,19 +297,48 @@ export const UserManagePage = () => {
               <input value={name} onChange={(e) => setName(e.target.value)} className="h-10 rounded-lg border border-gray-200 px-3 text-sm" />
             </label>
 
-            {modal !== "create" && modal && "edit" in modal && modal.edit.role?.name === "super_admin" ? null : (
-              <label className="mt-3 flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Username <span className="font-normal text-gray-400">(unique, for login)</span>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value.toLowerCase())}
-                  placeholder="e.g. editor.john"
-                  className="h-10 rounded-lg border border-gray-200 px-3 font-mono text-sm"
-                  autoComplete="off"
-                />
-              </label>
-            )}
+            {modal !== "create" && modal && "edit" in modal && modal.edit.role?.name === "super_admin" ? null : (() => {
+              const uValid = /^[a-z0-9][a-z0-9._-]{2,31}$/.test(username);
+              const uTooShort = username.length > 0 && username.length < 3;
+              const uBadStart = username.length > 0 && !/^[a-z0-9]/.test(username);
+              const uBadChars = username.length > 0 && /[^a-z0-9._-]/.test(username);
+              const rules = [
+                { ok: username.length >= 3, label: "Min 3 characters" },
+                { ok: /^[a-z0-9]/.test(username), label: "Start with letter or number" },
+                { ok: !/[^a-z0-9._-]/.test(username) || username.length === 0, label: "Only letters, numbers, . _ -" },
+                { ok: username.length <= 32, label: "Max 32 characters" },
+              ];
+              return (
+                <div className="mt-3 flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-600">
+                    Username <span className="font-normal text-gray-400">(unique, for login)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                    placeholder="e.g. editor.john"
+                    className={`h-10 rounded-lg border px-3 font-mono text-sm transition-colors ${
+                      username.length === 0 ? "border-gray-200" :
+                      uValid ? "border-green-400 bg-green-50/40" : "border-red-300 bg-red-50/40"
+                    }`}
+                    autoComplete="off"
+                  />
+                  {username.length > 0 && (
+                    <div className="mt-1.5 flex flex-col gap-1">
+                      {rules.map(r => (
+                        <div key={r.label} className={`flex items-center gap-1.5 text-xs ${r.ok ? "text-green-600" : "text-red-500"}`}>
+                          <span className="text-sm">{r.ok ? "✓" : "✗"}</span> {r.label}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {username.length === 0 && (
+                    <p className="text-xs text-gray-400 mt-0.5">Use letters, numbers, dot (.), underscore (_) or hyphen (-)</p>
+                  )}
+                </div>
+              );
+            })()}
 
             {modal === "create" && (
               <div className="mt-3">
