@@ -1,10 +1,9 @@
 <%- include('../partials/header') %>
 
-<!-- jsPDF CDN for Premium Client-Side PDF Generation -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- jsPDF loaded lazily on demand -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
@@ -1075,7 +1074,6 @@
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         if (_submitting) return; // prevent double submit
-        _submitting = true;
 
         // 1. Client-Side Field Validations
         const authorName = document.getElementById('author-name').value.trim();
@@ -1107,6 +1105,9 @@
           return;
         }
 
+        // All validation passed — lock submit
+        _submitting = true;
+
         // 2. Initialize Loading Overlay
         loadingTitle.innerText = 'Submitting Manuscript';
         loadingMessage.innerText = 'Initializing connection and sanitizing manuscript...';
@@ -1120,6 +1121,7 @@
 
         // 3. Perform AJAX Request with detailed progress tracking!
         const xhr = new XMLHttpRequest();
+        xhr.timeout = 90000; // 90s timeout
         xhr.open('POST', '/submit-paper', true);
 
         // Track upload progress
@@ -1215,20 +1217,27 @@
         xhr.onerror = function () {
           loadingOverlay.classList.remove('active');
           showError('A network error occurred. Please check your internet connection.');
-          _submitting = false; // allow retry on error
+          _submitting = false;
+        };
+
+        xhr.ontimeout = function () {
+          loadingOverlay.classList.remove('active');
+          showError('Submission timed out. Please check your connection and try again.');
+          _submitting = false;
         };
 
         xhr.send(formData);
       });
     }
 
-    // 4. Client-Side Premium PDF Generator (jsPDF Integration)
+    // 4. Client-Side Premium PDF Generator (jsPDF — lazy loaded on click)
     const downloadBtn = document.getElementById('download-receipt-btn');
     if (downloadBtn) {
       downloadBtn.addEventListener('click', function () {
         if (!currentSubmissionDetails) return;
 
-        const { jsPDF } = window.jspdf;
+        function generatePDF() {
+          const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
           orientation: 'portrait',
           unit: 'mm',
@@ -1359,6 +1368,17 @@
 
         // Save PDF receipt
         doc.save('ScriptHive_Receipt_' + submission_id + '.pdf');
+        } // end generatePDF
+
+        // Lazy load jsPDF then generate
+        if (window.jspdf) {
+          generatePDF();
+        } else {
+          var s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+          s.onload = generatePDF;
+          document.head.appendChild(s);
+        }
       });
     }
   });
