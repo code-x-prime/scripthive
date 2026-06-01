@@ -82,13 +82,16 @@ export const ProductionPipelinePage = () => {
         const body = (await res.json().catch(() => ({}))) as { message?: string };
         throw new Error(body.message ?? "Download failed");
       }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fallbackName;
-      a.click();
-      URL.revokeObjectURL(url);
+      const ct = res.headers.get("content-type") ?? "";
+      if (ct.includes("application/json")) {
+        const data = await res.json() as { url: string; filename?: string };
+        const a = document.createElement("a"); a.href = data.url; a.download = data.filename ?? fallbackName; a.target = "_blank"; a.click();
+      } else {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href = url; a.download = fallbackName; a.click();
+        URL.revokeObjectURL(url);
+      }
       toast.success("Download started");
       // author manuscript download → auto-moved to ReadyForUpload, reload
       if (kind === "author") {

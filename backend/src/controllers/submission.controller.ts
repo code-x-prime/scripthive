@@ -234,9 +234,9 @@ export const downloadManuscript = async (req: Request, res: Response): Promise<v
     return;
   }
   const raw = s.manuscriptPath;
-  // R2 URL — redirect directly
+  // R2 URL — return URL so frontend downloads directly (avoids CORS with auth headers)
   if (raw.startsWith("http://") || raw.startsWith("https://")) {
-    res.redirect(raw);
+    res.json({ url: raw, filename: raw.split("/").pop() ?? `manuscript-${id}` });
     return;
   }
   const abs = path.normalize(path.isAbsolute(raw) ? raw : path.resolve(process.cwd(), raw));
@@ -437,9 +437,9 @@ export const downloadManuscriptAndAdvance = async (req: Request, res: Response):
   }
 
   const raw = s.manuscriptPath;
-  // R2 URL — redirect directly
+  // R2 URL — return URL for direct download
   if (raw.startsWith("http://") || raw.startsWith("https://")) {
-    res.redirect(raw);
+    res.json({ url: raw, filename: raw.split("/").pop() ?? `manuscript-${id}` });
     return;
   }
   const abs = path.normalize(path.isAbsolute(raw) ? raw : path.resolve(process.cwd(), raw));
