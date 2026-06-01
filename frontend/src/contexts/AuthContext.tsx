@@ -116,12 +116,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         window.dispatchEvent(new CustomEvent("auth:idle-logout"));
       }, IDLE_MS);
     };
-    const events = ["mousemove", "keydown", "mousedown", "touchstart", "scroll", "click"];
-    events.forEach(e => window.addEventListener(e, reset, { passive: true }));
+    const events = ["mousemove", "keydown", "mousedown", "touchstart", "scroll", "click", "wheel", "pointermove"];
+    events.forEach(e => document.addEventListener(e, reset, { passive: true, capture: true }));
     reset(); // start timer immediately
     return () => {
       clearTimeout(timer);
-      events.forEach(e => window.removeEventListener(e, reset));
+      events.forEach(e => document.removeEventListener(e, reset, { capture: true }));
     };
   }, [accessToken, logout]);
 
