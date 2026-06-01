@@ -9,6 +9,7 @@ const db = require('./db');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
+app.set('trust proxy', 1); // Fix: Nginx reverse proxy sets X-Forwarded-For
 const PORT = process.env.PORT || 3000;
 
 // Body parsing middleware
