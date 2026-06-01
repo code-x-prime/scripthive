@@ -2125,12 +2125,14 @@
             <div class="sb-list">
               <div class="sb-item">
                 <span class="sb-item-label"><i class="fa-solid fa-print"></i> ISSN (Print)</span>
-                <span class="sb-item-val">XXXX-XXXX</span>
+                <span class="sb-item-val"><%= (typeof journalMeta !== 'undefined' && journalMeta.issn) ? journalMeta.issn : '—' %></span>
               </div>
+              <% if (typeof journalMeta !== 'undefined' && journalMeta.issnOnline && journalMeta.issnOnline !== 'XXXX-XXXX') { %>
               <div class="sb-item">
                 <span class="sb-item-label"><i class="fa-solid fa-wifi"></i> ISSN (Online)</span>
-                <span class="sb-item-val">XXXX-XXXX</span>
+                <span class="sb-item-val"><%= journalMeta.issnOnline %></span>
               </div>
+              <% } %>
               <div class="sb-item">
                 <span class="sb-item-label"><i class="fa-solid fa-calendar-days"></i> Frequency</span>
                 <span class="sb-item-val">Quarterly</span>
@@ -2643,4 +2645,5 @@
   </script>
 
 <%- include('../partials/footer') %>
+
 

@@ -141,7 +141,7 @@ JOURNAL_IDS_LIST.forEach(jid => {
       fetchArchive(jid),
       fetchEditorialBoard(jid)
     ]);
-    res.render(`journals/${jid}`, { archive, journalId: jid, editorialBoard });
+    res.render(`journals/${jid}`, { archive, journalId: jid, editorialBoard, journalMeta: JOURNAL_META[jid] || {} });
   });
 
   app.get(`/${jid}/archives`, async (req, res) => {
