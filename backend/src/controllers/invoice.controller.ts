@@ -126,6 +126,9 @@ export const updateInvoice = async (req: Request, res: Response): Promise<void> 
 // Manual mark-as-paid by admin → also moves submission to ReadyForPreparation
 export const markInvoicePaidManual = async (req: Request, res: Response): Promise<void> => {
   const invoiceId = String(req.params.id);
+  const { method: paymentMethod } = req.body as { method?: string };
+  const resolvedMethod = paymentMethod?.trim() || "Manual";
+
   const invoice = await prisma.invoice.findUnique({ where: { id: invoiceId } });
   if (!invoice) { res.status(404).json({ message: "Invoice not found" }); return; }
   if (invoice.status === "Paid") { res.status(400).json({ message: "Already paid" }); return; }
@@ -133,7 +136,7 @@ export const markInvoicePaidManual = async (req: Request, res: Response): Promis
   const now = new Date();
   await prisma.invoice.update({
     where: { id: invoiceId },
-    data: { status: "Paid", paidAt: now, method: "Manual", notes: "Marked as paid manually by admin" }
+    data: { status: "Paid", paidAt: now, method: resolvedMethod, notes: `Marked as paid manually by admin via ${resolvedMethod}` }
   });
 
   // move submission to ReadyForPreparation + mark payment paid
@@ -142,7 +145,7 @@ export const markInvoicePaidManual = async (req: Request, res: Response): Promis
       where: { id: invoice.submissionId },
       data: {
         paymentStatus: "Paid",
-        paymentMethod: "Manual",
+        paymentMethod: resolvedMethod,
         paidAt: now,
         productionStatus: "ReadyForPreparation"
       }

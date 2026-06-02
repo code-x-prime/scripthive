@@ -40,6 +40,8 @@ export const PaymentsPage = () => {
   const [apcRates, setApcRates] = useState({ usd: 140, inr: 11500 });
 
   const [search, setSearch] = useState("");
+  const [markPaidModal, setMarkPaidModal] = useState<Invoice | null>(null);
+  const [payMethod, setPayMethod] = useState("Cash");
 
   // inline amount editing state: invoiceId -> draft value
   const [editingAmount, setEditingAmount] = useState<Record<string, string>>({});
@@ -162,14 +164,26 @@ export const PaymentsPage = () => {
     }
   };
 
-  const markPaidManual = async (invoiceId: string) => {
-    if (!window.confirm("Mark this invoice as paid manually? This will move the submission to Ready for Preparation.")) return;
+  const openMarkPaid = (inv: Invoice) => {
+    setMarkPaidModal(inv);
+    setPayMethod("Cash");
+  };
+
+  const confirmMarkPaid = async () => {
+    if (!markPaidModal) return;
+    setSaving(true);
     try {
-      await apiJson(`/invoices/${encodeURIComponent(invoiceId)}/mark-paid`, { method: "POST" });
-      toast.success("Marked as paid — submission moved to production");
+      await apiJson(`/invoices/${encodeURIComponent(markPaidModal.id)}/mark-paid`, {
+        method: "POST",
+        body: JSON.stringify({ method: payMethod })
+      });
+      toast.success(`Marked as paid via ${payMethod} — moved to production`);
+      setMarkPaidModal(null);
       void load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to mark as paid");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -371,7 +385,7 @@ export const PaymentsPage = () => {
                               type="button"
                               title="Mark as paid manually (cash/offline)"
                               className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-green-300 bg-green-50 px-3 text-xs font-semibold text-green-800 hover:bg-green-100"
-                              onClick={() => void markPaidManual(inv.id)}
+                              onClick={() => openMarkPaid(inv)}
                             >
                               ✓ Mark Paid
                             </button>
@@ -478,6 +492,57 @@ export const PaymentsPage = () => {
           </div>
         </div>
       ) : null}
+
+      {/* Mark Paid Modal */}
+      {markPaidModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true">
+          <div className="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-heading text-lg text-gray-900">Mark as Paid</h2>
+              <button type="button" onClick={() => setMarkPaidModal(null)} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 mb-1">Invoice: <span className="font-mono font-semibold text-gray-800">{markPaidModal.id}</span></p>
+            {markPaidModal.submission?.title && (
+              <p className="text-xs text-gray-500 mb-4 line-clamp-1">{markPaidModal.submission.title}</p>
+            )}
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Payment Method</label>
+            <select
+              value={payMethod}
+              onChange={(e) => setPayMethod(e.target.value)}
+              className="w-full h-10 rounded-lg border border-gray-200 px-3 text-sm mb-5 focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="Cash">Cash</option>
+              <option value="UPI">UPI</option>
+              <option value="Card">Card / Net Banking</option>
+              <option value="Bank Transfer">Bank Transfer / NEFT</option>
+              <option value="Cheque">Cheque / DD</option>
+              <option value="Razorpay">Razorpay</option>
+              <option value="SMEPay">SMEPay</option>
+              <option value="PayPal">PayPal</option>
+              <option value="Other">Other</option>
+            </select>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => void confirmMarkPaid()}
+                className="flex-1 rounded-lg bg-green-600 py-2.5 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+              >
+                {saving ? "Saving…" : `✓ Confirm — ${payMethod}`}
+              </button>
+              <button
+                type="button"
+                onClick={() => setMarkPaidModal(null)}
+                className="rounded-lg border border-gray-200 px-4 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
