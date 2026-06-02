@@ -308,6 +308,7 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
 
             // Forward to ScriptHive backend (PostgreSQL) — BLOCKING to get real submission ID
             let submissionId = null;
+            let _backendForwardSuccess = false;
             try {
                 const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
                 const fd = new FormData();
@@ -333,6 +334,12 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
                 if (apiRes.ok) {
                     const apiData = await apiRes.json();
                     submissionId = apiData.id || apiData.submission_id || apiData.data?.id || null;
+                    // If duplicate detected by backend — return existing ID, skip all processing
+                    if (apiData._duplicate) {
+                        console.log('[ScriptHive API] Duplicate submission detected, returning existing ID:', submissionId);
+                        return res.json({ status: 'success', submission_id: submissionId, paper_title, journal: journal, review_timeline: '7–15 Working Days' });
+                    }
+                    _backendForwardSuccess = true; // backend will handle emails
                     console.log('[ScriptHive API] Submission created, ID:', submissionId);
                 } else {
                     const errBody = await apiRes.json().catch(() => ({}));
@@ -518,7 +525,7 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
                 ]
             };
 
-            // Respond immediately — don't block on emails or API forward
+            // Respond immediately — don't block on emails
             res.json({
                 status: 'success',
                 submission_id: submissionId,
@@ -530,11 +537,23 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
                 review_timeline: '7–15 Working Days'
             });
 
-            // Fire-and-forget: emails + backend API (non-blocking)
-            Promise.all([
-                submitTransporter.sendMail(mailOptionsAuthor),
-                submitTransporter.sendMail(mailOptionsAdmin)
-            ]).catch(err => console.error('[Email] Send failed:', err.message));
+            // Only send emails from here if backend API forward FAILED
+            // (backend already sends author confirmation + admin notification on success)
+            const backendForwardedOk = submissionId && !submissionId.startsWith('SH-') || 
+                                        (submissionId && submissionId.match(/^SH-\d{4}-[A-Z0-9]{4}$/) && !submissionId.includes('fallback'));
+            // Simpler check: if submissionId was set from API response (not fallback), skip emails
+            // We track this via a flag set during API forward
+            if (!_backendForwardSuccess) {
+                console.warn('[Email] Backend forward failed — sending fallback emails from client');
+                Promise.all([
+                    submitTransporter.sendMail(mailOptionsAuthor),
+                    submitTransporter.sendMail(mailOptionsAdmin)
+                ]).then(() => {
+                    console.log('[Email] Fallback emails sent successfully');
+                }).catch(err => console.error('[Email] Fallback send failed:', err.message));
+            } else {
+                console.log('[Email] Backend handled emails — skipping client duplicate send');
+            }
 
         } catch (error) {
             console.error('Manuscript Submission Route Error:', error);
