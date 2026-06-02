@@ -383,15 +383,15 @@
 
     /* STICKY NAV */
     .j-nav {
-      position: sticky;
-      top: 80px;
+      position: fixed;
+      top: 80px; width: 100%; left: 0;
       z-index: 100;
       background: rgba(255, 255, 255, 0.97);
       backdrop-filter: blur(10px);
       border-bottom: 2px solid rgba(0, 0, 0, 0.06);
       box-shadow: 0 2px 8px rgba(44, 95, 138, 0.08);
       padding: 0;
-      margin-bottom: 60px;
+      
       transition: box-shadow 0.35s ease, border-bottom-color 0.35s ease;
     }
 
@@ -445,6 +445,7 @@
 
     /* MAIN CONTENT SPLIT */
     .content-grid {
+      padding-top: 60px;
       display: grid;
       grid-template-columns: 1fr 350px;
       gap: 40px;
