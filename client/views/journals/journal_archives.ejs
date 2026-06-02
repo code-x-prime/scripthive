@@ -109,93 +109,99 @@
   .sidebar-btn-outline { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #fff; color: #374151; font-weight: 600; font-size: 0.85rem; padding: 11px; border-radius: 10px; text-decoration: none; margin-top: 10px; border: 1.5px solid #e2e8f0; transition: 0.2s; }
   .sidebar-btn-outline:hover { border-color: #2563eb; color: #2563eb; }
 
-  /* Hero */
-  .arch-hero { background: linear-gradient(135deg,#0b1120 0%,#0f172a 40%,#1a2744 100%); color: #fff; padding: 56px 20px 0; margin-top: 80px; position: relative; overflow: hidden; }
-  .arch-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(37,99,235,0.18) 0%, transparent 70%); pointer-events:none; }
-  .arch-hero-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 380px; gap: 48px; align-items: center; position: relative; z-index: 1; }
-  .arch-hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 5px 14px; border-radius: 20px; font-size: 0.82rem; color: #fbbf24; font-weight: 600; margin-bottom: 20px; }
-  .arch-hero h1 { font-size: 3.2rem; font-weight: 800; line-height: 1.15; margin-bottom: 10px; color: #fff; }
-  .arch-hero-abbr { font-size: 1.3rem; color: #fbbf24; font-weight: 700; margin-bottom: 20px; }
-  .arch-hero-issn { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-  .arch-hero-issn-chip { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18); padding: 5px 14px; border-radius: 6px; font-size: 0.8rem; color: #e2e8f0; font-family: monospace; }
-  .arch-hero-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
-  .arch-hero-tag { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; color: #cbd5e1; }
-  .arch-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-  .arch-hero-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 24px; border-radius: 8px; font-weight: 700; font-size: 0.88rem; text-decoration: none; transition: 0.2s; }
-  .arch-hero-btn.primary { background: #2563eb; color: #fff; box-shadow: 0 4px 14px rgba(37,99,235,0.4); }
-  .arch-hero-btn.primary:hover { background: #1d4ed8; }
-  .arch-hero-btn.outline { border: 1.5px solid rgba(255,255,255,0.3); color: #fff; }
-  .arch-hero-btn.outline:hover { background: rgba(255,255,255,0.08); }
+  /* Hero — exact match journal page */
+  :root { --navy:#0f172a; --gold:#fbbf24; --gold-light:#fef08a; --primary:#2563eb; --brand-shield:#10b981; --glass-bg:rgba(255,255,255,0.7); --glass-border:rgba(255,255,255,0.5); --glass-shadow:0 8px 32px 0 rgba(31,38,135,0.07); }
+  .arch-hero { background: var(--navy); color: white; padding: 160px 0 120px; position: relative; overflow: hidden; min-height: 80vh; display: flex; align-items: center; margin-top: 80px; }
+  .arch-hero-mesh { position:absolute; top:0; left:0; right:0; bottom:0; z-index:0; background: radial-gradient(circle at 10% 40%, rgba(37,99,235,0.25) 0%, transparent 60%), radial-gradient(circle at 90% 80%, rgba(251,191,36,0.15) 0%, transparent 60%); animation: archPulseMesh 10s infinite alternate; }
+  @keyframes archPulseMesh { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(1.1);opacity:1} }
+  .arch-hero-grid { display:grid; grid-template-columns:1.2fr 0.8fr; gap:60px; align-items:center; max-width:1200px; margin:0 auto; padding:0 20px; position:relative; z-index:1; width:100%; }
+  .arch-j-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:30px; font-size:0.9rem; margin-bottom:24px; backdrop-filter:blur(10px); color:var(--gold); font-weight:600; }
+  .arch-hero-title { font-size:3.5rem; font-weight:800; line-height:1.15; margin-bottom:16px; background:linear-gradient(to right,#fff,#cbd5e1); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .arch-hero-abbr { font-size:2rem; color:var(--gold-light); font-weight:700; margin-bottom:24px; }
+  .arch-hero-issn { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:30px; font-family:monospace; font-size:1.1rem; color:#94a3b8; }
+  .arch-hero-issn span { background:rgba(0,0,0,0.3); padding:6px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); }
+  .arch-hero-tags { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:40px; align-items:center; }
+  .arch-hero-tag { background:rgba(255,255,255,0.08); padding:8px 16px; border-radius:30px; font-size:0.88rem; font-weight:600; border:1px solid rgba(255,255,255,0.15); display:inline-flex; align-items:center; gap:7px; }
+  .arch-hero-btns { display:flex; gap:16px; flex-wrap:wrap; }
+  .arch-hero-btn-primary { display:inline-flex; align-items:center; gap:8px; background:var(--primary); color:#fff; padding:14px 28px; border-radius:10px; font-weight:700; font-size:1rem; text-decoration:none; transition:0.2s; box-shadow:0 4px 14px rgba(37,99,235,0.4); }
+  .arch-hero-btn-primary:hover { background:#1d4ed8; transform:translateY(-2px); }
+  .arch-hero-btn-outline { display:inline-flex; align-items:center; gap:8px; border:2px solid rgba(255,255,255,0.3); color:#fff; padding:13px 24px; border-radius:10px; font-weight:700; font-size:0.95rem; text-decoration:none; transition:0.2s; }
+  .arch-hero-btn-outline:hover { background:rgba(255,255,255,0.08); }
   /* cover visual */
-  .arch-hero-visual { position: relative; display: flex; justify-content: center; align-items: flex-end; height: 340px; }
-  .arch-hero-cover { width: 200px; height: 275px; border-radius: 8px; object-fit: cover; object-position: center top; box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 6px 20px rgba(0,0,0,0.4); position: relative; z-index: 2; transform: perspective(800px) rotateY(-8deg); transition: transform 0.4s; }
-  .arch-hero-cover:hover { transform: perspective(800px) rotateY(0deg) scale(1.03); }
-  .arch-hero-badge-doi { position: absolute; top: 20px; right: 10px; background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 14px; z-index: 3; text-align: center; font-size: 0.75rem; color: #94a3b8; font-weight: 600; backdrop-filter: blur(8px); }
-  .arch-hero-badge-doi strong { display: block; font-size: 0.85rem; color: #fff; }
-  .arch-hero-badge-issn { position: absolute; bottom: 40px; left: -10px; background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px 14px; z-index: 3; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(8px); }
-  .arch-hero-badge-issn-dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; }
-  .arch-hero-badge-issn-text { font-size: 0.75rem; color: #fff; font-weight: 600; }
-  .arch-hero-badge-issn-sub { font-size: 0.65rem; color: #94a3b8; }
+  .arch-hero-visual { position:relative; height:500px; perspective:1000px; }
+  .arch-floating-cover { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotateY(-15deg); width:320px; height:420px; border-radius:8px; box-shadow:-20px 20px 50px rgba(0,0,0,0.5), inset 2px 0 10px rgba(255,255,255,0.2); border-left:6px solid #fff; overflow:hidden; animation:archFloatBook 6s infinite alternate ease-in-out; z-index:2; }
+  .arch-floating-cover img { width:100%; height:100%; object-fit:cover; object-position:center top; display:block; }
+  @keyframes archFloatBook { 0%{transform:translate(-50%,-50%) rotateY(-15deg) translateY(0)} 100%{transform:translate(-50%,-50%) rotateY(-15deg) translateY(-20px)} }
+  .arch-float-badge { position:absolute; background:rgba(255,255,255,0.1); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.2); border-radius:16px; padding:15px 20px; display:flex; align-items:center; gap:12px; box-shadow:0 15px 30px rgba(0,0,0,0.3); color:white; font-weight:600; z-index:3; }
+  .arch-fb-1 { top:40px; right:0; animation:archFloatObj 5s infinite alternate ease-in-out; }
+  .arch-fb-2 { bottom:60px; left:-20px; animation:archFloatObj 7s infinite alternate-reverse ease-in-out; border-color:var(--brand-shield); }
+  @keyframes archFloatObj { 0%{transform:translateY(0)} 100%{transform:translateY(-15px)} }
+  .arch-fb-icon { width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
   /* stats bar */
-  .arch-hero-stats { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4,1fr); gap: 0; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 36px; position: relative; z-index: 1; }
-  .arch-hero-stat { padding: 20px 24px; border-right: 1px solid rgba(255,255,255,0.08); }
-  .arch-hero-stat:last-child { border-right: none; }
-  .arch-hero-stat-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 4px; }
-  .arch-hero-stat-value { font-size: 1rem; font-weight: 700; color: #fff; }
-  @media (max-width: 900px) {
-    .arch-hero-inner { grid-template-columns: 1fr; }
-    .arch-hero-visual { display: none; }
-    .arch-hero h1 { font-size: 2rem; }
-    .arch-hero-stats { grid-template-columns: repeat(2,1fr); }
+  .arch-stats-bar { margin-top:-50px; position:relative; z-index:10; margin-bottom:60px; padding:0 20px; }
+  .arch-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; max-width:1200px; margin:0 auto; }
+  .arch-stat-card { background:var(--glass-bg); backdrop-filter:blur(20px); border:1px solid var(--glass-border); border-radius:20px; padding:25px; box-shadow:var(--glass-shadow); display:flex; align-items:center; gap:20px; transition:0.3s; }
+  .arch-stat-card:hover { transform:translateY(-5px); border-color:var(--primary); }
+  .arch-stat-icon { width:50px; height:50px; background:rgba(37,99,235,0.1); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:var(--primary); }
+  .arch-stat-info h4 { font-size:0.85rem; color:#64748b; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em; }
+  .arch-stat-info p { font-size:1rem; font-weight:700; color:#0f172a; margin:0; }
+  @media (max-width:900px) {
+    .arch-hero-grid { grid-template-columns:1fr; }
+    .arch-hero-visual { display:none; }
+    .arch-hero-title { font-size:2.2rem; }
+    .arch-stats-grid { grid-template-columns:repeat(2,1fr); }
   }
 </style>
 
 <div class="arch-page">
 
-  <!-- Hero -->
-  <div class="arch-hero">
-    <div class="arch-hero-inner">
-      <!-- Left: text content -->
-      <div class="arch-hero-content">
-        <div class="arch-hero-badge">⭐ ScriptHive Journal</div>
-        <h1><%= journal.name %></h1>
+  <!-- Hero — exact journal page style -->
+  <section class="arch-hero">
+    <div class="arch-hero-mesh"></div>
+    <div class="arch-hero-grid">
+      <div class="arch-hero-text">
+        <div class="arch-j-badge"><i class="fa-solid fa-star"></i> ScriptHive Journal</div>
+        <h1 class="arch-hero-title"><%= journal.name %></h1>
         <div class="arch-hero-abbr">(<%= journal.abbr %>)</div>
         <div class="arch-hero-issn">
-          <% if (journal.issn) { %><span class="arch-hero-issn-chip">ISSN: <%= journal.issn %> (Print)</span><% } %>
-          <% if (journal.issnOnline && journal.issnOnline !== 'XXXX-XXXX') { %><span class="arch-hero-issn-chip">ISSN: <%= journal.issnOnline %> (Online)</span><% } %>
+          <span>ISSN: XXXX-XXXX (Print)</span>
+          <span>ISSN: XXXX-XXXX (Online)</span>
         </div>
         <div class="arch-hero-tags">
-          <span class="arch-hero-tag">📋 Peer-Reviewed</span>
-          <span class="arch-hero-tag">🔓 Open Access</span>
-          <span class="arch-hero-tag">📅 Quarterly</span>
-          <span class="arch-hero-tag">🌐 International</span>
+          <div class="arch-hero-tag"><i class="fa-solid fa-microscope" style="color:var(--brand-shield);"></i> Peer-Reviewed</div>
+          <div class="arch-hero-tag"><i class="fa-solid fa-lock-open" style="color:var(--gold);"></i> Open Access</div>
+          <div class="arch-hero-tag"><i class="fa-regular fa-calendar-check" style="color:#8b5cf6;"></i> Quarterly</div>
+          <div class="arch-hero-tag"><i class="fa-solid fa-globe" style="color:#3b82f6;"></i> International</div>
         </div>
-        <div class="arch-hero-actions">
-          <a href="/submit?journal=<%= journal.abbr %>" class="arch-hero-btn primary">✈ Submit Paper</a>
-          <a href="/<%= journal.abbr %>" class="arch-hero-btn outline">← Back to Journal</a>
+        <div class="arch-hero-btns">
+          <a href="/submit?journal=<%= journal.abbr %>" class="arch-hero-btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Paper</a>
+          <a href="/<%= journal.abbr %>" class="arch-hero-btn-outline"><i class="fa-solid fa-arrow-left"></i> Back to Journal</a>
         </div>
       </div>
-      <!-- Right: cover visual -->
       <div class="arch-hero-visual">
         <% if (journal.cover) { %>
-          <img src="<%= journal.cover %>" alt="<%= journal.abbr %> Cover" class="arch-hero-cover">
+        <div class="arch-floating-cover">
+          <img src="<%= journal.cover %>" alt="<%= journal.abbr %> Cover" loading="eager">
+        </div>
         <% } %>
-        <div class="arch-hero-badge-doi"><strong>DOI</strong>Supported</div>
-        <div class="arch-hero-badge-issn">
-          <div class="arch-hero-badge-issn-dot"></div>
-          <div>
-            <div class="arch-hero-badge-issn-text">ISSN</div>
-            <div class="arch-hero-badge-issn-sub">Verified</div>
-          </div>
+        <div class="arch-float-badge arch-fb-1">
+          <div class="arch-fb-icon" style="color:var(--primary);"><i class="fa-solid fa-fingerprint"></i></div>
+          <div>DOI<br><span style="font-size:0.75rem;font-weight:400;color:rgba(255,255,255,0.7);">Supported</span></div>
+        </div>
+        <div class="arch-float-badge arch-fb-2">
+          <div class="arch-fb-icon" style="color:var(--brand-shield);"><i class="fa-solid fa-certificate"></i></div>
+          <div>ISSN<br><span style="font-size:0.75rem;font-weight:400;color:rgba(255,255,255,0.7);">Verified</span></div>
         </div>
       </div>
     </div>
-    <!-- Stats bar -->
-    <div class="arch-hero-stats">
-      <div class="arch-hero-stat"><div class="arch-hero-stat-label">Frequency</div><div class="arch-hero-stat-value">Quarterly</div></div>
-      <div class="arch-hero-stat"><div class="arch-hero-stat-label">Review Time</div><div class="arch-hero-stat-value">7-15 Days</div></div>
-      <div class="arch-hero-stat"><div class="arch-hero-stat-label">Access</div><div class="arch-hero-stat-value">Open Access</div></div>
-      <div class="arch-hero-stat"><div class="arch-hero-stat-label">ISSN</div><div class="arch-hero-stat-value">Print &amp; Online</div></div>
+  </section>
+  <!-- Stats bar -->
+  <div class="arch-stats-bar">
+    <div class="arch-stats-grid">
+      <div class="arch-stat-card"><div class="arch-stat-icon"><i class="fa-regular fa-calendar-days"></i></div><div class="arch-stat-info"><h4>Frequency</h4><p>Quarterly</p></div></div>
+      <div class="arch-stat-card"><div class="arch-stat-icon" style="color:var(--gold);background:rgba(251,191,36,0.1);"><i class="fa-solid fa-bolt"></i></div><div class="arch-stat-info"><h4>Review Time</h4><p>7-15 Days</p></div></div>
+      <div class="arch-stat-card"><div class="arch-stat-icon" style="color:var(--brand-shield);background:rgba(16,185,129,0.1);"><i class="fa-solid fa-lock-open"></i></div><div class="arch-stat-info"><h4>Access</h4><p>Open Access</p></div></div>
+      <div class="arch-stat-card"><div class="arch-stat-icon" style="color:#8b5cf6;background:rgba(139,92,246,0.1);"><i class="fa-solid fa-barcode"></i></div><div class="arch-stat-info"><h4>ISSN</h4><p>Print &amp; Online</p></div></div>
     </div>
   </div>
 
