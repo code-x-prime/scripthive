@@ -122,7 +122,7 @@ export const getNextArticleNo = async (req: Request, res: Response): Promise<voi
   const count = await prisma.submission.count({
     where: { journalId, status: "Published" }
   });
-  const articleNo = 1474 + count + 1;
+  const articleNo = count + 1;
   res.json({ articleNo });
 };
 
@@ -201,7 +201,7 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
         const publishedCount = await prisma.submission.count({
           where: { journalId: submission.journalId, status: "Published" }
         });
-        articleNo = 1474 + publishedCount + 1;
+        articleNo = publishedCount + 1;
       }
 
       const prefixRow = await prisma.setting.findUnique({ where: { key: "doi_prefix" } });
