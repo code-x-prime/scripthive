@@ -395,59 +395,95 @@
     <!-- RIGHT: Filter + Journal Info -->
     <div class="arch-right-col">
 
-      <!-- Filter Articles — dropdowns -->
+      <!-- Filter Articles — cascading dropdowns -->
       <% if (issues.length > 0) { %>
+      <%
+        // Build data map for cascade — pass to JS
+        var issueDataJson = JSON.stringify(issues.map(function(i){
+          return { vol: i.vol.number, year: i.vol.year, iss: i.iss.number, part: i.part.name, count: i.articles.length };
+        }));
+        var seenVols2 = {}; issues.forEach(function(i){ seenVols2[i.vol.number]=i.vol.year; });
+        var volList = Object.keys(seenVols2).map(Number).sort(function(a,b){return b-a;});
+        var seenParts2 = {}; issues.forEach(function(i){ seenParts2[i.part.name]=true; });
+        var multiPart = Object.keys(seenParts2).length > 1;
+      %>
       <div class="filter-card">
         <div class="filter-card-title">
-          Filter Articles
+          Filter
           <button class="filter-clear" id="filterClearAll">Clear</button>
-        </div>
-
-        <%
-          var seenYears2 = {}; issues.forEach(function(i){ seenYears2[i.vol.year]=true; });
-          var yearList = Object.keys(seenYears2).map(Number).sort(function(a,b){return b-a;});
-          var seenVols2 = {}; issues.forEach(function(i){ seenVols2[i.vol.number]=true; });
-          var volList = Object.keys(seenVols2).map(Number).sort(function(a,b){return b-a;});
-          var seenIss2 = {}; issues.forEach(function(i){ seenIss2[i.iss.number]=true; });
-          var issList = Object.keys(seenIss2).map(Number).sort(function(a,b){return b-a;});
-          var seenParts2 = {}; issues.forEach(function(i){ seenParts2[i.part.name]=true; });
-          var partList2 = Object.keys(seenParts2).sort();
-        %>
-
-        <div class="filter-group">
-          <div class="filter-group-label">Year</div>
-          <select id="dropYear" class="arch-filter-select">
-            <option value="">All Years</option>
-            <% yearList.forEach(function(y){ %><option value="<%= y %>"><%= y %></option><% }); %>
-          </select>
         </div>
 
         <div class="filter-group">
           <div class="filter-group-label">Volume</div>
           <select id="dropVol" class="arch-filter-select">
-            <option value="">All Volumes</option>
-            <% volList.forEach(function(v){ %><option value="<%= v %>">Vol. <%= v %></option><% }); %>
+            <option value="">Select Volume</option>
+            <% volList.forEach(function(v){ %><option value="<%= v %>">Vol. <%= v %> (<%= seenVols2[v] %>)</option><% }); %>
           </select>
         </div>
 
-        <div class="filter-group">
+        <div class="filter-group" id="issGrp" style="display:none;">
           <div class="filter-group-label">Issue</div>
           <select id="dropIss" class="arch-filter-select">
-            <option value="">All Issues</option>
-            <% issList.forEach(function(n){ %><option value="<%= n %>">Issue <%= n %></option><% }); %>
+            <option value="">Select Issue</option>
           </select>
         </div>
 
-        <% if (partList2.length > 1) { %>
-        <div class="filter-group">
+        <% if (multiPart) { %>
+        <div class="filter-group" id="partGrp" style="display:none;">
           <div class="filter-group-label">Part</div>
           <select id="dropPart" class="arch-filter-select">
-            <option value="">All Parts</option>
-            <% partList2.forEach(function(p){ %><option value="<%= p %>">Part <%= p %></option><% }); %>
+            <option value="">Select Part</option>
           </select>
         </div>
         <% } %>
       </div>
+      <script>
+      (function(){
+        var DATA = <%- issueDataJson %>;
+        var multiPart = <%= multiPart ? 'true' : 'false' %>;
+
+        function getUniq(arr){ var s={}; arr.forEach(function(v){s[v]=true;}); return Object.keys(s).sort(function(a,b){return Number(b)-Number(a);}); }
+
+        var dropVol  = document.getElementById('dropVol');
+        var dropIss  = document.getElementById('dropIss');
+        var dropPart = document.getElementById('dropPart');
+        var issGrp   = document.getElementById('issGrp');
+        var partGrp  = document.getElementById('partGrp');
+
+        dropVol && dropVol.addEventListener('change', function(){
+          var v = this.value;
+          dropIss && (dropIss.innerHTML = '<option value="">Select Issue</option>');
+          dropPart && (dropPart.innerHTML = '<option value="">Select Part</option>');
+          issGrp && (issGrp.style.display = 'none');
+          partGrp && (partGrp.style.display = 'none');
+          if (!v) { applyFilters(); return; }
+          var issList = getUniq(DATA.filter(function(d){return String(d.vol)===v;}).map(function(d){return String(d.iss);}));
+          issList.forEach(function(n){
+            var o=document.createElement('option'); o.value=n; o.textContent='Issue '+n;
+            dropIss && dropIss.appendChild(o);
+          });
+          issGrp && (issGrp.style.display = '');
+          applyFilters();
+        });
+
+        dropIss && dropIss.addEventListener('change', function(){
+          var v = dropVol ? dropVol.value : '';
+          var n = this.value;
+          dropPart && (dropPart.innerHTML = '<option value="">Select Part</option>');
+          partGrp && (partGrp.style.display = 'none');
+          if (multiPart && v && n) {
+            var parts = getUniq(DATA.filter(function(d){return String(d.vol)===v&&String(d.iss)===n;}).map(function(d){return d.part;}));
+            if (parts.length > 1) {
+              parts.forEach(function(p){ var o=document.createElement('option'); o.value=p; o.textContent='Part '+p; dropPart && dropPart.appendChild(o); });
+              partGrp && (partGrp.style.display = '');
+            }
+          }
+          applyFilters();
+        });
+
+        dropPart && dropPart.addEventListener('change', applyFilters);
+      })();
+      </script>
       <% } %>
 
       <!-- Journal Info -->
