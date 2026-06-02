@@ -104,23 +104,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, [accessToken, logout]);
 
-  // 10 min idle auto-logout
+  // 10 min idle auto-logout — persisted via localStorage so reloads don't reset it
   useEffect(() => {
     if (!accessToken) return;
     const IDLE_MS = 10 * 60 * 1000;
-    let timer: ReturnType<typeof setTimeout>;
-    const reset = () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
+    const LS_KEY = "sh_admin_last_active";
+
+    const stampNow = () => localStorage.setItem(LS_KEY, String(Date.now()));
+    const reset = () => stampNow();
+
+    // On mount: check if already idle too long
+    const last = Number(localStorage.getItem(LS_KEY) || 0);
+    if (last > 0 && Date.now() - last > IDLE_MS) {
+      setTimeout(() => {
         void logout();
         window.dispatchEvent(new CustomEvent("auth:idle-logout"));
-      }, IDLE_MS);
-    };
+      }, 0);
+      return;
+    }
+    // Stamp now so reload itself counts as activity
+    stampNow();
+
+    // Polling check every 30s
+    const poll = setInterval(() => {
+      const t = Number(localStorage.getItem(LS_KEY) || 0);
+      if (Date.now() - t > IDLE_MS) {
+        void logout();
+        window.dispatchEvent(new CustomEvent("auth:idle-logout"));
+      }
+    }, 30000);
+
     const events = ["mousemove", "keydown", "mousedown", "touchstart", "scroll", "click", "wheel", "pointermove"];
     events.forEach(e => document.addEventListener(e, reset, { passive: true, capture: true }));
-    reset(); // start timer immediately
+
     return () => {
-      clearTimeout(timer);
+      clearInterval(poll);
       events.forEach(e => document.removeEventListener(e, reset, { capture: true }));
     };
   }, [accessToken, logout]);
