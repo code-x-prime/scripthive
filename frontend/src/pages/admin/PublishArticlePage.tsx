@@ -74,9 +74,13 @@ export const PublishArticlePage = () => {
   const doiLink = useMemo(() => {
     if (!assignDoiOnPublish || !selectedVolume || !selectedIssue || !articleNo) return "";
     const selectedPart = selectedIssue.parts.find((p) => String(p.id) === form.partId);
-    const partLetter = (selectedPart?.name ?? "A").toLowerCase();
-    return `https://www.doi.org/${doiPrefix}.${form.year}.v${selectedVolume.number}i${selectedIssue.number}${partLetter}.${articleNo}`;
-  }, [assignDoiOnPublish, selectedVolume, selectedIssue, form.partId, form.year, articleNo, doiPrefix]);
+    const partRaw = (selectedPart?.name ?? "A").toLowerCase().replace(/[^a-z0-9]/g, "");
+    // Special issue → s1, s2 etc; normal Part A = no suffix, Part B/AA = suffix
+    const partSeg = partRaw === "a" ? "" : `-p-${partRaw}`;
+    const jid = filterJournalId.toLowerCase();
+    // Format: PREFIX/journalId.v{vol}-is{issue}{partSeg}.{refNo}
+    return `https://www.doi.org/${doiPrefix}/${jid}.v${selectedVolume.number}-is${selectedIssue.number}${partSeg}.${articleNo}`;
+  }, [assignDoiOnPublish, selectedVolume, selectedIssue, form.partId, filterJournalId, articleNo, doiPrefix]);
 
   const loadData = useCallback(async () => {
     setLoading(true);

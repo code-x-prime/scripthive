@@ -42,8 +42,8 @@ export const assignDoi = async (req: Request, res: Response): Promise<void> => {
   }
   // Part: slugify, Part A = no suffix, Part B/AA/etc = append lowercase slug
   const partSlug = (part ?? "A").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-  const partSuffix = partSlug && partSlug !== "a" ? partSlug : "";
-  const doi = `${env.DOI_PREFIX}/${journalId.toLowerCase()}.v${volume}i${issue}${partSuffix}.${submissionId}`;
+  const partSeg = partSlug && partSlug !== "a" ? `-p-${partSlug}` : "";
+  const doi = `${env.DOI_PREFIX}/${journalId.toLowerCase()}.v${volume}-is${issue}${partSeg}.${submissionId}`;
   const row = await prisma.doiRecord.upsert({
     where: { submissionId },
     update: { doi, status: "Submitted" },

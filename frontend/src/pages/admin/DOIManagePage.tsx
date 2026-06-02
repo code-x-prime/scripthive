@@ -53,8 +53,8 @@ export const DOIManagePage = () => {
     const i = parseInt(iss, 10) || 1;
     // slugify part: keep only alphanumeric, lowercase
     const partSlug = part.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-    const partSuffix = partSlug && partSlug !== "a" ? partSlug : "";
-    return `${doiPrefix}/${jid}.v${v}i${i}${partSuffix}.${modal.id}`;
+    const partSeg = partSlug && partSlug !== "a" ? `-p-${partSlug}` : "";
+    return `${doiPrefix}/${jid}.v${v}-is${i}${partSeg}.${modal.id}`;
   }, [modal, vol, iss, part, doiPrefix]);
 
   const assign = async () => {
