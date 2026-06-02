@@ -128,8 +128,20 @@ export const createSubmission = async (req: Request, res: Response): Promise<voi
   try {
     await sendMail({
       to: env.ADMIN_EMAIL,
-      subject: `New submission received: ${created.id}`,
-      html: `<p>New submission received from ${created.authorName} (${created.authorEmail}).</p><p>ID: <strong>${created.id}</strong></p>`
+      subject: `New Paper Submission: ${created.id} | ScriptHive`,
+      replyTo: created.authorEmail,
+      html: `
+        <p>A new manuscript has been submitted.</p>
+        <table style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;">
+          <tr><td style="padding:6px 12px;color:#555;">Submission ID</td><td style="padding:6px 12px;font-weight:bold;">${created.id}</td></tr>
+          <tr><td style="padding:6px 12px;color:#555;">Author Name</td><td style="padding:6px 12px;">${created.authorName}</td></tr>
+          <tr><td style="padding:6px 12px;color:#555;">Author Email</td><td style="padding:6px 12px;"><a href="mailto:${created.authorEmail}">${created.authorEmail}</a></td></tr>
+          <tr><td style="padding:6px 12px;color:#555;">Title</td><td style="padding:6px 12px;">${created.title}</td></tr>
+          <tr><td style="padding:6px 12px;color:#555;">Journal</td><td style="padding:6px 12px;">${created.journalId}</td></tr>
+          <tr><td style="padding:6px 12px;color:#555;">Submitted At</td><td style="padding:6px 12px;">${created.createdAt.toUTCString()}</td></tr>
+        </table>
+        <p style="margin-top:16px;color:#888;font-size:12px;">Replying to this email will go directly to the author.</p>
+      `
     });
   } catch (err) {
     logger.warn({ message: "Admin alert email failed", submissionId: created.id, err });

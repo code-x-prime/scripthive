@@ -5,6 +5,7 @@ interface SendMailParams {
   to: string | string[];
   subject: string;
   html: string;
+  replyTo?: string;
 }
 
 /* ── Base template ─────────────────────────────────────────────────────────── */
@@ -93,12 +94,13 @@ function divider(): string {
 }
 
 /* ── sendMail ──────────────────────────────────────────────────────────────── */
-export const sendMail = async ({ to, subject, html }: SendMailParams): Promise<void> => {
+export const sendMail = async ({ to, subject, html, replyTo }: SendMailParams): Promise<void> => {
   await emailTransporter.sendMail({
     from: env.SMTP_FROM,
     to,
     subject,
-    html
+    html,
+    ...(replyTo ? { replyTo } : {})
   });
 };
 

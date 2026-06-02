@@ -47,6 +47,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // ignore
     }
+    // Clear idle timestamp so re-login isn't immediately blocked by stale value
+    localStorage.removeItem("sh_admin_last_active");
     setAccessToken(null);
     setAdmin(null);
   }, []);
@@ -156,6 +158,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const data = (await res.json()) as { accessToken: string; admin: AdminUser };
+    // Stamp fresh activity time so the idle timer starts from now, not from before logout
+    localStorage.setItem("sh_admin_last_active", String(Date.now()));
     setAccessToken(data.accessToken);
     setAdmin(normalizeAdmin(data.admin));
   };
