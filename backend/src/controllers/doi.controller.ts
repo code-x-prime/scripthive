@@ -40,10 +40,15 @@ export const assignDoi = async (req: Request, res: Response): Promise<void> => {
     res.status(400).json({ message: "submissionId, journalId, volume, and issue are required" });
     return;
   }
-  // Part: slugify, Part A = no suffix, Part B/AA/etc = append lowercase slug
+  // Part: A = no suffix, others = append
   const partSlug = (part ?? "A").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-  const partSeg = partSlug && partSlug !== "a" ? `-p-${partSlug}` : "";
-  const doi = `${env.DOI_PREFIX}/${journalId.toLowerCase()}.v${volume}-is${issue}${partSeg}.${submissionId}`;
+  const partSeg = partSlug && partSlug !== "a" ? partSlug : "";
+  // Ref no = published count for this journal + 1, zero-padded to 3 digits
+  const publishedCount = await prisma.submission.count({
+    where: { journalId, status: "Published" }
+  });
+  const refNo = String(publishedCount + 1).padStart(3, "0");
+  const doi = `${env.DOI_PREFIX}/${journalId.toLowerCase()}.v${volume}i${issue}${partSeg}.${refNo}`;
   const row = await prisma.doiRecord.upsert({
     where: { submissionId },
     update: { doi, status: "Submitted" },

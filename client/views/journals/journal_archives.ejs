@@ -88,7 +88,7 @@
   .filter-check-item label { font-size: 0.85rem; color: #374151; cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; font-weight: 500; }
   .filter-check-item input:checked + label { color: #2563eb; font-weight: 700; }
   .fcount { background: #f1f5f9; color: #64748b; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; min-width: 22px; text-align: center; }
-  .sidebar-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .sidebar-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 18px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
   .sidebar-card-title { font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f1f5f9; }
   .sidebar-abbr { font-size: 0.82rem; color: #64748b; font-weight: 600; margin-bottom: 14px; }
   .sidebar-info-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; padding: 9px 0; border-bottom: 1px solid #f8fafc; color: #374151; }
@@ -345,7 +345,7 @@
                 var pageRange = (ps && pe) ? (String(ps).padStart(2,'0') + '-' + String(pe).padStart(2,'0')) : null;
                 var partSuffix = iss.part.name !== 'A' ? iss.part.name.toLowerCase() : '';
                 var citation = journal.abbr + '; ' + iss.vol.year + '; ' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + (pageRange || '');
-                var articleSlug = pageRange ? (iss.vol.year + '-' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + pageRange) : (art.slug || art.id);
+                var articleSlug = art.slug || (pageRange ? (iss.vol.year + '-' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + pageRange) : art.id);
                 var pdfUrl = art.pdfPublicPath ? (art.pdfPublicPath.startsWith('http') ? art.pdfPublicPath : '/api-files/' + art.pdfPublicPath) : null;
               %>
               <tr class="art-row"

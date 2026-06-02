@@ -208,8 +208,9 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
       const doiPrefix = prefixRow?.value ?? "10.55662";
       const jid = submission.journalId.toLowerCase();
       const partSlug = partLower.replace(/[^a-z0-9]/g, "");
-      const partSeg = partSlug && partSlug !== "a" ? `-p-${partSlug}` : "";
-      const builtLink = `https://www.doi.org/${doiPrefix}/${jid}.v${volume}-is${issue}${partSeg}.${articleNo}`;
+      const partSeg = partSlug && partSlug !== "a" ? partSlug : "";
+      const refNo = String(articleNo).padStart(3, "0");
+      const builtLink = `https://www.doi.org/${doiPrefix}/${jid}.v${volume}i${issue}${partSeg}.${refNo}`;
 
       finalDoiLink =
         doiLinkFromClient?.trim() && doiLinkFromClient.includes("doi.org")

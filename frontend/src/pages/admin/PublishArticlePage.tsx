@@ -76,10 +76,11 @@ export const PublishArticlePage = () => {
     const selectedPart = selectedIssue.parts.find((p) => String(p.id) === form.partId);
     const partRaw = (selectedPart?.name ?? "A").toLowerCase().replace(/[^a-z0-9]/g, "");
     // Special issue → s1, s2 etc; normal Part A = no suffix, Part B/AA = suffix
-    const partSeg = partRaw === "a" ? "" : `-p-${partRaw}`;
+    const partSeg = partRaw === "a" ? "" : partRaw;
     const jid = filterJournalId.toLowerCase();
-    // Format: PREFIX/journalId.v{vol}-is{issue}{partSeg}.{refNo}
-    return `https://www.doi.org/${doiPrefix}/${jid}.v${selectedVolume.number}-is${selectedIssue.number}${partSeg}.${articleNo}`;
+    const refNo = String(articleNo).padStart(3, "0");
+    // Format: 10.55662/sgmrj.v1i1.001
+    return `https://www.doi.org/${doiPrefix}/${jid}.v${selectedVolume.number}i${selectedIssue.number}${partSeg}.${refNo}`;
   }, [assignDoiOnPublish, selectedVolume, selectedIssue, form.partId, filterJournalId, articleNo, doiPrefix]);
 
   const loadData = useCallback(async () => {
