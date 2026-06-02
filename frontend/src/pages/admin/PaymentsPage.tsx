@@ -273,10 +273,10 @@ export const PaymentsPage = () => {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <th className="px-3 py-3"></th>
-                {isCompleted && <th className="px-3 py-3">Invoice ID</th>}
                 <th className="px-3 py-3">Submission ID</th>
                 <th className="px-3 py-3">Customer</th>
                 <th className="px-3 py-3">Amount</th>
+                {isCompleted && <th className="px-3 py-3">Payment Method</th>}
                 {isCompleted && <th className="px-3 py-3">Transaction ID</th>}
                 <th className="px-3 py-3">Date</th>
                 <th className="px-3 py-3">Status</th>
@@ -299,7 +299,6 @@ export const PaymentsPage = () => {
                       </button>
                     )}
                   </td>
-                  {isCompleted && <td className="whitespace-nowrap px-3 py-2 font-mono text-green-700">{inv.id}</td>}
                   <td className="whitespace-nowrap px-3 py-2 font-mono text-gray-700">{inv.submissionId}</td>
                   <td className="max-w-[200px] px-3 py-2">
                     <p className="font-medium text-gray-900">{inv.customerName}</p>
@@ -326,6 +325,16 @@ export const PaymentsPage = () => {
                       </span>
                     )}
                   </td>
+                  {/* payment method — completed only */}
+                  {isCompleted && (
+                    <td className="px-3 py-2">
+                      {inv.method ? (
+                        <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
+                          {inv.method}
+                        </span>
+                      ) : "—"}
+                    </td>
+                  )}
                   {/* transaction ID — completed only */}
                   {isCompleted && (
                     <td className="px-3 py-2 font-mono text-xs text-gray-600">
