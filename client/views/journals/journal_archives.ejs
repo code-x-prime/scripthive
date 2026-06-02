@@ -112,10 +112,10 @@
   /* Hero */
   .arch-hero { background: linear-gradient(135deg,#0b1120 0%,#0f172a 40%,#1a2744 100%); color: #fff; padding: 56px 20px 0; margin-top: 80px; position: relative; overflow: hidden; }
   .arch-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(37,99,235,0.18) 0%, transparent 70%); pointer-events:none; }
-  .arch-hero-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: center; position: relative; z-index: 1; }
-  .arch-hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 5px 14px; border-radius: 20px; font-size: 0.78rem; color: #fbbf24; font-weight: 600; margin-bottom: 18px; }
-  .arch-hero h1 { font-size: 2.1rem; font-weight: 800; line-height: 1.2; margin-bottom: 8px; color: #fff; }
-  .arch-hero-abbr { font-size: 1.15rem; color: #fbbf24; font-weight: 700; margin-bottom: 18px; }
+  .arch-hero-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 380px; gap: 48px; align-items: center; position: relative; z-index: 1; }
+  .arch-hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 5px 14px; border-radius: 20px; font-size: 0.82rem; color: #fbbf24; font-weight: 600; margin-bottom: 20px; }
+  .arch-hero h1 { font-size: 3.2rem; font-weight: 800; line-height: 1.15; margin-bottom: 10px; color: #fff; }
+  .arch-hero-abbr { font-size: 1.3rem; color: #fbbf24; font-weight: 700; margin-bottom: 20px; }
   .arch-hero-issn { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
   .arch-hero-issn-chip { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18); padding: 5px 14px; border-radius: 6px; font-size: 0.8rem; color: #e2e8f0; font-family: monospace; }
   .arch-hero-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
@@ -127,8 +127,8 @@
   .arch-hero-btn.outline { border: 1.5px solid rgba(255,255,255,0.3); color: #fff; }
   .arch-hero-btn.outline:hover { background: rgba(255,255,255,0.08); }
   /* cover visual */
-  .arch-hero-visual { position: relative; display: flex; justify-content: center; align-items: flex-end; height: 280px; }
-  .arch-hero-cover { width: 160px; height: 220px; border-radius: 6px; object-fit: cover; object-position: center top; box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.4); position: relative; z-index: 2; transform: perspective(800px) rotateY(-8deg); transition: transform 0.4s; }
+  .arch-hero-visual { position: relative; display: flex; justify-content: center; align-items: flex-end; height: 340px; }
+  .arch-hero-cover { width: 200px; height: 275px; border-radius: 8px; object-fit: cover; object-position: center top; box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 6px 20px rgba(0,0,0,0.4); position: relative; z-index: 2; transform: perspective(800px) rotateY(-8deg); transition: transform 0.4s; }
   .arch-hero-cover:hover { transform: perspective(800px) rotateY(0deg) scale(1.03); }
   .arch-hero-badge-doi { position: absolute; top: 20px; right: 10px; background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 14px; z-index: 3; text-align: center; font-size: 0.75rem; color: #94a3b8; font-weight: 600; backdrop-filter: blur(8px); }
   .arch-hero-badge-doi strong { display: block; font-size: 0.85rem; color: #fff; }
@@ -145,7 +145,7 @@
   @media (max-width: 900px) {
     .arch-hero-inner { grid-template-columns: 1fr; }
     .arch-hero-visual { display: none; }
-    .arch-hero h1 { font-size: 1.5rem; }
+    .arch-hero h1 { font-size: 2rem; }
     .arch-hero-stats { grid-template-columns: repeat(2,1fr); }
   }
 </style>
