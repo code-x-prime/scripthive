@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Download, Eye, X } from "lucide-react";
 import { doiService, type DoiMintedRow } from "@/services/doi.service";
+import { apiJson } from "@/services/api";
 import type { Submission } from "@/types";
 import { submissionAuthorsDisplay } from "@/utils/submissionAuthors";
 import { buildCsv, downloadCsv } from "@/utils/exportCsv";
@@ -20,6 +21,7 @@ export const DOIManagePage = () => {
   const [vol, setVol] = useState("1");
   const [iss, setIss] = useState("1");
   const [part, setPart] = useState("A");
+  const [nextRefNo, setNextRefNo] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [doiPrefix, setDoiPrefix] = useState("10.55662");
 
@@ -54,8 +56,9 @@ export const DOIManagePage = () => {
     // slugify part: keep only alphanumeric, lowercase
     const partSlug = part.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
     const partSeg = partSlug && partSlug !== "a" ? partSlug : "";
-    return `${doiPrefix}/${jid}.v${v}i${i}${partSeg}.XXX`; // ref no assigned on save
-  }, [modal, vol, iss, part, doiPrefix]);
+    const refNo = nextRefNo ? String(nextRefNo).padStart(3, "0") : "XXX";
+    return `${doiPrefix}/${jid}.v${v}i${i}${partSeg}.${refNo}`;
+  }, [modal, vol, iss, part, doiPrefix, nextRefNo]);
 
   const assign = async () => {
     if (!modal) return;
@@ -208,7 +211,10 @@ export const DOIManagePage = () => {
                       <button
                         type="button"
                         className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700"
-                        onClick={() => { setModal(s); setVol("1"); setIss("1"); setPart("A"); }}
+                        onClick={() => {
+                          setModal(s); setVol("1"); setIss("1"); setPart("A"); setNextRefNo(null);
+                          void apiJson<{ articleNo: number }>(`/publish/next-article-no?journalId=${encodeURIComponent(s.journal?.id ?? s.journalId)}`).then(d => setNextRefNo(d.articleNo)).catch(() => {});
+                        }}
                       >
                         Assign DOI
                       </button>
@@ -255,10 +261,8 @@ export const DOIManagePage = () => {
                       type="button"
                       className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700"
                       onClick={() => {
-                        setModal(s);
-                        setVol("1");
-                        setIss("1");
-                        setPart("A");
+                        setModal(s); setVol("1"); setIss("1"); setPart("A"); setNextRefNo(null);
+                        void apiJson<{ articleNo: number }>(`/publish/next-article-no?journalId=${encodeURIComponent(s.journal?.id ?? s.journalId)}`).then(d => setNextRefNo(d.articleNo)).catch(() => {});
                       }}
                     >
                       Assign DOI
