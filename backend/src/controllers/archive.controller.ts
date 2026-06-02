@@ -4,13 +4,23 @@ import { prisma } from "../config/prisma.js";
 export const getArticleBySlug = async (req: Request, res: Response): Promise<void> => {
   const slug = String(req.params.slug).trim();
 
-  // Try slug first
+  const includeOpts = { journal: true, doiRecord: true, part: { include: { issue: { include: { volume: true } } } } };
+
+  // 1. Try DOI lookup — e.g. 10.55662/sgmrj.v1i1.001
   let article = await prisma.submission.findFirst({
-    where: { slug, status: "Published" },
-    include: { journal: true, doiRecord: true, part: { include: { issue: { include: { volume: true } } } } }
+    where: { status: "Published", doiRecord: { doi: slug } },
+    include: includeOpts
   });
 
-  // Fallback: citation-style lookup — format: YEAR-VOL(ISSUEpart):PAGES e.g. 2026-1(1aa):01-03
+  // 2. Try slug
+  if (!article) {
+    article = await prisma.submission.findFirst({
+      where: { slug, status: "Published" },
+      include: includeOpts
+    });
+  }
+
+  // 3. Fallback: citation-style lookup — format: YEAR-VOL(ISSUEpart):PAGES e.g. 2026-1(1aa):01-03
   if (!article) {
     const m = slug.match(/^(\d{4})-(\d+)\((\d+)([a-z]*)\):(\d+)-(\d+)$/i);
     if (m) {
@@ -26,7 +36,7 @@ export const getArticleBySlug = async (req: Request, res: Response): Promise<voi
           pageEnd,
           part: { issue: { number: issue, volume: { number: vol, year } } }
         },
-        include: { journal: true, doiRecord: true, part: { include: { issue: { include: { volume: true } } } } }
+        include: includeOpts
       });
     }
   }
