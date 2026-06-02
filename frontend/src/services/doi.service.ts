@@ -7,6 +7,6 @@ export const doiService = {
   pending: () => apiJson<Submission[]>("/doi/pending"),
   minted: () => apiJson<DoiMintedRow[]>("/doi/minted"),
   noDoi: () => apiJson<Submission[]>("/doi/no-doi"),
-  assign: (body: { submissionId: string; journalId: string; volume: number; issue: number }) =>
+  assign: (body: { submissionId: string; journalId: string; volume: number; issue: number; part?: string }) =>
     apiJson<DoiRecord>("/doi/assign", { method: "POST", body: JSON.stringify(body) })
 };

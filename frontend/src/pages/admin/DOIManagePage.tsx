@@ -19,6 +19,7 @@ export const DOIManagePage = () => {
   const [modal, setModal] = useState<Submission | null>(null);
   const [vol, setVol] = useState("1");
   const [iss, setIss] = useState("1");
+  const [part, setPart] = useState("A");
   const [saving, setSaving] = useState(false);
   const [doiPrefix, setDoiPrefix] = useState("10.55662");
 
@@ -50,8 +51,11 @@ export const DOIManagePage = () => {
     const jid = (modal.journal?.id ?? modal.journalId).toLowerCase();
     const v = parseInt(vol, 10) || 1;
     const i = parseInt(iss, 10) || 1;
-    return `${doiPrefix}/${jid}.v${v}i${i}.${modal.id}`;
-  }, [modal, vol, iss, doiPrefix]);
+    // slugify part: keep only alphanumeric, lowercase
+    const partSlug = part.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+    const partSuffix = partSlug && partSlug !== "a" ? partSlug : "";
+    return `${doiPrefix}/${jid}.v${v}i${i}${partSuffix}.${modal.id}`;
+  }, [modal, vol, iss, part, doiPrefix]);
 
   const assign = async () => {
     if (!modal) return;
@@ -61,7 +65,8 @@ export const DOIManagePage = () => {
         submissionId: modal.id,
         journalId: modal.journal?.id ?? modal.journalId,
         volume: parseInt(vol, 10) || 1,
-        issue: parseInt(iss, 10) || 1
+        issue: parseInt(iss, 10) || 1,
+        part: part.trim() || "A"
       });
       toast.success("DOI assigned");
       setModal(null);
@@ -203,7 +208,7 @@ export const DOIManagePage = () => {
                       <button
                         type="button"
                         className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700"
-                        onClick={() => { setModal(s); setVol("1"); setIss("1"); }}
+                        onClick={() => { setModal(s); setVol("1"); setIss("1"); setPart("A"); }}
                       >
                         Assign DOI
                       </button>
@@ -253,6 +258,7 @@ export const DOIManagePage = () => {
                         setModal(s);
                         setVol("1");
                         setIss("1");
+                        setPart("A");
                       }}
                     >
                       Assign DOI
@@ -278,7 +284,7 @@ export const DOIManagePage = () => {
             <p className="mt-1 text-xs text-gray-500">
               Journal: <span className="font-mono">{modal.journal?.id ?? modal.journalId}</span>
             </p>
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="mt-4 grid grid-cols-3 gap-3">
               <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
                 Volume
                 <input value={vol} onChange={(e) => setVol(e.target.value)} className="h-10 rounded-lg border border-gray-200 px-3 text-sm" type="number" min={1} />
@@ -287,7 +293,12 @@ export const DOIManagePage = () => {
                 Issue
                 <input value={iss} onChange={(e) => setIss(e.target.value)} className="h-10 rounded-lg border border-gray-200 px-3 text-sm" type="number" min={1} />
               </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Part <span className="font-normal text-gray-400">(A, B, AA…)</span>
+                <input value={part} onChange={(e) => setPart(e.target.value.toUpperCase())} className="h-10 rounded-lg border border-gray-200 px-3 text-sm font-mono" placeholder="A" maxLength={4} />
+              </label>
             </div>
+            <p className="mt-2 text-xs text-gray-400">Part A = no suffix in DOI. Part B, AA etc → added as suffix.</p>
             <p className="mt-4 text-xs font-medium uppercase text-gray-500">Preview</p>
             <p className="mt-1 break-all font-mono text-sm text-blue-800">{preview}</p>
             <div className="mt-6 flex gap-3">

@@ -29,17 +29,21 @@ export const listDoiMinted = async (_req: Request, res: Response): Promise<void>
 };
 
 export const assignDoi = async (req: Request, res: Response): Promise<void> => {
-  const { submissionId, journalId, volume, issue } = req.body as {
+  const { submissionId, journalId, volume, issue, part } = req.body as {
     submissionId: string;
     journalId: string;
     volume: number;
     issue: number;
+    part?: string;
   };
   if (!submissionId || !journalId || typeof volume !== "number" || typeof issue !== "number") {
     res.status(400).json({ message: "submissionId, journalId, volume, and issue are required" });
     return;
   }
-  const doi = `${env.DOI_PREFIX}/${journalId}.v${volume}i${issue}.${submissionId}`;
+  // Part: slugify, Part A = no suffix, Part B/AA/etc = append lowercase slug
+  const partSlug = (part ?? "A").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  const partSuffix = partSlug && partSlug !== "a" ? partSlug : "";
+  const doi = `${env.DOI_PREFIX}/${journalId.toLowerCase()}.v${volume}i${issue}${partSuffix}.${submissionId}`;
   const row = await prisma.doiRecord.upsert({
     where: { submissionId },
     update: { doi, status: "Submitted" },
