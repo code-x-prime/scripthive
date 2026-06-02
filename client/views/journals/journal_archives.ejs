@@ -71,6 +71,8 @@
   /* Empty state */
   .no-articles { text-align: center; padding: 60px 20px; color: #94a3b8; font-size: 1rem; }
 
+  .arch-filter-select { width:100%; height:38px; border:1.5px solid #e2e8f0; border-radius:8px; padding:0 10px; font-size:0.85rem; color:#374151; background:#fff; cursor:pointer; outline:none; transition:0.15s; }
+  .arch-filter-select:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.1); }
   .arch-filter-col { display: none; } /* moved to right col */
   .arch-right-col { position: sticky; top: 160px; align-self: start; }
   .arch-journal-info { /* part of right col */ }
@@ -393,66 +395,56 @@
     <!-- RIGHT: Filter + Journal Info -->
     <div class="arch-right-col">
 
-      <!-- Filter Articles -->
+      <!-- Filter Articles — dropdowns -->
       <% if (issues.length > 0) { %>
       <div class="filter-card">
         <div class="filter-card-title">
           Filter Articles
-          <button class="filter-clear" id="filterClearAll">Clear All</button>
+          <button class="filter-clear" id="filterClearAll">Clear</button>
         </div>
+
+        <%
+          var seenYears2 = {}; issues.forEach(function(i){ seenYears2[i.vol.year]=true; });
+          var yearList = Object.keys(seenYears2).map(Number).sort(function(a,b){return b-a;});
+          var seenVols2 = {}; issues.forEach(function(i){ seenVols2[i.vol.number]=true; });
+          var volList = Object.keys(seenVols2).map(Number).sort(function(a,b){return b-a;});
+          var seenIss2 = {}; issues.forEach(function(i){ seenIss2[i.iss.number]=true; });
+          var issList = Object.keys(seenIss2).map(Number).sort(function(a,b){return b-a;});
+          var seenParts2 = {}; issues.forEach(function(i){ seenParts2[i.part.name]=true; });
+          var partList2 = Object.keys(seenParts2).sort();
+        %>
+
         <div class="filter-group">
           <div class="filter-group-label">Year</div>
-          <% var seenYears = {};
-             issues.forEach(function(i){ seenYears[i.vol.year] = true; });
-             Object.keys(seenYears).map(Number).sort(function(a,b){return b-a;}).forEach(function(y) {
-               var cnt = issues.filter(function(i){return i.vol.year===y;}).reduce(function(s,i){return s+i.articles.length;},0);
-          %>
-          <div class="filter-check-item">
-            <input type="checkbox" id="fy_<%= y %>" class="filter-year" value="<%= y %>">
-            <label for="fy_<%= y %>"><span><%= y %></span><span class="fcount"><%= cnt %></span></label>
-          </div>
-          <% }); %>
+          <select id="dropYear" class="arch-filter-select">
+            <option value="">All Years</option>
+            <% yearList.forEach(function(y){ %><option value="<%= y %>"><%= y %></option><% }); %>
+          </select>
         </div>
+
         <div class="filter-group">
           <div class="filter-group-label">Volume</div>
-          <% var seenVols = {};
-             issues.forEach(function(i){ seenVols[i.vol.number] = true; });
-             Object.keys(seenVols).map(Number).sort(function(a,b){return b-a;}).forEach(function(v) {
-               var cnt = issues.filter(function(i){return i.vol.number===v;}).reduce(function(s,i){return s+i.articles.length;},0);
-          %>
-          <div class="filter-check-item">
-            <input type="checkbox" id="fv_<%= v %>" class="filter-vol" value="<%= v %>">
-            <label for="fv_<%= v %>"><span>Vol. <%= v %></span><span class="fcount"><%= cnt %></span></label>
-          </div>
-          <% }); %>
+          <select id="dropVol" class="arch-filter-select">
+            <option value="">All Volumes</option>
+            <% volList.forEach(function(v){ %><option value="<%= v %>">Vol. <%= v %></option><% }); %>
+          </select>
         </div>
+
         <div class="filter-group">
           <div class="filter-group-label">Issue</div>
-          <% var seenIss = {};
-             issues.forEach(function(i){ seenIss[i.iss.number] = true; });
-             Object.keys(seenIss).map(Number).sort(function(a,b){return b-a;}).forEach(function(n) {
-               var cnt = issues.filter(function(i){return i.iss.number===n;}).reduce(function(s,i){return s+i.articles.length;},0);
-          %>
-          <div class="filter-check-item">
-            <input type="checkbox" id="fi_<%= n %>" class="filter-iss" value="<%= n %>">
-            <label for="fi_<%= n %>"><span>Issue <%= n %></span><span class="fcount"><%= cnt %></span></label>
-          </div>
-          <% }); %>
+          <select id="dropIss" class="arch-filter-select">
+            <option value="">All Issues</option>
+            <% issList.forEach(function(n){ %><option value="<%= n %>">Issue <%= n %></option><% }); %>
+          </select>
         </div>
-        <% var seenParts = {};
-           issues.forEach(function(i){ seenParts[i.part.name] = true; });
-           var partKeys = Object.keys(seenParts).sort();
-           if (partKeys.length > 1) { %>
+
+        <% if (partList2.length > 1) { %>
         <div class="filter-group">
           <div class="filter-group-label">Part</div>
-          <% partKeys.forEach(function(p) {
-               var cnt = issues.filter(function(i){return i.part.name===p;}).reduce(function(s,i){return s+i.articles.length;},0);
-          %>
-          <div class="filter-check-item">
-            <input type="checkbox" id="fp_<%= p %>" class="filter-part" value="<%= p %>">
-            <label for="fp_<%= p %>"><span>Part <%= p %></span><span class="fcount"><%= cnt %></span></label>
-          </div>
-          <% }); %>
+          <select id="dropPart" class="arch-filter-select">
+            <option value="">All Parts</option>
+            <% partList2.forEach(function(p){ %><option value="<%= p %>">Part <%= p %></option><% }); %>
+          </select>
         </div>
         <% } %>
       </div>
@@ -513,16 +505,17 @@
   window.trackView = function(id) { _track('/api/archive/view/' + encodeURIComponent(id)); };
   window.trackDownload = function(id) { _track('/api/archive/download/' + encodeURIComponent(id)); };
 
-  function getChecked(cls) {
-    return Array.from(document.querySelectorAll('.' + cls + ':checked')).map(function(c){ return String(c.value); });
+  function getDropVal(id) {
+    var el = document.getElementById(id);
+    return el ? el.value : '';
   }
 
   function applyFilters() {
     var q = (document.getElementById('archSearch') ? document.getElementById('archSearch').value : '').toLowerCase().trim();
-    var years = getChecked('filter-year');
-    var vols  = getChecked('filter-vol');
-    var isss  = getChecked('filter-iss');
-    var parts = getChecked('filter-part');
+    var selYear = getDropVal('dropYear');
+    var selVol  = getDropVal('dropVol');
+    var selIss  = getDropVal('dropIss');
+    var selPart = getDropVal('dropPart');
     var rows = document.querySelectorAll('.art-row');
     var visible = 0;
 
@@ -534,10 +527,10 @@
       var iss    = String(row.getAttribute('data-iss') || '');
       var part   = String(row.getAttribute('data-part') || '');
       var matchQ = !q || title.indexOf(q) >= 0 || author.indexOf(q) >= 0;
-      var matchY = years.length === 0 || years.indexOf(year) >= 0;
-      var matchV = vols.length  === 0 || vols.indexOf(vol)   >= 0;
-      var matchI = isss.length  === 0 || isss.indexOf(iss)   >= 0;
-      var matchP = parts.length === 0 || parts.indexOf(part)  >= 0;
+      var matchY = !selYear || year === selYear;
+      var matchV = !selVol  || vol  === selVol;
+      var matchI = !selIss  || iss  === selIss;
+      var matchP = !selPart || part === selPart;
       var show = matchQ && matchY && matchV && matchI && matchP;
       row.style.display = show ? '' : 'none';
       if (show) visible++;
@@ -570,13 +563,17 @@
     var s = document.getElementById('archSearch');
     if (s) s.addEventListener('input', applyFilters);
 
-    document.querySelectorAll('.filter-year,.filter-vol,.filter-iss,.filter-part').forEach(function(cb) {
-      cb.addEventListener('change', applyFilters);
+    ['dropYear','dropVol','dropIss','dropPart'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('change', applyFilters);
     });
 
     var clearBtn = document.getElementById('filterClearAll');
     if (clearBtn) clearBtn.addEventListener('click', function() {
-      document.querySelectorAll('.filter-year,.filter-vol,.filter-iss,.filter-part').forEach(function(cb){ cb.checked = false; });
+      ['dropYear','dropVol','dropIss','dropPart'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
       if (s) s.value = '';
       applyFilters();
     });
