@@ -1,7 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../config/prisma.js";
 import { apcAmountForCurrency, loadApcRates } from "./apcSettings.service.js";
-import { generateInvoiceId } from "../utils/generateId.js";
+import { generateInvoiceId, getFinancialYear } from "../utils/generateId.js";
 
 /** Creates a Draft APC invoice when a submission is accepted, if none exists yet. */
 export async function ensureDraftInvoiceForSubmission(submissionId: string): Promise<void> {
@@ -19,12 +19,16 @@ export async function ensureDraftInvoiceForSubmission(submissionId: string): Pro
   const isIndia = country === "india" || country === "in";
   const currency = isIndia ? "INR" : "USD";
   const total = apcAmountForCurrency(currency, apc);
-  const count = await prisma.invoice.count();
+  const now = new Date();
+  const fy = getFinancialYear(now);
+  const fyCount = await prisma.invoice.count({
+    where: { createdAt: { gte: fy.start, lte: fy.end } }
+  });
   const items = [{ description: "Article Processing Charge (APC)", amount: total }] as unknown as Prisma.InputJsonValue;
 
   await prisma.invoice.create({
     data: {
-      id: generateInvoiceId(new Date(), count + 1),
+      id: generateInvoiceId(now, fyCount + 1),
       submissionId: sub.id,
       customerName: sub.authorName,
       customerEmail: sub.authorEmail,

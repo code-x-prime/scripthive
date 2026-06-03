@@ -41,7 +41,9 @@ export const PaymentsPage = () => {
 
   const [search, setSearch] = useState("");
   const [markPaidModal, setMarkPaidModal] = useState<Invoice | null>(null);
-  const [payMethod, setPayMethod] = useState("Cash");
+  const [payMethod, setPayMethod] = useState("UPI");
+  const [payUTR, setPayUTR] = useState("");
+  const [payRemarks, setPayRemarks] = useState("");
 
   // inline amount editing state: invoiceId -> draft value
   const [editingAmount, setEditingAmount] = useState<Record<string, string>>({});
@@ -166,7 +168,9 @@ export const PaymentsPage = () => {
 
   const openMarkPaid = (inv: Invoice) => {
     setMarkPaidModal(inv);
-    setPayMethod("Cash");
+    setPayMethod("UPI");
+    setPayUTR("");
+    setPayRemarks("");
   };
 
   const confirmMarkPaid = async () => {
@@ -175,9 +179,9 @@ export const PaymentsPage = () => {
     try {
       await apiJson(`/invoices/${encodeURIComponent(markPaidModal.id)}/mark-paid`, {
         method: "POST",
-        body: JSON.stringify({ method: payMethod })
+        body: JSON.stringify({ method: payMethod, utr: payUTR, remarks: payRemarks })
       });
-      toast.success(`Marked as paid via ${payMethod} — moved to production`);
+      toast.success(`Marked as paid via ${payMethod}`);
       setMarkPaidModal(null);
       void load();
     } catch (e) {
@@ -273,11 +277,12 @@ export const PaymentsPage = () => {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <th className="px-3 py-3"></th>
+                {isCompleted && <th className="px-3 py-3">Invoice No.</th>}
                 <th className="px-3 py-3">Submission ID</th>
                 <th className="px-3 py-3">Customer</th>
                 <th className="px-3 py-3">Amount</th>
                 {isCompleted && <th className="px-3 py-3">Payment Method</th>}
-                {isCompleted && <th className="px-3 py-3">Transaction ID</th>}
+                {isCompleted && <th className="px-3 py-3">UTR / Ref</th>}
                 <th className="px-3 py-3">Date</th>
                 <th className="px-3 py-3">Status</th>
                 <th className="px-3 py-3 text-right">Actions</th>
@@ -299,6 +304,7 @@ export const PaymentsPage = () => {
                       </button>
                     )}
                   </td>
+                  {isCompleted && <td className="whitespace-nowrap px-3 py-2 font-mono text-xs font-semibold text-blue-700">{inv.id}</td>}
                   <td className="whitespace-nowrap px-3 py-2 font-mono text-gray-700">{inv.submissionId}</td>
                   <td className="max-w-[200px] px-3 py-2">
                     <p className="font-medium text-gray-900">{inv.customerName}</p>
@@ -520,18 +526,37 @@ export const PaymentsPage = () => {
             <select
               value={payMethod}
               onChange={(e) => setPayMethod(e.target.value)}
-              className="w-full h-10 rounded-lg border border-gray-200 px-3 text-sm mb-5 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full h-10 rounded-lg border border-gray-200 px-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-              <option value="Cash">Cash</option>
               <option value="UPI">UPI</option>
-              <option value="Card">Card / Net Banking</option>
-              <option value="Bank Transfer">Bank Transfer / NEFT</option>
-              <option value="Cheque">Cheque / DD</option>
-              <option value="Razorpay">Razorpay</option>
-              <option value="SMEPay">SMEPay</option>
-              <option value="PayPal">PayPal</option>
+              <option value="Cash">Cash</option>
+              <option value="NEFT/RTGS">NEFT / RTGS</option>
+              <option value="Cheque/DD">Cheque / DD</option>
+              <option value="Razorpay">Razorpay (Online)</option>
+              <option value="SMEPay">SMEPay (Online)</option>
+              <option value="PayPal">PayPal (Online)</option>
               <option value="Other">Other</option>
             </select>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+              {payMethod === "UPI" || payMethod === "NEFT/RTGS" ? "UTR / Transaction ID" :
+               payMethod === "Cheque/DD" ? "Cheque / DD Number" :
+               payMethod === "Cash" ? "Reference (optional)" : "Transaction ID / Reference"}
+            </label>
+            <input
+              type="text"
+              value={payUTR}
+              onChange={(e) => setPayUTR(e.target.value)}
+              placeholder="Enter reference / UTR number"
+              className="w-full h-10 rounded-lg border border-gray-200 px-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Remarks (optional)</label>
+            <input
+              type="text"
+              value={payRemarks}
+              onChange={(e) => setPayRemarks(e.target.value)}
+              placeholder="Any additional notes"
+              className="w-full h-10 rounded-lg border border-gray-200 px-3 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
             <div className="flex gap-3">
               <button
                 type="button"

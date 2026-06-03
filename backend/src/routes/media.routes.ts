@@ -2,7 +2,7 @@ import { Router } from "express";
 import type { NextFunction, Request, Response } from "express";
 import multer from "multer";
 import { deleteMedia, listMedia, uploadMedia } from "../controllers/media.controller.js";
-import { authenticate, requireSuperAdmin } from "../middlewares/auth.middleware.js";
+import { authenticate, requirePermission, requireSuperAdmin } from "../middlewares/auth.middleware.js";
 import { mediaUpload } from "../middlewares/mediaUpload.middleware.js";
 
 export const mediaRouter = Router();
@@ -33,7 +33,7 @@ mediaRouter.get("/", authenticate, requireSuperAdmin, listMedia);
 mediaRouter.post(
   "/upload",
   authenticate,
-  requireSuperAdmin,
+  requirePermission("journals", "write"), // any admin with journal write can upload
   handleMulter(mediaUpload.array("files", 20)),
   uploadMedia
 );
