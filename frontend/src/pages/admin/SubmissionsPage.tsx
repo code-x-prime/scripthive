@@ -576,7 +576,7 @@ export const SubmissionsPage = () => {
         defaultPermission="submissions:read"
       />
 
-      {showProduction && selected.size > 0 && (
+      {selected.size > 0 && (
         <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-2 shadow-sm">
           <span className="text-sm text-gray-600">{selected.size} selected</span>
           <Button
