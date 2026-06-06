@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Mail, Search, Send, Star, X } from "lucide-react";
+import { FileText, Mail, Search, Send, Star, X } from "lucide-react";
 import { apiJson } from "@/services/api";
 import { paymentService } from "@/services/payment.service";
 import { apcAmountForCurrency } from "@/utils/apcAmounts";
@@ -277,15 +277,15 @@ export const PaymentsPage = () => {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <th className="px-3 py-3"></th>
-                {isCompleted && <th className="px-3 py-3">Invoice No.</th>}
-                <th className="px-3 py-3">Submission ID</th>
-                <th className="px-3 py-3">Customer</th>
-                <th className="px-3 py-3">Amount</th>
-                {isCompleted && <th className="px-3 py-3">Payment Method</th>}
-                {isCompleted && <th className="px-3 py-3">UTR / Ref</th>}
-                <th className="px-3 py-3">Date</th>
-                <th className="px-3 py-3">Status</th>
-                <th className="px-3 py-3 text-right">Actions</th>
+                  {isCompleted && <th className="px-3 py-3">Invoice No.</th>}
+                  <th className="px-3 py-3">Submission ID</th>
+                  <th className="px-3 py-3">Customer</th>
+                  <th className="px-3 py-3">Amount</th>
+                  {isCompleted && <th className="px-3 py-3">Payment Method</th>}
+                  {isCompleted && <th className="px-3 py-3">UTR / Ref</th>}
+                  <th className="px-3 py-3">Date</th>
+                  <th className="px-3 py-3">Status</th>
+                  <th className="px-3 py-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -364,12 +364,14 @@ export const PaymentsPage = () => {
                   <td className="whitespace-nowrap px-3 py-2 text-right">
                     <div className="flex justify-end gap-2">
                       {inv.status === "Paid" ? (
-                        <span
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400"
-                          title="Receipt was emailed at payment"
+                        <Link
+                          to={`/admin/invoices/${encodeURIComponent(inv.id)}`}
+                          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 text-xs font-semibold text-blue-800 hover:bg-blue-100"
+                          title="View / print invoice PDF"
                         >
-                          <Mail className="h-4 w-4" />
-                        </span>
+                          <FileText className="h-3.5 w-3.5" />
+                          PDF
+                        </Link>
                       ) : inv.status === "Draft" ? (
                         /* Draft — send button */
                         canWriteInvoice ? (
@@ -532,21 +534,16 @@ export const PaymentsPage = () => {
               <option value="Cash">Cash</option>
               <option value="NEFT/RTGS">NEFT / RTGS</option>
               <option value="Cheque/DD">Cheque / DD</option>
-              <option value="Razorpay">Razorpay (Online)</option>
-              <option value="SMEPay">SMEPay (Online)</option>
-              <option value="PayPal">PayPal (Online)</option>
               <option value="Other">Other</option>
             </select>
             <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-              {payMethod === "UPI" || payMethod === "NEFT/RTGS" ? "UTR / Transaction ID" :
-               payMethod === "Cheque/DD" ? "Cheque / DD Number" :
-               payMethod === "Cash" ? "Reference (optional)" : "Transaction ID / Reference"}
+              Remarks / Reference Number
             </label>
             <input
               type="text"
               value={payUTR}
               onChange={(e) => setPayUTR(e.target.value)}
-              placeholder="Enter reference / UTR number"
+              placeholder="UTR / Transaction ID / Cheque No. / any reference"
               className="w-full h-10 rounded-lg border border-gray-200 px-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
             <label className="block text-xs font-semibold text-gray-600 mb-1.5">Remarks (optional)</label>

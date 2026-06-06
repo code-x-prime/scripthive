@@ -1069,7 +1069,15 @@
 
     // AJAX Form submission
     const form = document.getElementById('paper-submit-form');
+    const submitButton = form ? form.querySelector('.submit-btn') : null;
     let _submitting = false; // guard against double submit
+    function setSubmittingState(isBusy) {
+      if (submitButton) {
+        submitButton.disabled = isBusy;
+        submitButton.style.opacity = isBusy ? '0.75' : '';
+        submitButton.style.cursor = isBusy ? 'not-allowed' : '';
+      }
+    }
     if (form) {
       form.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -1107,6 +1115,7 @@
 
         // All validation passed — lock submit
         _submitting = true;
+        setSubmittingState(true);
 
         // 2. Initialize Loading Overlay
         loadingTitle.innerText = 'Submitting Manuscript';
@@ -1211,6 +1220,7 @@
             const errDetail = xhr.status !== 200 ? `HTTP ${xhr.status}` : undefined;
             showError(errMsg, errDetail);
             _submitting = false; // allow retry on error
+            setSubmittingState(false);
           }
         };
 
@@ -1218,12 +1228,14 @@
           loadingOverlay.classList.remove('active');
           showError('A network error occurred. Please check your internet connection.');
           _submitting = false;
+          setSubmittingState(false);
         };
 
         xhr.ontimeout = function () {
           loadingOverlay.classList.remove('active');
           showError('Submission timed out. Please check your connection and try again.');
           _submitting = false;
+          setSubmittingState(false);
         };
 
         xhr.send(formData);

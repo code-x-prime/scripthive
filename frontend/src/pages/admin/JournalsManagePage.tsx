@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Check, Hash, Mail, Pencil, Phone, Plus, Trash2, Upload, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { apiJson } from "@/services/api";
+import { setMediaTokenGetter } from "@/services/media.service";
 import { uploadMediaFile } from "@/services/media.service";
 
 interface EditorialMember {
@@ -60,6 +62,7 @@ function isValidEmail(value: string): boolean {
 }
 
 export const JournalsManagePage = () => {
+  const { accessToken } = useAuth();
   const [journals, setJournals] = useState<JournalAdmin[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingIssn, setEditingIssn] = useState<string | null>(null);
@@ -73,6 +76,10 @@ export const JournalsManagePage = () => {
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setMediaTokenGetter(() => accessToken);
+  }, [accessToken]);
 
   const uploadPhoto = async (file: File) => {
     setUploadingPhoto(true);

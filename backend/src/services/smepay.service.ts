@@ -29,6 +29,7 @@ export async function createSmepayOrder(
 
   const token = await getAccessToken(cfg.smepay.clientId, cfg.smepay.clientSecret, cfg.smepay.mode);
   const callbackUrl = `${env.FRONTEND_URL ?? "http://localhost:5173"}/pay/${encodeURIComponent(invoiceId)}?smepay=1`;
+  const safeOrderId = `INV-${invoiceId.replace(/[^A-Za-z0-9_-]/g, "-")}-${Date.now()}`;
 
   const res = await fetch(`${baseUrl(cfg.smepay.mode)}/api/wiz/external/order/create`, {
     method: "POST",
@@ -39,7 +40,7 @@ export async function createSmepayOrder(
     body: JSON.stringify({
       client_id: cfg.smepay.clientId,
       amount: String(Math.round(amountInRupees)),
-      order_id: `INV-${invoiceId}-${Date.now()}`,
+      order_id: safeOrderId,
       callback_url: callbackUrl,
       customer_details: {
         email: customerEmail,

@@ -59,7 +59,6 @@ export const updatePublishedArticle = async (req: Request, res: Response): Promi
 };
 
 export const createSubmission = async (req: Request, res: Response): Promise<void> => {
-  const count = await prisma.submission.count();
   const data = req.body as Record<string, string>;
   if (!data.journalId || !data.title || !data.authorName || !data.authorEmail || !data.abstract || !data.keywords) {
     res.status(400).json({ message: "Missing required submission fields" });
@@ -67,59 +66,80 @@ export const createSubmission = async (req: Request, res: Response): Promise<voi
   }
 
   const authorEmail = data.authorEmail.trim().toLowerCase();
+  const journalId = data.journalId.trim().toUpperCase();
+  const title = data.title.trim();
+  const authorName = String(data.authorName ?? "").trim();
+  const authorPhone = String(data.authorPhone ?? "").trim();
+  const country = String(data.country ?? "").trim();
+  const affiliations = String(data.affiliations ?? "").trim();
+  const coAuthors = String(data.coAuthors ?? "").trim();
+  const abstract = String(data.abstract ?? "").trim();
+  const keywords = String(data.keywords ?? "").trim();
+  const duplicateWindowMs = 10 * 60 * 1000;
+  const duplicateKey = `${authorEmail}|${journalId}|${title.toLowerCase()}`;
 
-  // Duplicate guard: same email + same title within 60 seconds = reject duplicate
-  const recentDuplicate = await prisma.submission.findFirst({
-    where: {
-      authorEmail,
-      title: data.title.trim(),
-      createdAt: { gte: new Date(Date.now() - 60000) }
+  const { created, duplicate } = await prisma.$transaction(async (tx) => {
+    // Serialize duplicate checks for the same paper so double-click / retry requests can't create twins.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${duplicateKey}))`;
+
+    const recentDuplicate = await tx.submission.findFirst({
+      where: {
+        authorEmail,
+        journalId,
+        title,
+        createdAt: { gte: new Date(Date.now() - duplicateWindowMs) }
+      }
+    });
+    if (recentDuplicate) {
+      return { created: recentDuplicate, duplicate: true as const };
     }
+
+    const linkedAuthor = await tx.author.findUnique({ where: { email: authorEmail } });
+    const submissionId = generateSubmissionId(new Date());
+
+    let manuscriptPath: string | null = null;
+    if (req.file) {
+      const ext = path.extname(req.file.originalname).toLowerCase() || ".pdf";
+      const r2Key = `manuscripts/${submissionId}${ext}`;
+      try {
+        manuscriptPath = await uploadToR2(req.file.path, r2Key);
+      } catch {
+        manuscriptPath = req.file.path.replace(/\\/g, "/");
+      }
+    }
+
+    let addonsJson: object | null = null;
+    if (data.addons) {
+      try { addonsJson = JSON.parse(data.addons) as object; } catch { addonsJson = null; }
+    }
+
+    const submission = await tx.submission.create({
+      data: {
+        id: submissionId,
+        journalId,
+        authorUserId: linkedAuthor?.id ?? null,
+        title,
+        country: country || linkedAuthor?.country || null,
+        authorName,
+        authorEmail,
+        authorPhone: authorPhone || linkedAuthor?.phone || null,
+        affiliations: affiliations || linkedAuthor?.affiliations || null,
+        coAuthors: coAuthors || null,
+        abstract,
+        keywords,
+        articleType: data.articleType ?? "Research",
+        manuscriptPath,
+        addons: addonsJson ?? Prisma.JsonNull
+      }
+    });
+
+    return { created: submission, duplicate: false as const };
   });
-  if (recentDuplicate) {
-    res.json({ id: recentDuplicate.id, _duplicate: true });
+
+  if (duplicate) {
+    res.json({ id: created.id, submissionId: created.id, _duplicate: true });
     return;
   }
-
-  const linkedAuthor = await prisma.author.findUnique({ where: { email: authorEmail } });
-
-  const submissionId = generateSubmissionId(new Date(), count + 1);
-
-  let manuscriptPath: string | null = null;
-  if (req.file) {
-    const ext = path.extname(req.file.originalname).toLowerCase() || ".pdf";
-    const r2Key = `manuscripts/${submissionId}${ext}`;
-    try {
-      manuscriptPath = await uploadToR2(req.file.path, r2Key);
-    } catch {
-      manuscriptPath = req.file.path.replace(/\\/g, "/");
-    }
-  }
-
-  let addonsJson: object | null = null;
-  if (data.addons) {
-    try { addonsJson = JSON.parse(data.addons) as object; } catch { addonsJson = null; }
-  }
-
-  const created = await prisma.submission.create({
-    data: {
-      id: submissionId,
-      journalId: data.journalId.trim(),
-      authorUserId: linkedAuthor?.id ?? null,
-      title: data.title.trim(),
-      country: data.country?.trim() || linkedAuthor?.country || null,
-      authorName: data.authorName.trim(),
-      authorEmail,
-      authorPhone: data.authorPhone?.trim() || linkedAuthor?.phone || null,
-      affiliations: data.affiliations?.trim() || linkedAuthor?.affiliations || null,
-      coAuthors: data.coAuthors?.trim() || null,
-      abstract: data.abstract,
-      keywords: data.keywords,
-      articleType: data.articleType ?? "Research",
-      manuscriptPath,
-      addons: addonsJson ?? Prisma.JsonNull
-    }
-  });
   try {
     await sendSubmissionConfirmationEmail(created.authorEmail, created.authorName, created.id);
   } catch (err) {

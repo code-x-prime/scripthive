@@ -142,9 +142,9 @@ JWT_REFRESH_EXPIRES_IN=7d
 
 SMTP_HOST=mail.scripthive.org
 SMTP_PORT=587
-SMTP_USER=article@scripthive.org
-SMTP_PASS=TUMHARI_EMAIL_PASSWORD
-SMTP_FROM=ScriptHive Publication  <noreply@scripthive.org>
+SMTP_USER=contact@scripthive.org
+SMTP_PASS=Praveen@11553
+SMTP_FROM=ScriptHive Publication <contact@scripthive.org>
 ADMIN_EMAIL=info@scripthive.org
 
 DOI_PREFIX=10.55662

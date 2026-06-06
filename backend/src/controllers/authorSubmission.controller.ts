@@ -94,51 +94,74 @@ export const createAuthorSubmission = async (req: AuthorRequest, res: Response):
     return;
   }
 
-  // Duplicate guard: same author + same title within 60 seconds
-  const recentDuplicate = await prisma.submission.findFirst({
-    where: {
-      authorEmail: author.email,
-      title: data.title.trim(),
-      createdAt: { gte: new Date(Date.now() - 60000) }
+  const authorEmail = author.email.trim().toLowerCase();
+  const journalId = data.journalId.trim().toUpperCase();
+  const title = data.title.trim();
+  const authorName = String(data.authorName ?? author.name).trim() || author.name;
+  const authorPhone = String(data.authorPhone ?? author.phone ?? "").trim();
+  const country = String(data.country ?? author.country ?? "").trim();
+  const affiliations = String(data.affiliations ?? author.affiliations ?? "").trim();
+  const coAuthors = String(data.coAuthors ?? "").trim();
+  const abstract = String(data.abstract ?? "").trim();
+  const keywords = String(data.keywords ?? "").trim();
+  const duplicateWindowMs = 10 * 60 * 1000;
+  const duplicateKey = `${authorEmail}|${journalId}|${title.toLowerCase()}`;
+
+  const { created, duplicate } = await prisma.$transaction(async (tx) => {
+    // Keep repeated clicks / retry storms from creating twin submissions.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${duplicateKey}))`;
+
+    const recentDuplicate = await tx.submission.findFirst({
+      where: {
+        authorEmail,
+        journalId,
+        title,
+        createdAt: { gte: new Date(Date.now() - duplicateWindowMs) }
+      }
+    });
+    if (recentDuplicate) {
+      return { created: recentDuplicate, duplicate: true as const };
     }
+
+    const submissionId = generateSubmissionId(new Date());
+
+    let manuscriptPath: string | null = null;
+    if (req.file) {
+      const ext = path.extname(req.file.originalname).toLowerCase() || ".pdf";
+      const r2Key = `manuscripts/${submissionId}${ext}`;
+      try {
+        manuscriptPath = await uploadToR2(req.file.path, r2Key);
+      } catch {
+        manuscriptPath = req.file.path.replace(/\\/g, "/");
+      }
+    }
+
+    const submission = await tx.submission.create({
+      data: {
+        id: submissionId,
+        journalId,
+        authorUserId: author.id,
+        title,
+        country: country || author.country,
+        authorName,
+        authorEmail,
+        authorPhone: authorPhone || author.phone,
+        affiliations: affiliations || author.affiliations,
+        coAuthors: coAuthors || null,
+        abstract,
+        keywords,
+        articleType: data.articleType ?? "Research",
+        manuscriptPath
+      }
+    });
+
+    return { created: submission, duplicate: false as const };
   });
-  if (recentDuplicate) {
-    res.status(200).json({ id: recentDuplicate.id, _duplicate: true });
+
+  if (duplicate) {
+    res.status(200).json({ id: created.id, submissionId: created.id, _duplicate: true });
     return;
   }
-
-  const count = await prisma.submission.count();
-  const submissionId = generateSubmissionId(new Date(), count + 1);
-
-  let manuscriptPath: string | null = null;
-  if (req.file) {
-    const ext = path.extname(req.file.originalname).toLowerCase() || ".pdf";
-    const r2Key = `manuscripts/${submissionId}${ext}`;
-    try {
-      manuscriptPath = await uploadToR2(req.file.path, r2Key);
-    } catch {
-      manuscriptPath = req.file.path.replace(/\\/g, "/");
-    }
-  }
-
-  const created = await prisma.submission.create({
-    data: {
-      id: submissionId,
-      journalId: data.journalId,
-      authorUserId: author.id,
-      title: data.title.trim(),
-      country: data.country?.trim() || author.country,
-      authorName: data.authorName?.trim() || author.name,
-      authorEmail: author.email,
-      authorPhone: data.authorPhone?.trim() || author.phone,
-      affiliations: data.affiliations?.trim() || author.affiliations,
-      coAuthors: data.coAuthors?.trim() || null,
-      abstract: data.abstract,
-      keywords: data.keywords,
-      articleType: data.articleType ?? "Research",
-      manuscriptPath
-    }
-  });
 
   try {
     await sendSubmissionConfirmationEmail(created.authorEmail, created.authorName, created.id);

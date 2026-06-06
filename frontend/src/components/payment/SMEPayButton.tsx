@@ -34,34 +34,45 @@ export const SMEPayButton = ({ invoiceId, onSuccess, onError }: Props) => {
     setLoading(true);
     try {
       const res = await paymentService.createSmepayOrder(invoiceId);
-      const { orderSlug } = res.data;
+      const { orderSlug, paymentUrl } = res.data;
 
       if (!window.smepayCheckout) {
-        onError();
-        return;
+        if (paymentUrl) {
+          window.location.href = paymentUrl;
+          return;
+        }
+        throw new Error("SMEPay checkout script is unavailable");
       }
 
-      window.smepayCheckout({
-        slug: orderSlug,
-        onSuccess: async () => {
-          try {
-            const verify = await paymentService.verifySmepay(invoiceId, orderSlug);
-            if (verify.data?.transactionId || verify.data?.alreadyPaid) {
-              onSuccess(verify.data.transactionId ?? orderSlug);
-            } else {
+      try {
+        window.smepayCheckout({
+          slug: orderSlug,
+          onSuccess: async () => {
+            try {
+              const verify = await paymentService.verifySmepay(invoiceId, orderSlug);
+              if (verify.data?.transactionId || verify.data?.alreadyPaid) {
+                onSuccess(verify.data.transactionId ?? orderSlug);
+              } else {
+                onError();
+              }
+            } catch {
               onError();
+            } finally {
+              setLoading(false);
             }
-          } catch {
-            onError();
-          } finally {
+          },
+          onFailure: () => {
             setLoading(false);
+            onError();
           }
-        },
-        onFailure: () => {
-          setLoading(false);
-          onError();
+        });
+      } catch {
+        if (paymentUrl) {
+          window.location.href = paymentUrl;
+          return;
         }
-      });
+        return;
+      }
     } catch {
       setLoading(false);
       onError();
