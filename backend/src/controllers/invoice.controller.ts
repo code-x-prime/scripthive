@@ -3,14 +3,13 @@ import type { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
 import { env } from "../config/env.js";
 import { sendPaymentLinkEmail, sendPaymentReceiptEmail } from "../services/email.service.js";
-import { generateInvoiceId } from "../utils/generateId.js";
+import { generateInvoiceId, getFinancialYear } from "../utils/generateId.js";
 import { apcAmountForCurrency, loadApcRates } from "../services/apcSettings.service.js";
 import { ensureDraftInvoiceForSubmission } from "../services/invoiceDraft.service.js";
 import { writeAuditLog } from "../utils/auditLog.js";
 import type { AuthRequest } from "../middlewares/auth.middleware.js";
 
 export const createInvoice = async (req: Request, res: Response): Promise<void> => {
-  const count = await prisma.invoice.count();
   const body = req.body as {
     submissionId: string;
     customerName: string;
@@ -21,9 +20,15 @@ export const createInvoice = async (req: Request, res: Response): Promise<void> 
     items: Prisma.InputJsonValue;
     currency: string;
   };
+  // Count invoices in current financial year (Apr-Mar) for proper numbering reset
+  const now = new Date();
+  const fy = getFinancialYear(now);
+  const fyCount = await prisma.invoice.count({
+    where: { createdAt: { gte: fy.start, lte: fy.end } }
+  });
   const invoice = await prisma.invoice.create({
     data: {
-      id: generateInvoiceId(new Date(), count + 1),
+      id: generateInvoiceId(now, fyCount + 1),
       ...body
     }
   });
@@ -169,8 +174,8 @@ export const markInvoicePaidManual = async (req: Request, res: Response): Promis
   if (invoice.submissionId) {
     const sub = await prisma.submission.findUnique({ where: { id: invoice.submissionId }, select: { authorEmail: true, authorName: true } });
     if (sub) {
-      void sendPaymentReceiptEmail(sub.authorEmail, invoiceId, invoice.total, invoice.currency, "MANUAL").catch(() => {});
-      void sendPaymentReceiptEmail(env.ADMIN_EMAIL, invoiceId, invoice.total, invoice.currency, "MANUAL").catch(() => {});
+      void sendPaymentReceiptEmail(sub.authorEmail, invoiceId, invoice.total, invoice.currency, "MANUAL").catch(() => { });
+      void sendPaymentReceiptEmail(env.ADMIN_EMAIL, invoiceId, invoice.total, invoice.currency, "MANUAL").catch(() => { });
     }
   }
 
