@@ -76,6 +76,7 @@ const App = () => (
             <Route path="submit" element={<AuthorSubmitPage />} />
             <Route path="submissions/:id/edit" element={<AuthorEditSubmissionPage />} />
             <Route path="submissions/:id" element={<AuthorSubmissionDetailPage />} />
+            <Route path="invoices/:id" element={<InvoiceViewPage />} />
             <Route path="profile" element={<AuthorProfilePage />} />
           </Route>
 

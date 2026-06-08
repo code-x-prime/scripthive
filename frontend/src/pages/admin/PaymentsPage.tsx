@@ -52,6 +52,7 @@ export const PaymentsPage = () => {
     setLoading(true);
     try {
       const res = await paymentService.listAdmin();
+      console.log("Loaded invoices from listAdmin API:", res.data.invoices);
       if (res.data.apc) setApcRates(res.data.apc);
       setStats(res.data.stats);
       setInvoices(res.data.invoices);
@@ -131,9 +132,12 @@ export const PaymentsPage = () => {
 
 
   const openModal = (inv: Invoice) => {
+    console.log("openModal input inv:", inv, "apcRates:", apcRates);
     setModalInvoice(inv);
     setFormCurrency(inv.currency || "USD");
-    setFormTotal(String(inv.total ?? ""));
+    const initialTotal = inv.total > 0 ? inv.total : apcAmountForCurrency(inv.currency || "USD", apcRates);
+    console.log("openModal initialTotal computed:", initialTotal);
+    setFormTotal(String(initialTotal ?? ""));
     setFormDue(inv.dueDate ? inv.dueDate.slice(0, 10) : "");
     setFormStatus(inv.status);
   };

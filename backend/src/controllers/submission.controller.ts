@@ -148,7 +148,7 @@ export const createSubmission = async (req: Request, res: Response): Promise<voi
   try {
     await sendMail({
       to: env.ADMIN_EMAIL,
-      subject: `New Paper Submission: ${created.id} | ScriptHive`,
+      subject: `New Paper Submission: ${created.id}`,
       replyTo: created.authorEmail,
       html: `
         <p>A new manuscript has been submitted.</p>

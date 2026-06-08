@@ -8,6 +8,7 @@ import { createSmepayOrder, validateSmepayOrder } from "../services/smepay.servi
 import { getPublicPaymentConfig, resolvePaymentConfig } from "../services/paymentGatewaySettings.service.js";
 import { sendPaymentReceiptEmail } from "../services/email.service.js";
 import { loadApcRates } from "../services/apcSettings.service.js";
+import { generateInvoiceId, getFinancialYear } from "../utils/generateId.js";
 import Razorpay from "razorpay";
 
 const paidStatuses = new Set(["Paid", "paid", "PAID"]);
@@ -31,8 +32,26 @@ async function markInvoicePaid(
   paymentId: string,
   notes: string
 ) {
+  let finalInvoiceId = invoice.id;
+  if (!invoice.id.startsWith("SH/")) {
+    const now = new Date();
+    const fy = getFinancialYear(now);
+    const fyCount = await prisma.invoice.count({
+      where: {
+        createdAt: { gte: fy.start, lte: fy.end },
+        id: { startsWith: "SH/" }
+      }
+    });
+    finalInvoiceId = generateInvoiceId(now, fyCount + 1);
+    await prisma.$executeRawUnsafe(
+      `UPDATE "Invoice" SET "id" = $1 WHERE "id" = $2`,
+      finalInvoiceId,
+      invoice.id
+    );
+  }
+
   await prisma.invoice.update({
-    where: { id: invoice.id },
+    where: { id: finalInvoiceId },
     data: { status: "Paid", paidAt: new Date(), method, notes, gatewayPayId: paymentId }
   });
   await prisma.submission.updateMany({
@@ -42,11 +61,49 @@ async function markInvoicePaid(
   void writeAuditLog({
     action: "payment_received",
     resource: "invoice",
-    resourceId: invoice.id,
+    resourceId: finalInvoiceId,
     details: { method, paymentId, amount: invoice.total, currency: invoice.currency, submissionId: invoice.submissionId }
   });
-  await sendPaymentReceiptEmail(invoice.customerEmail, invoice.id, invoice.total, invoice.currency, paymentId);
-  await sendPaymentReceiptEmail(env.ADMIN_EMAIL, invoice.id, invoice.total, invoice.currency, paymentId);
+
+  let journalName: string | undefined;
+  let issn: string | null | undefined;
+  let eIssn: string | null | undefined;
+  try {
+    const sub = await prisma.submission.findUnique({
+      where: { id: invoice.submissionId },
+      include: { journal: true }
+    });
+    if (sub?.journal) {
+      journalName = sub.journal.name;
+      issn = sub.journal.issn;
+      eIssn = sub.journal.eIssn;
+    }
+  } catch (e) {
+    console.error("Failed to load journal details for receipt email:", e);
+  }
+
+  await sendPaymentReceiptEmail(
+    invoice.customerEmail,
+    finalInvoiceId,
+    invoice.total,
+    invoice.currency,
+    paymentId,
+    invoice.submissionId,
+    journalName,
+    issn,
+    eIssn
+  );
+  await sendPaymentReceiptEmail(
+    env.ADMIN_EMAIL,
+    finalInvoiceId,
+    invoice.total,
+    invoice.currency,
+    paymentId,
+    invoice.submissionId,
+    journalName,
+    issn,
+    eIssn
+  );
 }
 
 export const getPaymentConfigController = async (_req: Request, res: Response): Promise<void> => {

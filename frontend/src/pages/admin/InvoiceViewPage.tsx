@@ -66,17 +66,21 @@ export const InvoiceViewPage = () => {
     );
   }
 
+  const isAuthor = window.location.pathname.startsWith("/author/");
+
   if (!invoice) {
     return (
       <section className="mx-auto max-w-4xl space-y-4 px-2">
         <h1 className="font-heading text-3xl text-gray-900">Invoice</h1>
         <p className="text-sm text-gray-500">Invoice not found.</p>
-        <Link to="/admin/payments/completed" className="inline-flex text-sm font-medium text-green-700 hover:underline">
-          Back to payments
+        <Link to={isAuthor ? "/author/dashboard" : "/admin/payments/completed"} className="inline-flex text-sm font-medium text-green-700 hover:underline">
+          {isAuthor ? "Back to dashboard" : "Back to payments"}
         </Link>
       </section>
     );
   }
+
+  const backUrl = isAuthor ? `/author/submissions/${invoice.submissionId}` : "/admin/payments/completed";
 
   return (
     <section className="mx-auto max-w-4xl space-y-4 px-2 pb-8">
@@ -87,7 +91,7 @@ export const InvoiceViewPage = () => {
         </div>
         <div className="flex gap-2">
           <Link
-            to="/admin/payments/completed"
+            to={backUrl}
             className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
             Back
@@ -118,10 +122,23 @@ export const InvoiceViewPage = () => {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Submission ID</p>
             <p className="mt-1 font-mono text-sm font-semibold text-gray-900">{invoice.submissionId}</p>
+          </div>
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Journal / ISSN</p>
+            <p className="mt-1 text-sm font-semibold text-gray-900 leading-tight">
+              {invoice.submission?.journal?.name || "—"}
+              {invoice.submission?.journal?.issn || invoice.submission?.journal?.eIssn ? (
+                <span className="mt-0.5 block font-mono text-xs font-normal text-gray-500">
+                  {invoice.submission.journal.issn ? `ISSN: ${invoice.submission.journal.issn}` : ""}
+                  {invoice.submission.journal.issn && invoice.submission.journal.eIssn ? " · " : ""}
+                  {invoice.submission.journal.eIssn ? `e-ISSN: ${invoice.submission.journal.eIssn}` : ""}
+                </span>
+              ) : null}
+            </p>
           </div>
           <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Payment method</p>

@@ -17,19 +17,21 @@ export const AdminLayout = () => {
   }, []);
 
   return (
-    <div className="flex h-screen bg-slate-50">
-      <div className="hidden xl:flex xl:h-screen xl:sticky xl:top-0">
+    <div className="flex h-screen bg-slate-50 print:h-auto print:bg-white">
+      <div className="hidden xl:flex xl:h-screen xl:sticky xl:top-0 print:hidden">
         <AdminSidebar />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <TopBar onOpenNav={() => setMobileOpen(true)} />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="print:hidden">
+          <TopBar onOpenNav={() => setMobileOpen(true)} />
+        </div>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 print:overflow-visible print:p-0">
           <Outlet />
         </main>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-around border-t border-slate-200 bg-white px-2 py-2 xl:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-around border-t border-slate-200 bg-white px-2 py-2 xl:hidden print:hidden">
         <button
           type="button"
           className="flex min-h-[48px] min-w-[48px] flex-col items-center justify-center gap-0.5 text-xs text-slate-700"

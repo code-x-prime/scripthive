@@ -24,7 +24,10 @@ export const createInvoice = async (req: Request, res: Response): Promise<void> 
   const now = new Date();
   const fy = getFinancialYear(now);
   const fyCount = await prisma.invoice.count({
-    where: { createdAt: { gte: fy.start, lte: fy.end } }
+    where: {
+      createdAt: { gte: fy.start, lte: fy.end },
+      id: { startsWith: "SH/" }
+    }
   });
   const invoice = await prisma.invoice.create({
     data: {
@@ -40,10 +43,18 @@ export const listInvoices = async (_req: Request, res: Response): Promise<void> 
 };
 
 export const getInvoice = async (req: Request, res: Response): Promise<void> => {
-  const invoice = await prisma.invoice.findUnique({
-    where: { id: String(req.params.id) },
-    include: { submission: true }
+  const id = String(req.params.id);
+  let invoice = await prisma.invoice.findUnique({
+    where: { id },
+    include: { submission: { include: { journal: true } } }
   });
+  if (!invoice) {
+    invoice = await prisma.invoice.findFirst({
+      where: { submissionId: id },
+      orderBy: { createdAt: "desc" },
+      include: { submission: { include: { journal: true } } }
+    });
+  }
   if (!invoice) {
     res.status(404).json({ message: "Invoice not found" });
     return;
@@ -53,13 +64,25 @@ export const getInvoice = async (req: Request, res: Response): Promise<void> => 
 
 export const sendInvoiceLink = async (req: Request, res: Response): Promise<void> => {
   const invoiceId = String(req.params.id);
-  const invoice = await prisma.invoice.findUnique({ where: { id: invoiceId } });
+  const invoice = await prisma.invoice.findUnique({
+    where: { id: invoiceId },
+    include: { submission: { include: { journal: true } } }
+  });
   if (!invoice) {
     res.status(404).json({ message: "Invoice not found" });
     return;
   }
-  const paymentLink = `${env.FRONTEND_URL}/pay/${invoice.id}`;
-  await sendPaymentLinkEmail(invoice.customerEmail, invoice.customerName, invoice.id, paymentLink);
+  const paymentLink = `${env.FRONTEND_URL}/pay/${invoice.submissionId}`;
+  const journal = invoice.submission?.journal;
+  await sendPaymentLinkEmail(
+    invoice.customerEmail,
+    invoice.customerName,
+    invoice.submissionId,
+    paymentLink,
+    journal?.name,
+    journal?.issn,
+    journal?.eIssn
+  );
   const nextStatus =
     invoice.status === "Draft" ? "Pending" : invoice.status === "Pending" ? "Pending" : invoice.status;
   const updated = await prisma.invoice.update({
@@ -142,9 +165,27 @@ export const markInvoicePaidManual = async (req: Request, res: Response): Promis
   if (!invoice) { res.status(404).json({ message: "Invoice not found" }); return; }
   if (invoice.status === "Paid") { res.status(400).json({ message: "Already paid" }); return; }
 
+  let finalInvoiceId = invoiceId;
+  if (!invoiceId.startsWith("SH/")) {
+    const now = new Date();
+    const fy = getFinancialYear(now);
+    const fyCount = await prisma.invoice.count({
+      where: {
+        createdAt: { gte: fy.start, lte: fy.end },
+        id: { startsWith: "SH/" }
+      }
+    });
+    finalInvoiceId = generateInvoiceId(now, fyCount + 1);
+    await prisma.$executeRawUnsafe(
+      `UPDATE "Invoice" SET "id" = $1 WHERE "id" = $2`,
+      finalInvoiceId,
+      invoiceId
+    );
+  }
+
   const now = new Date();
   await prisma.invoice.update({
-    where: { id: invoiceId },
+    where: { id: finalInvoiceId },
     data: { status: "Paid", paidAt: now, method: resolvedMethod, notes: resolvedNotes, ...(utr?.trim() ? { gatewayPayId: utr.trim() } : {}) }
   });
 
@@ -165,19 +206,42 @@ export const markInvoicePaidManual = async (req: Request, res: Response): Promis
     adminId: (req as AuthRequest).admin?.adminId,
     action: "payment_manual_paid",
     resource: "invoice",
-    resourceId: invoiceId,
+    resourceId: finalInvoiceId,
     details: { submissionId: invoice.submissionId, method: "Manual" },
     ipAddress: req.ip
   });
 
   // send receipt email non-blocking
   if (invoice.submissionId) {
-    const sub = await prisma.submission.findUnique({ where: { id: invoice.submissionId }, select: { authorEmail: true, authorName: true } });
+    const sub = await prisma.submission.findUnique({
+      where: { id: invoice.submissionId },
+      include: { journal: true }
+    });
     if (sub) {
-      void sendPaymentReceiptEmail(sub.authorEmail, invoiceId, invoice.total, invoice.currency, "MANUAL").catch(() => { });
-      void sendPaymentReceiptEmail(env.ADMIN_EMAIL, invoiceId, invoice.total, invoice.currency, "MANUAL").catch(() => { });
+      void sendPaymentReceiptEmail(
+        sub.authorEmail,
+        finalInvoiceId,
+        invoice.total,
+        invoice.currency,
+        "MANUAL",
+        invoice.submissionId,
+        sub.journal?.name,
+        sub.journal?.issn,
+        sub.journal?.eIssn
+      ).catch(() => { });
+      void sendPaymentReceiptEmail(
+        env.ADMIN_EMAIL,
+        finalInvoiceId,
+        invoice.total,
+        invoice.currency,
+        "MANUAL",
+        invoice.submissionId,
+        sub.journal?.name,
+        sub.journal?.issn,
+        sub.journal?.eIssn
+      ).catch(() => { });
     }
   }
 
-  res.json({ success: true, message: "Marked as paid — submission moved to Ready for Preparation" });
+  res.json({ success: true, message: "Marked as paid — submission moved to Ready for Preparation", invoiceId: finalInvoiceId });
 };

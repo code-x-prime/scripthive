@@ -22,7 +22,10 @@ export async function ensureDraftInvoiceForSubmission(submissionId: string): Pro
   const now = new Date();
   const fy = getFinancialYear(now);
   const fyCount = await prisma.invoice.count({
-    where: { createdAt: { gte: fy.start, lte: fy.end } }
+    where: {
+      createdAt: { gte: fy.start, lte: fy.end },
+      id: { startsWith: "SH/" }
+    }
   });
   const items = [{ description: "Article Processing Charge (APC)", amount: total }] as unknown as Prisma.InputJsonValue;
 

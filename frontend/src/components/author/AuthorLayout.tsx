@@ -22,9 +22,9 @@ export function AuthorLayout() {
     : "AU";
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-slate-50 print:min-h-0 print:bg-white">
       {/* Sidebar — sticky, does not scroll with page */}
-      <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white sticky top-0 h-screen overflow-y-auto">
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white sticky top-0 h-screen overflow-y-auto print:hidden">
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-600 text-white">
@@ -85,7 +85,7 @@ export function AuthorLayout() {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
+        <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm print:hidden">
           <div className="flex items-center gap-2 text-sm text-slate-500">
             <BookOpen className="h-4 w-4 text-green-600" />
             <ChevronRight className="h-3 w-3" />
@@ -121,7 +121,7 @@ export function AuthorLayout() {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-6 lg:p-8">
+        <main className="flex-1 p-6 lg:p-8 print:p-0">
           <Outlet />
         </main>
       </div>

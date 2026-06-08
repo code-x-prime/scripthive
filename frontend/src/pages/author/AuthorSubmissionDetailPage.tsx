@@ -69,6 +69,8 @@ export function AuthorSubmissionDetailPage() {
 
   const keywords = parseKeywords(row.keywords);
   const editable = canAuthorEditSubmission(row.status);
+  const pendingInvoice = row.invoices?.find((inv) => inv.status === "Pending");
+  const paidInvoice = row.invoices?.find((inv) => inv.status === "Paid");
 
   return (
     <div className="space-y-6">
@@ -118,12 +120,21 @@ export function AuthorSubmissionDetailPage() {
           Submitted {new Date(row.createdAt).toLocaleString()} · Updated {new Date(row.updatedAt).toLocaleString()}
         </p>
 
-        {row.paymentStatus === "Pending" && (row.apcAmount ?? 0) > 0 ? (
+        {row.paymentStatus === "Pending" && pendingInvoice ? (
           <Link
             to={`/pay/${row.id}`}
             className="mt-4 inline-flex rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
           >
             Pay APC
+          </Link>
+        ) : null}
+
+        {row.paymentStatus === "Paid" && paidInvoice ? (
+          <Link
+            to={`/author/invoices/${paidInvoice.id}`}
+            className="mt-4 inline-flex rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-800 hover:bg-blue-100"
+          >
+            Download Invoice
           </Link>
         ) : null}
       </div>

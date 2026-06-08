@@ -153,7 +153,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
   await prisma.$executeRaw`UPDATE "AdminUser" SET "otpCode" = ${otp}, "otpExpiresAt" = ${otpExpiresAt} WHERE id = ${admin.id}`;
   await sendMail({
     to: admin.email!,
-    subject: "🔐 Password Reset OTP — ScriptHive Admin",
+    subject: "🔐 Password Reset OTP — Admin",
     html: `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body style="margin:0;padding:0;background:#f4f6fb;font-family:'Segoe UI',Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6fb;padding:32px 0;">
 <tr><td align="center">

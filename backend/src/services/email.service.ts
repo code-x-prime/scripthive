@@ -128,7 +128,7 @@ export const sendSubmissionConfirmationEmail = async (
   `;
   await sendMail({
     to: authorEmail,
-    subject: `✅ Submission Received — ${submissionId} | ScriptHive`,
+    subject: `✅ Submission Received — ${submissionId}`,
     html: baseTemplate("Submission Received", `Your submission ${submissionId} has been received.`, body)
   });
 };
@@ -139,9 +139,32 @@ export const sendPaymentReceiptEmail = async (
   invoiceId: string,
   amount: number,
   currency: string,
-  transactionId: string
+  transactionId: string,
+  submissionId?: string,
+  journalName?: string,
+  issn?: string | null,
+  eIssn?: string | null
 ): Promise<void> => {
   const symbol = currency === "INR" ? "₹" : "$";
+  const infoRows: [string, string][] = [
+    ["Invoice ID", invoiceId],
+  ];
+  if (submissionId) {
+    infoRows.push(["Submission ID", submissionId]);
+  }
+  if (journalName) {
+    infoRows.push(["Journal", journalName]);
+  }
+  if (issn || eIssn) {
+    const parts = [];
+    if (issn) parts.push(`ISSN: ${issn}`);
+    if (eIssn) parts.push(`e-ISSN: ${eIssn}`);
+    infoRows.push(["ISSN", parts.join(" · ")]);
+  }
+  infoRows.push(["Amount Paid", `${currency} ${amount.toFixed(2)}`]);
+  infoRows.push(["Transaction ID", transactionId]);
+  infoRows.push(["Status", "Paid"]);
+
   const body = `
     <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
       Your payment has been successfully processed. Below are your transaction details.
@@ -150,17 +173,12 @@ export const sendPaymentReceiptEmail = async (
       <div style="font-size:36px;font-weight:800;color:#16a34a;">${symbol}${amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
       ${badge("Payment Successful", "#16a34a", "#dcfce7")}
     </div>
-    ${infoCard([
-    ["Invoice ID", invoiceId],
-    ["Amount Paid", `${currency} ${amount.toFixed(2)}`],
-    ["Transaction ID", transactionId],
-    ["Status", "Paid"],
-  ])}
+    ${infoCard(infoRows)}
     <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">Please keep this receipt for your records. If you have questions, reply to this email with your Invoice ID.</p>
   `;
   await sendMail({
     to,
-    subject: `🧾 Payment Receipt — ${invoiceId} | ScriptHive`,
+    subject: `🧾 Payment Receipt — ${invoiceId}`,
     html: baseTemplate("Payment Receipt", `Payment of ${currency} ${amount.toFixed(2)} received for ${invoiceId}.`, body)
   });
 };
@@ -188,7 +206,7 @@ export const sendUnderReviewEmail = async (
   `;
   await sendMail({
     to: authorEmail,
-    subject: `🔍 Manuscript Under Review | ScriptHive`,
+    subject: `🔍 Manuscript Under Review`,
     html: baseTemplate("Under Review", `Your manuscript "${title}" is now under peer review.`, body)
   });
 };
@@ -218,7 +236,7 @@ export const sendAcceptedEmail = async (
   `;
   await sendMail({
     to: authorEmail,
-    subject: `🎉 Manuscript Accepted — ${title} | ScriptHive`,
+    subject: `🎉 Manuscript Accepted — ${title}`,
     html: baseTemplate("Manuscript Accepted", `Congratulations! Your manuscript has been accepted.`, body)
   });
 };
@@ -246,7 +264,7 @@ export const sendRejectedEmail = async (
   `;
   await sendMail({
     to: authorEmail,
-    subject: `Editorial Decision — ${title} | ScriptHive`,
+    subject: `Editorial Decision — ${title}`,
     html: baseTemplate("Editorial Decision", `We have reached a decision on your manuscript.`, body)
   });
 };
@@ -255,26 +273,40 @@ export const sendRejectedEmail = async (
 export const sendPaymentLinkEmail = async (
   authorEmail: string,
   authorName: string,
-  invoiceId: string,
-  paymentUrl: string
+  submissionId: string,
+  paymentUrl: string,
+  journalName?: string,
+  issn?: string | null,
+  eIssn?: string | null
 ): Promise<void> => {
+  const infoRows: [string, string][] = [
+    ["Submission ID", submissionId],
+  ];
+  if (journalName) {
+    infoRows.push(["Journal", journalName]);
+  }
+  if (issn || eIssn) {
+    const parts = [];
+    if (issn) parts.push(`ISSN: ${issn}`);
+    if (eIssn) parts.push(`e-ISSN: ${eIssn}`);
+    infoRows.push(["ISSN", parts.join(" · ")]);
+  }
+  infoRows.push(["Action Required", "Complete APC Payment"]);
+
   const body = `
     ${greeting(authorName)}
     <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
       Your manuscript has been accepted! Please complete your <strong>Article Processing Charge (APC)</strong> payment using the secure link below to proceed to publication.
     </p>
-    ${infoCard([
-    ["Invoice ID", invoiceId],
-    ["Action Required", "Complete APC Payment"],
-  ])}
+    ${infoCard(infoRows)}
     ${ctaButton("💳 Pay Now — Complete APC", paymentUrl)}
     ${divider()}
     <p style="margin:0;font-size:13px;color:#64748b;">This payment link is secure. If you did not expect this email, please contact us at <a href="mailto:support@scripthive.org" style="color:#2563eb;">support@scripthive.org</a>.</p>
   `;
   await sendMail({
     to: authorEmail,
-    subject: `💳 APC Payment Required — ${invoiceId} | ScriptHive`,
-    html: baseTemplate("Payment Required", `Complete your APC payment for invoice ${invoiceId}.`, body)
+    subject: `💳 APC Payment Required — ${submissionId}`,
+    html: baseTemplate("Payment Required", `Complete your APC payment for submission ${submissionId}.`, body)
   });
 };
 
@@ -303,7 +335,7 @@ export const sendDoiAssignedEmail = async (
   `;
   await sendMail({
     to: authorEmail,
-    subject: `🔗 DOI Assigned — ${doi} | ScriptHive`,
+    subject: `🔗 DOI Assigned — ${doi}`,
     html: baseTemplate("DOI Assigned", `Your manuscript has been assigned DOI: ${doi}`, body)
   });
 };
@@ -336,7 +368,7 @@ export const sendArticlePublishedEmail = async (
   `;
   await sendMail({
     to: authorEmail,
-    subject: `🌟 Your Article is Published — ${title} | ScriptHive`,
+    subject: `🌟 Your Article is Published — ${title}`,
     html: baseTemplate("Article Published", `Your article "${title}" is now published.`, body)
   });
 };
