@@ -1,5 +1,4 @@
-// date-fmt
-import { fmtDate, fmtDateTime } from "@/utils/formatDate";
+import { fmtDate } from "@/utils/formatDate";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";

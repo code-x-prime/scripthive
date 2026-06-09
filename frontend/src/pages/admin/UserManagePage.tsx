@@ -1,5 +1,4 @@
-// date-fmt
-import { fmtDate, fmtDateTime } from "@/utils/formatDate";
+import { fmtDate } from "@/utils/formatDate";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, KeyRound, Pencil, Plus, Power, RefreshCw, Trash2, X } from "lucide-react";

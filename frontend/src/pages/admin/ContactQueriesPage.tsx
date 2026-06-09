@@ -1,4 +1,3 @@
-// date-fmt
 import { fmtDate, fmtDateTime } from "@/utils/formatDate";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";

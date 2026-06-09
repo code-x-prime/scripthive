@@ -1,5 +1,4 @@
-// date-fmt
-import { fmtDate, fmtDateTime } from "@/utils/formatDate";
+import { fmtDate } from "@/utils/formatDate";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { ChevronDown, ChevronRight, Download, ExternalLink, FileText, Globe } from "lucide-react";
