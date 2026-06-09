@@ -2,6 +2,8 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "../config/prisma.js";
 import { apcAmountForCurrency, loadApcRates } from "./apcSettings.service.js";
 import { generateInvoiceId, getFinancialYear } from "../utils/generateId.js";
+import { sendPaymentLinkEmail } from "./email.service.js";
+import { env } from "../config/env.js";
 
 /** Creates a Draft APC invoice when a submission is accepted, if none exists yet. */
 export async function ensureDraftInvoiceForSubmission(submissionId: string): Promise<void> {
@@ -40,7 +42,20 @@ export async function ensureDraftInvoiceForSubmission(submissionId: string): Pro
       tax: 0,
       total,
       currency,
-      status: "Draft"
+      status: "Pending"
     }
   });
+
+  // Auto-send payment link email
+  const paymentLink = `${env.FRONTEND_URL}/pay/${sub.id}`;
+  const journalRec = await prisma.journal.findUnique({ where: { id: sub.journalId } }).catch(() => null);
+  void sendPaymentLinkEmail(
+    sub.authorEmail,
+    sub.authorName,
+    sub.id,
+    paymentLink,
+    journalRec?.name,
+    journalRec?.issn,
+    journalRec?.eIssn
+  ).catch(() => { /* non-blocking */ });
 }

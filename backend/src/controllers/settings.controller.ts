@@ -4,7 +4,7 @@ import {
   getPaymentGatewaySettingsForAdmin,
   updatePaymentGatewaySettings
 } from "../services/paymentGatewaySettings.service.js";
-import { DEFAULT_ADDONS, loadAddonServices } from "../services/apcSettings.service.js";
+import { DEFAULT_ADDONS, loadAddonServices, loadApcRates } from "../services/apcSettings.service.js";
 
 const KEYS = ["doi_prefix", "apc_usd", "apc_inr", "site_name", "site_email", "addon_services"] as const;
 
@@ -66,6 +66,9 @@ export const updateSettings = async (req: Request, res: Response): Promise<void>
 
 // Public — no auth required, used by client website
 export const listPublicAddons = async (_req: Request, res: Response): Promise<void> => {
-  const addons = await loadAddonServices();
-  res.json(addons.filter((a) => a.enabled));
+  const [addons, apcRates] = await Promise.all([loadAddonServices(), loadApcRates()]);
+  res.json({
+    addons: addons.filter((a) => a.enabled),
+    apc: { inr: apcRates.inr, usd: apcRates.usd }
+  });
 };

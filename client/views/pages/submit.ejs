@@ -758,6 +758,7 @@
     // Add-on services — injected server-side, no CORS issues
     (function initAddons() {
       const addons = <%- JSON.stringify(typeof addonServices !== 'undefined' ? addonServices : []) %>;
+      const _apcRates = <%- JSON.stringify(typeof apcRates !== 'undefined' ? apcRates : {inr:0,usd:0}) %>;
       if (!addons || !addons.length) return;
 
       const section  = document.getElementById('addon-section');
@@ -1179,13 +1180,21 @@
             let selectedAddons = [];
             try { if (addonsRaw && addonsRaw.value) selectedAddons = JSON.parse(addonsRaw.value); } catch(e) {}
 
-            if (selectedAddons.length > 0) {
-              const total = selectedAddons.reduce(function(s,a){ return s + a.price; }, 0);
+            // Get APC rates injected from server
+            var _apc = (typeof _apcRates !== 'undefined') ? _apcRates : {inr:0,usd:0};
+            var apcAmt = isIndia ? (_apc.inr || 0) : (_apc.usd || 0);
+
+            if (selectedAddons.length > 0 || apcAmt > 0) {
+              const addonsSum = selectedAddons.reduce(function(s,a){ return s + a.price; }, 0);
+              const total = apcAmt + addonsSum; // APC + addons
               const paySection = document.getElementById('payment-section');
               const receiptDoneBtns = document.getElementById('receipt-done-btns');
               if (paySection) {
+                var breakdownLines = [];
+                if (apcAmt > 0) breakdownLines.push('APC: ' + (isIndia ? '₹' + apcAmt.toLocaleString('en-IN') : '$' + apcAmt));
+                selectedAddons.forEach(function(a){ breakdownLines.push(a.label + ': ' + (isIndia ? '₹' : '$') + a.price.toLocaleString('en-IN')); });
                 document.getElementById('payment-amount-display').textContent = isIndia ? ('₹' + total.toLocaleString('en-IN')) : ('$' + (total / 83).toFixed(2));
-                document.getElementById('payment-addons-list').textContent = selectedAddons.map(function(a){ return a.label; }).join(', ');
+                document.getElementById('payment-addons-list').textContent = breakdownLines.join(' + ');
                 if (isIndia) {
                   document.getElementById('inr-payment-methods').style.display = 'block';
                   document.getElementById('usd-payment-methods').style.display = 'none';
@@ -1291,9 +1300,9 @@
         // Metadata grid table-like structure
         const gridData = [
           ['Submission ID', submission_id],
-          ['Primary Author', author_name],
+          ['Corresponding Author', author_name],
           ['Contact Email', email],
-          ['Target Journal', journal],
+          ['Journal Name', journal],
           ['Submission Date', timestamp],
           ['Review Timeline', review_timeline],
           ['Status', 'Submitted under Peer Review']
@@ -1311,7 +1320,7 @@
           doc.setFont('Helvetica', 'normal');
           doc.setTextColor(15, 23, 42);
           
-          if (row[0] === 'Target Journal' || row[0] === 'Submission ID') {
+          if (row[0] === 'Journal Name' || row[0] === 'Submission ID') {
             doc.setFont('Helvetica', 'bold');
           }
           
@@ -1372,7 +1381,7 @@
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(9);
         doc.setTextColor(100, 116, 139);
-        doc.text('Thank you for choosing ScriptHive to publish your valuable research.', 20, 275);
+        doc.text('Thank you for choosing ScriptHive Publication to publish your valuable research.', 20, 275);
         
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(8);

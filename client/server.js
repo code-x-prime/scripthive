@@ -110,14 +110,25 @@ app.get('/policies', (req, res) => res.render('pages/policies'));
 app.get('/services', (req, res) => res.render('pages/services'));
 app.get('/submit', async (req, res) => {
   let addonServices = [];
+  let apcRates = { inr: 0, usd: 0 };
   try {
     const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
     const r = await fetch(`${apiUrl}/api/settings/public/addons`);
-    if (r.ok) addonServices = await r.json();
+    if (r.ok) {
+      const data = await r.json();
+      // Support both old format (array) and new format ({addons, apc})
+      if (Array.isArray(data)) {
+        addonServices = data;
+      } else {
+        addonServices = data.addons || [];
+        apcRates = data.apc || { inr: 0, usd: 0 };
+      }
+    }
   } catch { /* non-blocking */ }
   res.render('pages/submit', {
     preselectedJournal: req.query.journal || '',
-    addonServices
+    addonServices,
+    apcRates
   });
 });
 app.get('/subscription', (req, res) => res.render('pages/subscription'));
