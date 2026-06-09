@@ -468,7 +468,7 @@
         </div>
         <div class="sub-check-item">
           <i class="fa-solid fa-check"></i>
-          <p>Submit exclusively in MS Word format (.doc or .docx).</p>
+          <p>Submit in PDF, Word (.doc/.docx), or Excel (.xls/.xlsx) format.</p>
         </div>
         <div class="sub-check-item">
           <i class="fa-solid fa-check"></i>
@@ -529,6 +529,14 @@
                 <div id="country-list"></div>
               </div>
               <span id="country-currency-badge" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);background:#eff6ff;color:#2563eb;font-size:0.75rem;font-weight:700;padding:3px 8px;border-radius:8px;"></span>
+            </div>
+            <div class="form-group full">
+              <input type="text" id="author-address" name="author_address" class="form-control" placeholder=" " maxlength="300">
+              <label for="author-address" class="form-label">Address</label>
+            </div>
+            <div class="form-group">
+              <input type="text" id="author-state" name="author_state" class="form-control" placeholder=" " maxlength="100">
+              <label for="author-state" class="form-label">State / Province</label>
             </div>
           </div>
         </div>
@@ -593,7 +601,7 @@
           <div class="sub-form-section-title"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Manuscript</div>
           <div class="form-group full">
             <div class="file-drop" id="manuscript-drop">
-              <input type="file" name="manuscript" id="manuscript" accept=".pdf,.doc,.docx" required>
+              <input type="file" name="manuscript" id="manuscript" accept=".pdf,.doc,.docx,.xls,.xlsx" required>
               <div class="file-drop-icon"><i class="fa-solid fa-file-arrow-up"></i></div>
               <p>Drag & drop your manuscript here or click to browse</p>
               <span>Supported: PDF, DOC, DOCX — Max 10 MB</span>

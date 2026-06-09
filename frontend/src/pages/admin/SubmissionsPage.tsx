@@ -71,7 +71,7 @@ interface AdminCreateModalProps {
 const EMPTY_FORM = {
   journalId: "", title: "", authorName: "", authorEmail: "",
   authorPhone: "", coAuthors: "", affiliations: "", abstract: "",
-  keywords: "", articleType: "Research", country: "",
+  keywords: "", articleType: "Research", country: "", address: "", state: "",
 };
 
 interface AddonService { id: string; label: string; price: number; currency: string; enabled: boolean }
@@ -100,8 +100,10 @@ const AdminCreateModal = ({ onClose, onCreated }: AdminCreateModalProps) => {
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const onPickFile = (f: File | null) => {
-    if (f && (f.type !== "application/pdf" || !f.name.toLowerCase().endsWith(".pdf"))) {
-      toast.error("PDF only"); return;
+    const allowedExts = [".pdf", ".doc", ".docx", ".xls", ".xlsx"];
+    const ext = f ? f.name.toLowerCase().slice(f.name.lastIndexOf(".")) : "";
+    if (f && !allowedExts.includes(ext)) {
+      toast.error("Allowed: PDF, Word (.doc/.docx), Excel (.xls/.xlsx)"); return;
     }
     if (f && f.size > 10 * 1024 * 1024) {
       toast.error("File too large. Maximum 10 MB."); return;
@@ -181,7 +183,17 @@ const AdminCreateModal = ({ onClose, onCreated }: AdminCreateModalProps) => {
                 <input value={form.country} onChange={set("country")} placeholder="e.g. India"
                   className="mt-1 h-10 w-full rounded-lg border border-gray-200 px-3 text-sm" />
               </label>
+              <label className="block text-sm font-medium text-gray-700">
+                State / Province
+                <input value={form.state} onChange={set("state")} placeholder="e.g. Maharashtra"
+                  className="mt-1 h-10 w-full rounded-lg border border-gray-200 px-3 text-sm" />
+              </label>
             </div>
+            <label className="block text-sm font-medium text-gray-700">
+              Address
+              <input value={form.address} onChange={set("address")} placeholder="Full address"
+                className="mt-1 h-10 w-full rounded-lg border border-gray-200 px-3 text-sm" />
+            </label>
             <label className="block text-sm font-medium text-gray-700">
               Abstract *
               <textarea value={form.abstract} onChange={set("abstract")} rows={4} required
@@ -197,7 +209,7 @@ const AdminCreateModal = ({ onClose, onCreated }: AdminCreateModalProps) => {
               <label className="mt-1 flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 px-4 py-4 hover:border-green-300 hover:bg-green-50/30">
                 <Upload className="h-5 w-5 shrink-0 text-gray-400" />
                 <span className="text-sm text-gray-500">{file ? file.name : "Click to attach PDF"}</span>
-                <input type="file" accept="application/pdf,.pdf" className="hidden"
+                <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" className="hidden"
                   onChange={(e) => onPickFile(e.target.files?.[0] ?? null)} />
               </label>
               {file && (

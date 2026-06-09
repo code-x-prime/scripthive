@@ -10,14 +10,17 @@ const pdfFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
 
 const docFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-  const allowed = [".pdf", ".doc", ".docx"];
+  const allowed = [".pdf", ".doc", ".docx", ".xls", ".xlsx"];
   const allowedMime = [
     "application/pdf",
     "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/octet-stream" // some systems send this for Office files
   ];
-  if (allowed.includes(ext) && allowedMime.includes(file.mimetype)) { cb(null, true); return; }
-  cb(new Error("Only PDF or Word files allowed"));
+  if (allowed.includes(ext)) { cb(null, true); return; } // ext check sufficient
+  cb(new Error("Only PDF, Word, or Excel files allowed"));
 };
 
 // manuscripts — accepts PDF, DOC, DOCX; caller renames to submissionId after DB record created

@@ -32,6 +32,8 @@ export function AuthorSubmitPage() {
   const [keywords, setKeywords]       = useState("");
   const [articleType, setArticleType] = useState("Research");
   const [country, setCountry]         = useState("");
+  const [authorAddress, setAuthorAddress] = useState("");
+  const [authorState, setAuthorState] = useState("");
   const [affiliations, setAffiliations] = useState("");
   const [file, setFile]               = useState<File | null>(null);
   const [authorSeed, setAuthorSeed]   = useState<string | null>(null);
@@ -98,6 +100,8 @@ export function AuthorSubmitPage() {
     fd.append("keywords",    keywords.trim());
     fd.append("articleType", articleType);
     if (country.trim())      fd.append("country",      country.trim());
+    if (authorAddress.trim()) fd.append("author_address", authorAddress.trim());
+    if (authorState.trim())   fd.append("author_state",   authorState.trim());
     if (coAuthors.trim())    fd.append("coAuthors",    coAuthors.trim());
     if (affiliations.trim()) fd.append("affiliations", affiliations.trim());
     if (selectedAddons.length > 0) {
@@ -169,6 +173,16 @@ export function AuthorSubmitPage() {
               <input value={country} onChange={(e) => setCountry(e.target.value)}
                 placeholder="e.g. India" className={inputCls} />
             </div>
+            <div>
+              <label className={labelCls}>State / Province</label>
+              <input value={authorState} onChange={(e) => setAuthorState(e.target.value)}
+                placeholder="e.g. Maharashtra" className={inputCls} />
+            </div>
+            <div className="md:col-span-2">
+              <label className={labelCls}>Address</label>
+              <input value={authorAddress} onChange={(e) => setAuthorAddress(e.target.value)}
+                placeholder="Full postal address" className={inputCls} />
+            </div>
           </div>
         </div>
 
@@ -233,7 +247,7 @@ export function AuthorSubmitPage() {
                 <p className="text-xs text-slate-400">PDF, DOC, DOCX — max 10 MB</p>
               </div>
             )}
-            <input type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx"
               onChange={(e) => onPickFile(e.target.files?.[0] ?? null)} className="hidden" />
           </label>
         </div>

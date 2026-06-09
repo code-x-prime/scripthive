@@ -272,13 +272,10 @@ const manuscriptUpload = multer({
         fileSize: 10 * 1024 * 1024 // 10MB file size limit
     },
     fileFilter: function (req, file, cb) {
-        const filetypes = /pdf|doc|docx/i;
+        const filetypes = /pdf|doc|docx|xls|xlsx/i;
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        
-        if (extname) {
-            return cb(null, true);
-        }
-        cb(new Error('File upload failed: Only PDF, DOC, and DOCX files are allowed!'));
+        if (extname) { return cb(null, true); }
+        cb(new Error('File upload failed: Only PDF, DOC, DOCX, XLS, XLSX files are allowed!'));
     }
 });
 
@@ -326,7 +323,7 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
             }
 
             if (!file) {
-                return res.status(400).json({ status: 'error', message: 'Please upload your manuscript file (.pdf, .doc, or .docx).' });
+                return res.status(400).json({ status: 'error', message: 'Please upload your manuscript file (.pdf, .doc, .docx, .xls, or .xlsx).' });
             }
 
             const timestamp = new Date().toLocaleString();
@@ -364,7 +361,7 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
                 if (addons) fd.append('addons', typeof addons === 'string' ? addons : JSON.stringify(addons));
                 const fileBuffer = fs.readFileSync(file.path);
                 const ext = (file.originalname || '').split('.').pop().toLowerCase();
-                const mimeMap = { pdf: 'application/pdf', doc: 'application/msword', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
+                const mimeMap = { pdf: 'application/pdf', doc: 'application/msword', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', xls: 'application/vnd.ms-excel', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' };
                 const mime = mimeMap[ext] || file.mimetype || 'application/octet-stream';
                 const blob = new Blob([fileBuffer], { type: mime });
                 fd.append('manuscript', blob, file.originalname);
