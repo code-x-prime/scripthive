@@ -27,7 +27,6 @@
       color: var(--text-dark);
       background-color: var(--bg-light);
       position: relative;
-      overflow-x: hidden;
       padding-bottom: 80px;
     }
 
@@ -381,8 +380,8 @@
 
     /* STICKY NAV */
     .j-nav {
-      position: fixed;
-      top: 80px; left: 0; right: 0; width: 100%;
+      position: sticky;
+      top: 80px;
       z-index: 1000;
       background: rgba(255, 255, 255, 0.97);
       backdrop-filter: blur(10px);
@@ -447,8 +446,7 @@
       grid-template-columns: 1fr 350px;
       gap: 40px;
       margin-bottom: 100px;
-      padding-top: 56px;
-    }
+          }
 
     .main-col {
       display: flex;
