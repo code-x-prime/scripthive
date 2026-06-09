@@ -20,7 +20,28 @@ export async function ensureDraftInvoiceForSubmission(submissionId: string): Pro
   const country = (sub.country ?? "").trim().toLowerCase();
   const isIndia = country === "india" || country === "in";
   const currency = isIndia ? "INR" : "USD";
-  const total = apcAmountForCurrency(currency, apc);
+  const apcAmount = apcAmountForCurrency(currency, apc);
+
+  // Parse addons from submission — addons stored in INR, convert if USD
+  let addonsTotal = 0;
+  const addonItems: { description: string; amount: number }[] = [];
+  if (sub.addons && Array.isArray(sub.addons)) {
+    for (const addon of sub.addons as { label?: string; price?: number; currency?: string }[]) {
+      if (addon.price && addon.label) {
+        // Addons priced in INR — convert if USD invoice
+        const addonAmt = isIndia ? addon.price : Math.round((addon.price / 83) * 100) / 100;
+        addonItems.push({ description: addon.label, amount: addonAmt });
+        addonsTotal += addonAmt;
+      }
+    }
+  }
+
+  const total = apcAmount + addonsTotal;
+  const lineItems = [
+    { description: "Article Processing Charge (APC)", amount: apcAmount },
+    ...addonItems
+  ] as unknown as Prisma.InputJsonValue;
+
   const now = new Date();
   const fy = getFinancialYear(now);
   const fyCount = await prisma.invoice.count({
@@ -29,7 +50,6 @@ export async function ensureDraftInvoiceForSubmission(submissionId: string): Pro
       id: { startsWith: "SH/" }
     }
   });
-  const items = [{ description: "Article Processing Charge (APC)", amount: total }] as unknown as Prisma.InputJsonValue;
 
   await prisma.invoice.create({
     data: {
@@ -37,7 +57,7 @@ export async function ensureDraftInvoiceForSubmission(submissionId: string): Pro
       submissionId: sub.id,
       customerName: sub.authorName,
       customerEmail: sub.authorEmail,
-      items,
+      items: lineItems,
       subtotal: total,
       tax: 0,
       total,
