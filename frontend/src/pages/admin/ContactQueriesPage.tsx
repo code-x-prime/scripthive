@@ -1,3 +1,5 @@
+// date-fmt
+import { fmtDate, fmtDateTime } from "@/utils/formatDate";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Mail, Trash2, Eye, X } from "lucide-react";
@@ -26,7 +28,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  return fmtDate(iso);
 }
 
 export const ContactQueriesPage = () => {

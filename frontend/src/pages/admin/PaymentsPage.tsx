@@ -1,3 +1,5 @@
+// date-fmt
+import { fmtDate, fmtDateTime } from "@/utils/formatDate";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -11,7 +13,7 @@ import { usePermissions } from "@/hooks/usePermissions";
 
 function formatDate(iso?: string | null): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  return fmtDate(iso);
 }
 
 const STATUS_OPTIONS = ["Draft", "Pending", "Paid"] as const;

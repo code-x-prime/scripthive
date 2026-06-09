@@ -133,7 +133,7 @@ app.get('/submit', async (req, res) => {
 });
 app.get('/subscription', (req, res) => res.render('pages/subscription'));
 
-// Journal metadata
+// Journal metadata — static fallback, overridden by live DB data
 const JOURNAL_META = {
   SGJVSR: { abbr: 'SGJVSR', issn: '3048-6114', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Vedic and Sanskrit Research', shortDesc: 'Vedic & Sanskrit Research', cover: '/images/SGJVSR - Cover Page.png' },
   SGMRJ:  { abbr: 'SGMRJ',  issn: '3048-6122', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Multidisciplinary Research Journal', shortDesc: 'Multidisciplinary Research', cover: '/images/SGMRJ - Cover Page.png' },
@@ -142,6 +142,33 @@ const JOURNAL_META = {
   SGJSSH: { abbr: 'SGJSSH', issn: '3048-6157', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Social Sciences and Humanities', shortDesc: 'Social Sciences & Humanities', cover: '/images/SGJSSH - Cover Page.png' },
   SGJASH: { abbr: 'SGJASH', issn: '3048-6165', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Applied Science and Health', shortDesc: 'Applied Science & Health', cover: '/images/SGJASH Cover Page.png' }
 };
+
+// Live ISSN cache — refresh from DB every 5 min
+let _issnCache = {};
+let _issnCacheAt = 0;
+async function getLiveJournalMeta(jid) {
+  if (Date.now() - _issnCacheAt < 300000 && _issnCache[jid]) return _issnCache[jid];
+  try {
+    const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+    const r = await fetch(`${apiUrl}/api/journals/admin`, { headers: { 'Authorization': 'Bearer skip' } }).catch(() => null);
+    // Use public journals list instead
+    const r2 = await fetch(`${apiUrl}/api/journals`);
+    if (r2.ok) {
+      const list = await r2.json();
+      list.forEach(j => {
+        const id = j.id || j.abbr;
+        if (JOURNAL_META[id]) {
+          _issnCache[id] = Object.assign({}, JOURNAL_META[id], {
+            issn: j.issn || JOURNAL_META[id].issn,
+            issnOnline: j.eIssn || JOURNAL_META[id].issnOnline
+          });
+        }
+      });
+      _issnCacheAt = Date.now();
+    }
+  } catch { /* fallback to static */ }
+  return _issnCache[jid] || JOURNAL_META[jid] || {};
+}
 
 // Journals Routes — pass archive data + journalId for #archives section
 const JOURNAL_IDS_LIST = ['SGJASH','SGJETR','SGJPLS','SGJSSH','SGJVSR','SGMRJ'];
@@ -152,19 +179,20 @@ JOURNAL_IDS_LIST.forEach(jid => {
       fetchArchive(jid),
       fetchEditorialBoard(jid)
     ]);
-    res.render(`journals/${jid}`, { archive, journalId: jid, editorialBoard, journalMeta: JOURNAL_META[jid] || {} });
+    const journalMeta = await getLiveJournalMeta(jid);
+    res.render(`journals/${jid}`, { archive, journalId: jid, editorialBoard, journalMeta });
   });
 
   app.get(`/${jid}/archives`, async (req, res) => {
     if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
     const archive = await fetchArchive(jid);
-    res.render('journals/journal_archives', { archive, journalId: jid, journal: JOURNAL_META[jid] });
+    getLiveJournalMeta(jid).then(jm => res.render('journals/journal_archives', { archive, journalId: jid, journal: jm }));
   });
 
   app.get(`/${jid}/archives/:slug`, async (req, res) => {
     if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
     const archive = await fetchArchive(jid);
-    res.render('journals/journal_archives', { archive, journalId: jid, journal: JOURNAL_META[jid], activeSlug: req.params.slug });
+    getLiveJournalMeta(jid).then(jm => res.render('journals/journal_archives', { archive, journalId: jid, journal: jm, activeSlug: req.params.slug }));
   });
 });
 

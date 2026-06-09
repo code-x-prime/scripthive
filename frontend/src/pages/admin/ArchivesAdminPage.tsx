@@ -1,3 +1,5 @@
+// date-fmt
+import { fmtDate, fmtDateTime } from "@/utils/formatDate";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { ChevronDown, ChevronRight, Download, ExternalLink, FileText, Globe } from "lucide-react";
@@ -337,7 +339,7 @@ function ArticleCard({
             ) : null}
 
             {a.pubDate && (
-              <span>Published: {new Date(a.pubDate).toLocaleDateString()}</span>
+              <span>Published: {fmtDate(a.pubDate)}</span>
             )}
           </div>
         </div>

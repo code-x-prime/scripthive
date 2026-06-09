@@ -1,3 +1,5 @@
+// date-fmt
+import { fmtDate, fmtDateTime } from "@/utils/formatDate";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
@@ -165,7 +167,7 @@ function exportUserCSV(user: UserActivitySummary, logs: AuditLogEntry[], days: n
   lines.push("");
   lines.push(r("Date/Time", "Action", "Resource", "Resource ID", "Details"));
   logs.filter(l => l.adminId === user.adminId).forEach(l =>
-    lines.push(r(new Date(l.createdAt).toLocaleString(), ACTION_LABELS[l.action] ?? l.action,
+    lines.push(r(fmtDateTime(l.createdAt), ACTION_LABELS[l.action] ?? l.action,
       l.resource, l.resourceId ?? "", l.details ? JSON.stringify(l.details) : ""))
   );
   const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
@@ -273,7 +275,7 @@ function UserDrillDown({ user, logs, days, onClose }: {
                     )}
                   </div>
                   <span className="shrink-0 text-xs text-slate-400 whitespace-nowrap">
-                    {new Date(log.createdAt).toLocaleString()}
+                    {fmtDateTime(log.createdAt)}
                   </span>
                 </div>
               ))}
@@ -317,7 +319,7 @@ function ActivityTab({ activityData }: { activityData: ActivityPayload }) {
       r("Date/Time", "User", "Role", "Action", "Resource", "Resource ID", "Details", "IP")
     ];
     recentLogs.forEach(l => lines.push(r(
-      new Date(l.createdAt).toLocaleString(),
+      fmtDateTime(l.createdAt),
       l.admin?.name ?? "System",
       l.admin?.role?.displayName ?? "—",
       ACTION_LABELS[l.action] ?? l.action,
@@ -521,7 +523,7 @@ function ActivityTab({ activityData }: { activityData: ActivityPayload }) {
                 )}
               </div>
               <span className="shrink-0 text-xs text-slate-400 whitespace-nowrap">
-                {new Date(log.createdAt).toLocaleString()}
+                {fmtDateTime(log.createdAt)}
               </span>
             </div>
           ))}

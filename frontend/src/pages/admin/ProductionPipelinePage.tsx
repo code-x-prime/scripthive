@@ -1,3 +1,5 @@
+// date-fmt
+import { fmtDate, fmtDateTime } from "@/utils/formatDate";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -158,9 +160,9 @@ export const ProductionPipelinePage = () => {
   const dateLabel = isPreparation ? "Payment date" : isUpload ? "Preparation date" : "Upload date";
   const dateFor = (r: Submission): string => {
     if (isPreparation) {
-      return r.paidAt ? new Date(r.paidAt).toLocaleDateString() : "—";
+      return r.paidAt ? fmtDate(r.paidAt) : "—";
     }
-    return new Date(r.updatedAt).toLocaleDateString();
+    return fmtDate(r.updatedAt);
   };
 
   return (

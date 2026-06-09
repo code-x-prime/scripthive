@@ -1,3 +1,5 @@
+// date-fmt
+import { fmtDate, fmtDateTime } from "@/utils/formatDate";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -89,7 +91,7 @@ export const DOIManagePage = () => {
       { key: "authors", label: "Authors", getValue: (r) => r.submission ? submissionAuthorsDisplay(r.submission as Submission) : "" },
       { key: "journal", label: "Journal", getValue: (r) => r.submission?.journal?.id ?? "" },
       { key: "doi", label: "DOI", getValue: (r) => r.doi ?? "" },
-      { key: "assigned", label: "Assigned Date", getValue: (r) => r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "" }
+      { key: "assigned", label: "Assigned Date", getValue: (r) => r.updatedAt ? fmtDate(r.updatedAt) : "" }
     ]);
     downloadCsv(csv, "doi-minted.csv");
   };
@@ -161,7 +163,7 @@ export const DOIManagePage = () => {
                         "—"
                       )}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-600">{r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "—"}</td>
+                    <td className="whitespace-nowrap px-3 py-2 text-gray-600">{r.updatedAt ? fmtDate(r.updatedAt) : "—"}</td>
                     <td className="px-3 py-2 text-right">
                       <Link
                         to={`/admin/submissions/${r.submissionId}`}
@@ -206,7 +208,7 @@ export const DOIManagePage = () => {
                         {s.journal?.id ?? s.journalId}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-600">{new Date(s.updatedAt).toLocaleDateString()}</td>
+                    <td className="whitespace-nowrap px-3 py-2 text-gray-600">{fmtDate(s.updatedAt)}</td>
                     <td className="px-3 py-2 text-right">
                       <button
                         type="button"
@@ -255,7 +257,7 @@ export const DOIManagePage = () => {
                       {s.journal?.id ?? s.journalId}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-2 text-gray-600">{new Date(s.updatedAt).toLocaleDateString()}</td>
+                  <td className="whitespace-nowrap px-3 py-2 text-gray-600">{fmtDate(s.updatedAt)}</td>
                   <td className="px-3 py-2 text-right">
                     <button
                       type="button"

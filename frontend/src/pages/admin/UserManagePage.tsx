@@ -1,3 +1,5 @@
+// date-fmt
+import { fmtDate, fmtDateTime } from "@/utils/formatDate";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, KeyRound, Pencil, Plus, Power, RefreshCw, Trash2, X } from "lucide-react";
@@ -223,7 +225,7 @@ export const UserManagePage = () => {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-gray-600">
-                    {new Date(u.createdAt).toLocaleDateString()}
+                    {fmtDate(u.createdAt)}
                   </td>
                   <td className="px-4 py-3 text-center">
                     {u.isActive ? (

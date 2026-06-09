@@ -1,3 +1,5 @@
+// date-fmt
+import { fmtDate, fmtDateTime } from "@/utils/formatDate";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -692,7 +694,7 @@ export const SubmissionsPage = () => {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-3 py-2 text-gray-600">
-                    {new Date(r.createdAt).toLocaleDateString()}
+                    {fmtDate(r.createdAt)}
                   </td>
                   <td className="px-3 py-2">
                     <StatusBadge status={r.status} />
