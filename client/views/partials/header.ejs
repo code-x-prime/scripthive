@@ -44,9 +44,11 @@
         <a href="/subscription">Subscription</a>
         <a href="/contact">Contact</a>
       </nav>
-      <% var _adminBase = process.env.ADMIN_PANEL_URL || 'https://admin.scripthive.org'; %>
-      <a href="<%= _adminBase %>/author/login" target="_blank" class="btn btn-sm" style="margin-left:8px;border:1.5px solid #2563eb;color:#2563eb;background:#fff;border-radius:8px;padding:8px 16px;font-weight:600;font-size:0.85rem;text-decoration:none;white-space:nowrap;">Author Portal</a>
-      <a href="/submit" class="btn btn-primary btn-sm nav-cta" style="margin-left:8px;">Submit Paper</a>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:16px;">
+        <% var _adminBase = process.env.ADMIN_PANEL_URL || 'https://admin.scripthive.org'; %>
+        <a href="<%= _adminBase %>/author/login" target="_blank" style="border:1.5px solid #2563eb;color:#2563eb;background:#fff;border-radius:8px;padding:8px 14px;font-weight:600;font-size:0.85rem;text-decoration:none;white-space:nowrap;">Author Portal</a>
+        <a href="/submit" class="btn btn-primary btn-sm nav-cta">Submit Paper</a>
+      </div>
       <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
         <span></span><span></span><span></span>
       </button>
