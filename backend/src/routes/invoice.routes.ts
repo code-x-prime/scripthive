@@ -20,7 +20,8 @@ invoiceRouter.post(
   createDraftFromSubmission
 );
 invoiceRouter.get("/", requireAuth, requirePermission("invoices", "read"), listInvoices);
-invoiceRouter.get("/:id", getInvoice);
-invoiceRouter.post("/:id/send-link", requireAuth, requirePermission("invoices", "write"), sendInvoiceLink);
-invoiceRouter.post("/:id/mark-paid", requireAuth, requirePermission("invoices", "write"), markInvoicePaidManual);
-invoiceRouter.put("/:id", requireAuth, requirePermission("invoices", "write"), updateInvoice);
+// Invoice IDs contain "/" (e.g. SH/26-27/001) — must use wildcard routes
+invoiceRouter.get("/:id(*)", getInvoice);
+invoiceRouter.post("/:id(*)/send-link", requireAuth, requirePermission("invoices", "write"), sendInvoiceLink);
+invoiceRouter.post("/:id(*)/mark-paid", requireAuth, requirePermission("invoices", "write"), markInvoicePaidManual);
+invoiceRouter.put("/:id(*)", requireAuth, requirePermission("invoices", "write"), updateInvoice);
