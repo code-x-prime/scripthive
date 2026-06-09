@@ -2,13 +2,14 @@ import { fmtDate } from "@/utils/formatDate";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
-import { FileText, Mail, Search, Send, Star, X } from "lucide-react";
+import { Download, FileText, Mail, Search, Send, Star, X } from "lucide-react";
 import { apiJson } from "@/services/api";
 import { paymentService } from "@/services/payment.service";
 import { apcAmountForCurrency } from "@/utils/apcAmounts";
 import type { Invoice, PaymentStats } from "@/types";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { usePermissions } from "@/hooks/usePermissions";
+import { buildCsv, downloadCsv } from "@/utils/exportCsv";
 
 function formatDate(iso?: string | null): string {
   if (!iso) return "—";
@@ -209,15 +210,43 @@ export const PaymentsPage = () => {
 
   return (
     <section className="space-y-6">
-      <div>
-        <h1 className="font-heading text-3xl text-gray-900">{isCompleted ? "Completed payments" : "Pending payments"}</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          {isCompleted ? "Paid invoices and settled APC records." : "Draft and pending invoices."}
-        </p>
-        <p className="mt-2 text-xs text-gray-500">
-          Current APC rates: ${apcRates.usd.toLocaleString("en-US")} (USD · PayPal) · ₹
-          {apcRates.inr.toLocaleString("en-IN")} (INR · Razorpay / SMEPay). Change in Settings → APC pricing.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-heading text-3xl text-gray-900">{isCompleted ? "Completed payments" : "Pending payments"}</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            {isCompleted ? "Paid invoices and settled APC records." : "Draft and pending invoices."}
+          </p>
+          <p className="mt-2 text-xs text-gray-500">
+            Current APC rates: ${apcRates.usd.toLocaleString("en-US")} (USD · PayPal) · ₹
+            {apcRates.inr.toLocaleString("en-IN")} (INR · Razorpay / SMEPay). Change in Settings → APC pricing.
+          </p>
+        </div>
+        <button
+          type="button"
+          disabled={tableRows.length === 0}
+          onClick={() => {
+            const csv = buildCsv(tableRows, [
+              { key: "id", label: "Invoice No.", getValue: (r) => r.id },
+              { key: "submissionId", label: "Submission ID", getValue: (r) => r.submissionId ?? "" },
+              { key: "title", label: "Paper Title", getValue: (r) => r.submission?.title ?? "" },
+              { key: "customerName", label: "Author", getValue: (r) => r.customerName },
+              { key: "customerEmail", label: "Email", getValue: (r) => r.customerEmail },
+              { key: "total", label: "Amount", getValue: (r) => String(r.total) },
+              { key: "currency", label: "Currency", getValue: (r) => r.currency },
+              { key: "method", label: "Payment Method", getValue: (r) => r.method ?? "" },
+              { key: "gatewayPayId", label: "UTR / Ref", getValue: (r) => r.gatewayPayId ?? "" },
+              { key: "notes", label: "Remarks", getValue: (r) => r.notes ?? "" },
+              { key: "status", label: "Status", getValue: (r) => r.status },
+              { key: "paidAt", label: "Paid Date", getValue: (r) => r.paidAt ? fmtDate(r.paidAt) : "" },
+              { key: "createdAt", label: "Created", getValue: (r) => fmtDate(r.createdAt) },
+            ]);
+            downloadCsv(csv, `payments-${isCompleted ? "completed" : "pending"}-${new Date().toISOString().slice(0,10)}.csv`);
+          }}
+          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 shrink-0"
+        >
+          <Download className="h-4 w-4" />
+          Export CSV
+        </button>
       </div>
 
       {loading ? (
