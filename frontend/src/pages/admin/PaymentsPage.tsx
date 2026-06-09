@@ -240,7 +240,7 @@ export const PaymentsPage = () => {
               { key: "paidAt", label: "Paid Date", getValue: (r) => r.paidAt ? fmtDate(r.paidAt) : "" },
               { key: "createdAt", label: "Created", getValue: (r) => fmtDate(r.createdAt) },
             ]);
-            downloadCsv(csv, `payments-${isCompleted ? "completed" : "pending"}-${new Date().toISOString().slice(0,10)}.csv`);
+            downloadCsv(csv, `payments-${isCompleted ? "completed" : "pending"}-${new Date().toISOString().slice(0, 10)}.csv`);
           }}
           className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 shrink-0"
         >
@@ -311,15 +311,15 @@ export const PaymentsPage = () => {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <th className="px-3 py-3"></th>
-                  {isCompleted && <th className="px-3 py-3">Invoice No.</th>}
-                  <th className="px-3 py-3">Submission ID</th>
-                  <th className="px-3 py-3">Customer</th>
-                  <th className="px-3 py-3">Amount</th>
-                  {isCompleted && <th className="px-3 py-3">Payment Method</th>}
-                  {isCompleted && <th className="px-3 py-3">UTR / Ref</th>}
-                  <th className="px-3 py-3">Date</th>
-                  <th className="px-3 py-3">Status</th>
-                  <th className="px-3 py-3 text-right">Actions</th>
+                {isCompleted && <th className="px-3 py-3">Invoice No.</th>}
+                <th className="px-3 py-3">Submission ID</th>
+                <th className="px-3 py-3">Customer</th>
+                <th className="px-3 py-3">Amount</th>
+                {isCompleted && <th className="px-3 py-3">Payment Method</th>}
+                {isCompleted && <th className="px-3 py-3">UTR / Ref</th>}
+                <th className="px-3 py-3">Date</th>
+                <th className="px-3 py-3">Status</th>
+                <th className="px-3 py-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -459,7 +459,7 @@ export const PaymentsPage = () => {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="font-heading text-xl text-gray-900">Send payment link</h2>
-                <p className="mt-0.5 font-mono text-sm text-gray-500">{modalInvoice.id}</p>
+
                 {modalInvoice.submission ? (
                   <div className="mt-2 rounded-lg bg-gray-50 px-3 py-2">
                     <p className="text-sm font-medium text-gray-800">{modalInvoice.submission.title}</p>
