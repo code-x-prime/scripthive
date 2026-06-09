@@ -216,7 +216,7 @@ button {
   background: rgba(255, 255, 255, .97);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  z-index: 1000;
+  z-index: 1001;
   transition: var(--transition);
   border-bottom: 1px solid var(--border-light);
 }
