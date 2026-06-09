@@ -1,9 +1,7 @@
 ﻿<%- include('../partials/header') %>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-  <link
+      <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
 
@@ -1700,7 +1698,7 @@
     <!-- HERO SECTION -->
     <section class="j-hero">
       <div class="hero-mesh"></div>
-      <div class="container hero-grid gs-reveal">
+      <div class="container hero-grid">
         <div class="hero-text">
           <div class="j-badge"><i class="fa-solid fa-star"></i> ScriptHive Journal</div>
           <h1 class="hero-title">ScriptHive Global Multidisciplinary Research Journal</h1>
@@ -1795,7 +1793,7 @@
         <div class="main-col">
 
           <!-- About Section -->
-          <section id="about" class="c-section gs-reveal-up">
+          <section id="about" class="c-section">
             <h2><i class="fa-solid fa-circle-info"></i> About The Journal</h2>
             <div class="c-box">
               <p>The <strong>ScriptHive Global Multidisciplinary Research Journal (SGMRJ)</strong> is a peer-reviewed, open-access international journal dedicated to publishing high-quality original research across multiple academic disciplines.</p>
@@ -1810,7 +1808,7 @@
           </section>
 
           <!-- Aim & Scope -->
-          <section id="scope" class="c-section gs-reveal-up">
+          <section id="scope" class="c-section">
             <h2><i class="fa-solid fa-bullseye"></i> Aim & Scope</h2>
             <div class="c-box">
               <p>SGMRJ aims to bridge the gaps between distinct scientific, humanistic, and technical fields. We prioritize research that integrates multiple methodologies to solve complex real-world challenges.</p>
@@ -1832,7 +1830,7 @@
           </section>
 
           <!-- Editorial Board Preview -->
-          <section id="editorial" class="c-section gs-reveal-up">
+          <section id="editorial" class="c-section">
             <div class="editorial-header">
               <h2 style="margin:0;"><i class="fa-solid fa-users"></i> Editorial Board</h2>
               <button class="btn-apply-board" data-bs-toggle="modal" data-bs-target="#applyBoardModal">
@@ -2006,7 +2004,7 @@
           </div>
 
           <!-- Publication Ethics -->
-          <section id="ethics" class="c-section gs-reveal-up">
+          <section id="ethics" class="c-section">
             <h2><i class="fa-solid fa-scale-balanced"></i> Publication Ethics</h2>
             <div class="c-box">
 
@@ -2086,7 +2084,7 @@
 
         <!-- RIGHT SIDEBAR -->
         <div class="sidebar-col">
-          <div class="sidebar-box gs-reveal">
+          <div class="sidebar-box">
             <div class="sb-header">
               <h3>Journal Info</h3>
               <p>SGMRJ</p>
@@ -2135,7 +2133,7 @@
       </div>
 
       <!-- TRUST INDICATORS -->
-      <div class="trust-section gs-reveal-up">
+      <div class="trust-section">
         <div class="trust-grid">
           <div class="trust-card"><i class="fa-solid fa-receipt"></i>
             <h4>ISSN Registered</h4>
@@ -2159,7 +2157,7 @@
       </div>
 
       <!-- FINAL CTA -->
-      <div class="cta-banner gs-reveal">
+      <div class="cta-banner">
         <div class="cta-content">
           <h2>Ready to Publish Your Research?</h2>
           <p>Submit your manuscript to SGMRJ and share your scholarly work with the global academic community. Fast,
@@ -2178,18 +2176,18 @@
       gsap.registerPlugin(ScrollTrigger);
 
       // Reveal animations
-      gsap.utils.toArray('.gs-reveal').forEach(function (elem) {
+      /* gsap.utils.toArray('.gs-reveal').forEach(function (elem) {
         gsap.from(elem, {
           scrollTrigger: { trigger: elem, start: "top 85%" },
           y: 50, opacity: 0, duration: 1, ease: "power3.out"
-        });
+        }); */
       });
 
-      gsap.utils.toArray('.gs-reveal-up').forEach(function (elem) {
+      /* gsap.utils.toArray('.gs-reveal-up').forEach(function (elem) {
         gsap.from(elem, {
           scrollTrigger: { trigger: elem, start: "top 85%" },
           y: 30, opacity: 0, duration: 0.8, ease: "power2.out"
-        });
+        }); */
       });
 
       // ── Smart Sticky Nav: Freeze → Unfreeze + Re-animate ───────────────────────
