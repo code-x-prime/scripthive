@@ -1705,10 +1705,7 @@
           <div class="j-badge"><i class="fa-solid fa-star"></i> ScriptHive Journal</div>
           <h1 class="hero-title">ScriptHive Global Journal of Social Sciences and Humanities</h1>
           <div class="hero-abbr">(SGJSSH)</div>
-          <div class="hero-issn">
-            <span>ISSN: XXXX-XXXX (Print)</span>
-            <span>ISSN: XXXX-XXXX (Online)</span>
-          </div>
+          <div class="hero-issn"><% if(typeof journalMeta !== "undefined" && journalMeta.issn && journalMeta.issn !== "XXXX-XXXX") { %><span>ISSN: <%= journalMeta.issn %> (P)</span><% } else { %><span>ISSN: XXXX-XXXX (P)</span><% } %><% if(typeof journalMeta !== "undefined" && journalMeta.issnOnline && journalMeta.issnOnline !== "XXXX-XXXX") { %><span>ISSN: <%= journalMeta.issnOnline %> (O)</span><% } else { %><span>ISSN: XXXX-XXXX (O)</span><% } %></div>
           <div class="hero-tags">
             <div class="hero-tag"><i class="fa-solid fa-microscope" style="color:var(--brand-shield);"></i> Peer-Reviewed</div>
             <div class="hero-tag"><i class="fa-solid fa-lock-open" style="color:var(--gold);"></i> Open Access</div>

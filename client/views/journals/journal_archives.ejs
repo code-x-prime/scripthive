@@ -166,8 +166,10 @@
         <h1 class="arch-hero-title"><%= journal.name %></h1>
         <div class="arch-hero-abbr">(<%= journal.abbr %>)</div>
         <div class="arch-hero-issn">
-          <span>ISSN: XXXX-XXXX (Print)</span>
-          <span>ISSN: XXXX-XXXX (Online)</span>
+          <span>ISSN: <%= (journal && journal.issn && journal.issn !== 'XXXX-XXXX') ? journal.issn : 'XXXX-XXXX' %> (P)</span>
+          <% if (journal && journal.issnOnline && journal.issnOnline !== 'XXXX-XXXX') { %>
+          <span>ISSN: <%= journal.issnOnline %> (O)</span>
+          <% } %>
         </div>
         <div class="arch-hero-tags">
           <div class="arch-hero-tag"><i class="fa-solid fa-microscope" style="color:var(--brand-shield);"></i> Peer-Reviewed</div>
@@ -493,12 +495,14 @@
 
         <div class="sidebar-info-row">
           <div class="sidebar-info-row-left"><i class="fa-solid fa-print"></i> ISSN (Print)</div>
-          <div class="sidebar-info-row-val">XXXX-XXXX</div>
+          <div class="sidebar-info-row-val"><%= (journal && journal.issn && journal.issn !== 'XXXX-XXXX') ? journal.issn : 'XXXX-XXXX' %></div>
         </div>
+        <% if (journal && journal.issnOnline && journal.issnOnline !== 'XXXX-XXXX') { %>
         <div class="sidebar-info-row">
           <div class="sidebar-info-row-left"><i class="fa-solid fa-wifi"></i> ISSN (Online)</div>
-          <div class="sidebar-info-row-val">XXXX-XXXX</div>
+          <div class="sidebar-info-row-val"><%= journal.issnOnline %></div>
         </div>
+        <% } %>
         <div class="sidebar-info-row">
           <div class="sidebar-info-row-left"><i class="fa-solid fa-calendar-days"></i> Frequency</div>
           <div class="sidebar-info-row-val">Quarterly</div>
