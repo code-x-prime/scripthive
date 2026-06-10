@@ -1202,7 +1202,7 @@
                 if (apcAmt > 0) breakdownLines.push('APC: ' + (isIndia ? '₹' + apcAmt.toLocaleString('en-IN') : '$' + apcAmt));
                 selectedAddons.forEach(function(a){ breakdownLines.push(a.label + ': ' + (isIndia ? '₹' : '$') + a.price.toLocaleString('en-IN')); });
                 document.getElementById('payment-amount-display').textContent = isIndia ? ('₹' + total.toLocaleString('en-IN')) : ('$' + (total / 83).toFixed(2));
-                document.getElementById('payment-addons-list').textContent = breakdownLines.join(' + ');
+                document.getElementById('payment-addons-list').textContent = '';
                 if (isIndia) {
                   document.getElementById('inr-payment-methods').style.display = 'block';
                   document.getElementById('usd-payment-methods').style.display = 'none';
