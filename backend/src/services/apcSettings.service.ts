@@ -7,6 +7,7 @@ export interface AddonService {
   id: string;
   label: string;
   price: number;
+  priceUsd?: number | null;
   currency: "INR";
   enabled: boolean;
 }
