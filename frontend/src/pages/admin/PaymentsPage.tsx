@@ -345,7 +345,7 @@ export const PaymentsPage = () => {
                     <p className="text-xs text-gray-500">{inv.customerEmail}</p>
                   </td>
                   {/* inline editable amount */}
-                  <td className="whitespace-nowrap px-3 py-2">
+                  <td className="px-3 py-2">
                     {inv.status !== "Paid" && canWriteInvoice ? (
                       <div className="flex items-center gap-1">
                         <input
@@ -363,6 +363,13 @@ export const PaymentsPage = () => {
                       <span className="font-medium text-gray-900">
                         {inv.total} <span className="text-xs font-semibold text-gray-500">{inv.currency}</span>
                       </span>
+                    )}
+                    {Array.isArray(inv.items) && (inv.items as {description:string;amount:number}[]).length > 1 && (
+                      <div className="mt-0.5 space-y-0.5">
+                        {(inv.items as {description:string;amount:number}[]).map((item, i) => (
+                          <p key={i} className="text-xs text-gray-400 whitespace-nowrap">{item.description}: {inv.currency === "INR" ? "₹" : "$"}{item.amount}</p>
+                        ))}
+                      </div>
                     )}
                   </td>
                   {/* payment method — completed only */}
@@ -478,6 +485,22 @@ export const PaymentsPage = () => {
             </div>
 
             <div className="mt-5 space-y-4">
+              {/* Line items breakdown */}
+              {Array.isArray(modalInvoice.items) && (modalInvoice.items as {description:string;amount:number}[]).length > 0 && (
+                <div className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-xs text-gray-700">
+                  <p className="mb-1.5 font-semibold uppercase tracking-wide text-gray-500">Breakdown</p>
+                  {(modalInvoice.items as {description:string;amount:number}[]).map((item, i) => (
+                    <div key={i} className="flex justify-between gap-4 py-0.5">
+                      <span>{item.description}</span>
+                      <span className="font-mono font-medium">{formCurrency === "INR" ? "₹" : "$"}{item.amount.toLocaleString()}</span>
+                    </div>
+                  ))}
+                  <div className="mt-1.5 flex justify-between gap-4 border-t border-gray-200 pt-1.5 font-semibold">
+                    <span>Total</span>
+                    <span className="font-mono">{formCurrency === "INR" ? "₹" : "$"}{(modalInvoice.items as {description:string;amount:number}[]).reduce((s,i)=>s+i.amount,0).toLocaleString()}</span>
+                  </div>
+                </div>
+              )}
               <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
                 Currency
                 <select
@@ -490,7 +513,7 @@ export const PaymentsPage = () => {
                 </select>
               </label>
               <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Amount (APC)
+                Total amount
                 <input
                   type="number"
                   min={0}
