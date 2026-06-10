@@ -56,7 +56,9 @@ app.use(async (req, res, next) => {
     return Object.assign({}, j, {
       abbr: abbr,
       shortDesc: meta.shortDesc || abbr,
-      name: j.name || meta.name || abbr
+      name: j.name || meta.name || abbr,
+      issn: j.issn || meta.issn,
+      issnOnline: j.eIssn || j.issnOnline || meta.issnOnline
     });
   });
   next();
