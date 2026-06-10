@@ -17,44 +17,74 @@ function baseTemplate(title: string, preheader: string, body: string): string {
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>${title}</title>
 </head>
-<body style="margin:0;padding:0;background:#f4f6fb;font-family:'Segoe UI',Arial,sans-serif;">
-<span style="display:none;font-size:1px;color:#f4f6fb;max-height:0;overflow:hidden;">${preheader}</span>
+<body style="margin:0;padding:0;background:#eef2f7;font-family:'Segoe UI',Arial,sans-serif;">
+<span style="display:none;font-size:1px;color:#eef2f7;max-height:0;overflow:hidden;">${preheader}</span>
 
-<!-- Wrapper -->
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6fb;padding:32px 0;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:40px 0;">
 <tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+<table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;">
+
+  <!-- Top accent bar -->
+  <tr>
+    <td style="background:#1d4ed8;height:5px;font-size:0;line-height:0;">&nbsp;</td>
+  </tr>
 
   <!-- Header -->
   <tr>
-    <td style="background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 100%);border-radius:14px 14px 0 0;padding:32px 40px;text-align:center;">
-      <div style="font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">
-        📚 ScriptHive Publication
-      </div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;letter-spacing:1px;text-transform:uppercase;">
-        International Research Journals
-      </div>
+    <td style="background:#0f172a;padding:36px 48px 28px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td>
+            <div style="font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;line-height:1.2;">ScriptHive Publication</div>
+            <div style="font-size:11px;color:#93c5fd;margin-top:5px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">International Research Journals</div>
+          </td>
+          <td align="right" valign="middle">
+            <div style="background:#1d4ed8;color:#ffffff;font-size:11px;font-weight:700;padding:5px 14px;letter-spacing:1px;text-transform:uppercase;">ISSN Supported</div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Title bar -->
+  <tr>
+    <td style="background:#1d4ed8;padding:16px 48px;">
+      <div style="font-size:15px;font-weight:700;color:#ffffff;letter-spacing:0.3px;">${title}</div>
     </td>
   </tr>
 
   <!-- Body -->
   <tr>
-    <td style="background:#ffffff;padding:40px;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;">
+    <td style="background:#ffffff;padding:44px 48px;border-left:1px solid #dde3ed;border-right:1px solid #dde3ed;">
       ${body}
     </td>
   </tr>
 
   <!-- Footer -->
   <tr>
-    <td style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 14px 14px;padding:24px 40px;text-align:center;">
-      <p style="margin:0 0 6px;font-size:12px;color:#64748b;">
-        ScriptHive Publication  &nbsp;|&nbsp; <a href="https://scripthive.org" style="color:#2563eb;text-decoration:none;">scripthive.org</a>
-      </p>
-      <p style="margin:0;font-size:11px;color:#94a3b8;">
-        This email was sent from <a href="mailto:noreply@mail.scripthive.org" style="color:#94a3b8;">noreply@mail.scripthive.org</a>.<br/>
-        If you did not expect this email, you can safely ignore it.
-      </p>
+    <td style="background:#f1f5f9;border:1px solid #dde3ed;border-top:3px solid #1d4ed8;padding:28px 48px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td>
+            <div style="font-size:13px;font-weight:700;color:#0f172a;">ScriptHive Publication</div>
+            <div style="font-size:12px;color:#64748b;margin-top:3px;">
+              <a href="https://scripthive.org" style="color:#1d4ed8;text-decoration:none;">scripthive.org</a>
+              &nbsp;·&nbsp;
+              <a href="mailto:info@scripthive.org" style="color:#1d4ed8;text-decoration:none;">info@scripthive.org</a>
+              &nbsp;·&nbsp;+91 9899916683
+            </div>
+          </td>
+        </tr>
+        <tr><td style="padding-top:14px;border-top:1px solid #e2e8f0;margin-top:14px;">
+          <div style="font-size:11px;color:#94a3b8;">This is an automated email. If you did not expect this, please ignore it or contact us at <a href="mailto:info@scripthive.org" style="color:#94a3b8;">info@scripthive.org</a></div>
+        </td></tr>
+      </table>
     </td>
+  </tr>
+
+  <!-- Bottom accent -->
+  <tr>
+    <td style="background:#0f172a;height:4px;font-size:0;line-height:0;">&nbsp;</td>
   </tr>
 
 </table>
@@ -70,27 +100,29 @@ function greeting(name: string): string {
 }
 
 function badge(text: string, color: string, bg: string): string {
-  return `<span style="display:inline-block;background:${bg};color:${color};font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;">${text}</span>`;
+  return `<span style="display:inline-block;background:${bg};color:${color};font-size:11px;font-weight:800;padding:5px 14px;letter-spacing:1px;text-transform:uppercase;border-left:3px solid ${color};">${text}</span>`;
 }
 
 function infoCard(rows: [string, string][]): string {
-  const cells = rows.map(([k, v]) =>
-    `<tr>
-      <td style="padding:10px 16px;font-size:13px;color:#64748b;border-bottom:1px solid #f1f5f9;white-space:nowrap;">${k}</td>
-      <td style="padding:10px 16px;font-size:13px;color:#0f172a;font-weight:600;border-bottom:1px solid #f1f5f9;">${v}</td>
+  const cells = rows.map(([k, v], i) =>
+    `<tr style="background:${i % 2 === 0 ? "#f8fafc" : "#ffffff"};">
+      <td style="padding:11px 16px;font-size:12px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #e8edf4;width:38%;border-right:1px solid #e8edf4;">${k}</td>
+      <td style="padding:11px 16px;font-size:13px;color:#0f172a;font-weight:600;border-bottom:1px solid #e8edf4;">${v}</td>
     </tr>`
   ).join("");
-  return `<table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin:20px 0;">${cells}</table>`;
+  return `<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #dde3ed;margin:24px 0;"><thead><tr><td colspan="2" style="background:#0f172a;padding:10px 16px;font-size:11px;font-weight:800;color:#93c5fd;letter-spacing:1.5px;text-transform:uppercase;">Details</td></tr></thead><tbody>${cells}</tbody></table>`;
 }
 
 function ctaButton(text: string, url: string): string {
-  return `<p style="text-align:center;margin:28px 0 0;">
-    <a href="${url}" style="display:inline-block;background:#2563eb;color:#ffffff;font-size:14px;font-weight:700;padding:14px 32px;border-radius:8px;text-decoration:none;letter-spacing:0.3px;">${text}</a>
-  </p>`;
+  return `<table width="100%" cellpadding="0" cellspacing="0" style="margin:32px 0 0;">
+    <tr><td align="center">
+      <a href="${url}" style="display:inline-block;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:800;padding:16px 40px;text-decoration:none;letter-spacing:0.5px;text-transform:uppercase;border-bottom:3px solid #1e40af;">${text}</a>
+    </td></tr>
+  </table>`;
 }
 
 function divider(): string {
-  return `<hr style="border:none;border-top:1px solid #f1f5f9;margin:24px 0;" />`;
+  return `<table width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0;"><tr><td style="border-top:2px solid #e8edf4;font-size:0;line-height:0;">&nbsp;</td></tr></table>`;
 }
 
 /* ── sendMail ──────────────────────────────────────────────────────────────── */

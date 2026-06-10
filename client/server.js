@@ -21,47 +21,47 @@ let _activeJournalsCache = [];
 let _activeJournalsCacheAt = 0;
 let _activeJournalsFetched = false; // track if at least one successful fetch done
 async function getActiveJournals() {
-  if (Date.now() - _activeJournalsCacheAt < 5000 && _activeJournalsFetched) return _activeJournalsCache;
-  try {
-    const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
-    const r = await fetch(`${apiUrl}/api/journals`, { signal: AbortSignal.timeout(3000) });
-    if (r.ok) {
-      const data = await r.json();
-      const list = Array.isArray(data) ? data : (data.data || []);
-      _activeJournalsCache = list; // always update — even empty means all inactive
-      _activeJournalsCacheAt = Date.now();
-      _activeJournalsFetched = true;
+    if (Date.now() - _activeJournalsCacheAt < 5000 && _activeJournalsFetched) return _activeJournalsCache;
+    try {
+        const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+        const r = await fetch(`${apiUrl}/api/journals`, { signal: AbortSignal.timeout(3000) });
+        if (r.ok) {
+            const data = await r.json();
+            const list = Array.isArray(data) ? data : (data.data || []);
+            _activeJournalsCache = list; // always update — even empty means all inactive
+            _activeJournalsCacheAt = Date.now();
+            _activeJournalsFetched = true;
+        }
+    } catch { /* non-blocking */ }
+    // Only fallback to JOURNAL_META if API never responded (startup race)
+    if (!_activeJournalsFetched) {
+        return Object.values(JOURNAL_META);
     }
-  } catch { /* non-blocking */ }
-  // Only fallback to JOURNAL_META if API never responded (startup race)
-  if (!_activeJournalsFetched) {
-    return Object.values(JOURNAL_META);
-  }
-  return _activeJournalsCache;
+    return _activeJournalsCache;
 }
 
 // Inject carousel slides + active journals into every rendered page
 app.use(async (req, res, next) => {
-  res.locals.carouselSlides = [];
-  try {
-    const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
-    const r = await fetch(`${apiUrl}/api/carousel/public`);
-    if (r.ok) res.locals.carouselSlides = await r.json();
-  } catch { /* non-blocking */ }
-  const active = await getActiveJournals();
-  // Backend uses j.id as the abbr (e.g. "SGJVSR"). Normalize to abbr field.
-  res.locals.activeJournals = active.map(j => {
-    const abbr = j.abbr || j.id;
-    const meta = JOURNAL_META[abbr] || {};
-    return Object.assign({}, j, {
-      abbr: abbr,
-      shortDesc: meta.shortDesc || abbr,
-      name: j.name || meta.name || abbr,
-      issn: j.issn || meta.issn,
-      issnOnline: j.eIssn || j.issnOnline || meta.issnOnline
+    res.locals.carouselSlides = [];
+    try {
+        const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+        const r = await fetch(`${apiUrl}/api/carousel/public`);
+        if (r.ok) res.locals.carouselSlides = await r.json();
+    } catch { /* non-blocking */ }
+    const active = await getActiveJournals();
+    // Backend uses j.id as the abbr (e.g. "SGJVSR"). Normalize to abbr field.
+    res.locals.activeJournals = active.map(j => {
+        const abbr = j.abbr || j.id;
+        const meta = JOURNAL_META[abbr] || {};
+        return Object.assign({}, j, {
+            abbr: abbr,
+            shortDesc: meta.shortDesc || abbr,
+            name: j.name || meta.name || abbr,
+            issn: j.issn || meta.issn,
+            issnOnline: j.eIssn || j.issnOnline || meta.issnOnline
+        });
     });
-  });
-  next();
+    next();
 });
 
 // Setup multer for in-memory file uploads (for contact form attachments)
@@ -71,7 +71,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
+    secure: process.env.SMTP_PORT == 465,
     auth: {
         user: process.env.SENDER_EMAIL,
         pass: process.env.SENDER_PASSWORD
@@ -111,111 +111,111 @@ app.get('/journals', (req, res) => res.render('pages/journals'));
 app.get('/policies', (req, res) => res.render('pages/policies'));
 app.get('/services', (req, res) => res.render('pages/services'));
 app.get('/submit', async (req, res) => {
-  let addonServices = [];
-  let apcRates = { inr: 0, usd: 0 };
-  try {
-    const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
-    const r = await fetch(`${apiUrl}/api/settings/public/addons`);
-    if (r.ok) {
-      const data = await r.json();
-      // Support both old format (array) and new format ({addons, apc})
-      if (Array.isArray(data)) {
-        addonServices = data;
-      } else {
-        addonServices = data.addons || [];
-        apcRates = data.apc || { inr: 0, usd: 0 };
-      }
-    }
-  } catch { /* non-blocking */ }
-  res.render('pages/submit', {
-    preselectedJournal: req.query.journal || '',
-    addonServices,
-    apcRates
-  });
+    let addonServices = [];
+    let apcRates = { inr: 0, usd: 0 };
+    try {
+        const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+        const r = await fetch(`${apiUrl}/api/settings/public/addons`);
+        if (r.ok) {
+            const data = await r.json();
+            // Support both old format (array) and new format ({addons, apc})
+            if (Array.isArray(data)) {
+                addonServices = data;
+            } else {
+                addonServices = data.addons || [];
+                apcRates = data.apc || { inr: 0, usd: 0 };
+            }
+        }
+    } catch { /* non-blocking */ }
+    res.render('pages/submit', {
+        preselectedJournal: req.query.journal || '',
+        addonServices,
+        apcRates
+    });
 });
 app.get('/subscription', (req, res) => res.render('pages/subscription'));
 
 // Journal metadata — static fallback, overridden by live DB data
 const JOURNAL_META = {
-  SGJVSR: { abbr: 'SGJVSR', issn: '3048-6114', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Vedic and Sanskrit Research', shortDesc: 'Vedic & Sanskrit Research', cover: '/images/SGJVSR - Cover Page.png' },
-  SGMRJ:  { abbr: 'SGMRJ',  issn: '3048-6122', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Multidisciplinary Research Journal', shortDesc: 'Multidisciplinary Research', cover: '/images/SGMRJ - Cover Page.png' },
-  SGJPLS: { abbr: 'SGJPLS', issn: '3048-6130', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Physical and Life Sciences', shortDesc: 'Physical & Life Sciences', cover: '/images/SGJPLS Cover Page.png' },
-  SGJETR: { abbr: 'SGJETR', issn: '3048-6149', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Engineering and Technology Research', shortDesc: 'Engineering & Technology', cover: '/images/SGJETR - Cover Page.png' },
-  SGJSSH: { abbr: 'SGJSSH', issn: '3048-6157', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Social Sciences and Humanities', shortDesc: 'Social Sciences & Humanities', cover: '/images/SGJSSH - Cover Page.png' },
-  SGJASH: { abbr: 'SGJASH', issn: '3048-6165', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Applied Science and Health', shortDesc: 'Applied Science & Health', cover: '/images/SGJASH Cover Page.png' }
+    SGJVSR: { abbr: 'SGJVSR', issn: '3048-6114', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Vedic and Sanskrit Research', shortDesc: 'Vedic & Sanskrit Research', cover: '/images/SGJVSR - Cover Page.png' },
+    SGMRJ: { abbr: 'SGMRJ', issn: '3048-6122', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Multidisciplinary Research Journal', shortDesc: 'Multidisciplinary Research', cover: '/images/SGMRJ - Cover Page.png' },
+    SGJPLS: { abbr: 'SGJPLS', issn: '3048-6130', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Physical and Life Sciences', shortDesc: 'Physical & Life Sciences', cover: '/images/SGJPLS Cover Page.png' },
+    SGJETR: { abbr: 'SGJETR', issn: '3048-6149', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Engineering and Technology Research', shortDesc: 'Engineering & Technology', cover: '/images/SGJETR - Cover Page.png' },
+    SGJSSH: { abbr: 'SGJSSH', issn: '3048-6157', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Social Sciences and Humanities', shortDesc: 'Social Sciences & Humanities', cover: '/images/SGJSSH - Cover Page.png' },
+    SGJASH: { abbr: 'SGJASH', issn: '3048-6165', issnOnline: 'XXXX-XXXX', name: 'ScriptHive Global Journal of Applied Science and Health', shortDesc: 'Applied Science & Health', cover: '/images/SGJASH Cover Page.png' }
 };
 
 // Live ISSN cache — refresh from DB every 5 min
 let _issnCache = {};
 let _issnCacheAt = 0;
 async function getLiveJournalMeta(jid) {
-  if (Date.now() - _issnCacheAt < 300000 && _issnCache[jid]) return _issnCache[jid];
-  try {
-    const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
-    const r = await fetch(`${apiUrl}/api/journals/admin`, { headers: { 'Authorization': 'Bearer skip' } }).catch(() => null);
-    // Use public journals list instead
-    const r2 = await fetch(`${apiUrl}/api/journals`);
-    if (r2.ok) {
-      const list = await r2.json();
-      list.forEach(j => {
-        const id = j.id || j.abbr;
-        if (JOURNAL_META[id]) {
-          _issnCache[id] = Object.assign({}, JOURNAL_META[id], {
-            issn: j.issn || JOURNAL_META[id].issn,
-            issnOnline: j.eIssn || JOURNAL_META[id].issnOnline
-          });
+    if (Date.now() - _issnCacheAt < 300000 && _issnCache[jid]) return _issnCache[jid];
+    try {
+        const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+        const r = await fetch(`${apiUrl}/api/journals/admin`, { headers: { 'Authorization': 'Bearer skip' } }).catch(() => null);
+        // Use public journals list instead
+        const r2 = await fetch(`${apiUrl}/api/journals`);
+        if (r2.ok) {
+            const list = await r2.json();
+            list.forEach(j => {
+                const id = j.id || j.abbr;
+                if (JOURNAL_META[id]) {
+                    _issnCache[id] = Object.assign({}, JOURNAL_META[id], {
+                        issn: j.issn || JOURNAL_META[id].issn,
+                        issnOnline: j.eIssn || JOURNAL_META[id].issnOnline
+                    });
+                }
+            });
+            _issnCacheAt = Date.now();
         }
-      });
-      _issnCacheAt = Date.now();
-    }
-  } catch { /* fallback to static */ }
-  return _issnCache[jid] || JOURNAL_META[jid] || {};
+    } catch { /* fallback to static */ }
+    return _issnCache[jid] || JOURNAL_META[jid] || {};
 }
 
 // Journals Routes — pass archive data + journalId for #archives section
-const JOURNAL_IDS_LIST = ['SGJASH','SGJETR','SGJPLS','SGJSSH','SGJVSR','SGMRJ'];
+const JOURNAL_IDS_LIST = ['SGJASH', 'SGJETR', 'SGJPLS', 'SGJSSH', 'SGJVSR', 'SGMRJ'];
 JOURNAL_IDS_LIST.forEach(jid => {
-  app.get(`/${jid}`, async (req, res) => {
-    if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
-    const [archive, editorialBoard] = await Promise.all([
-      fetchArchive(jid),
-      fetchEditorialBoard(jid)
-    ]);
-    const journalMeta = await getLiveJournalMeta(jid);
-    res.render(`journals/${jid}`, { archive, journalId: jid, editorialBoard, journalMeta });
-  });
+    app.get(`/${jid}`, async (req, res) => {
+        if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
+        const [archive, editorialBoard] = await Promise.all([
+            fetchArchive(jid),
+            fetchEditorialBoard(jid)
+        ]);
+        const journalMeta = await getLiveJournalMeta(jid);
+        res.render(`journals/${jid}`, { archive, journalId: jid, editorialBoard, journalMeta });
+    });
 
-  app.get(`/${jid}/archives`, async (req, res) => {
-    if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
-    const archive = await fetchArchive(jid);
-    getLiveJournalMeta(jid).then(jm => res.render('journals/journal_archives', { archive, journalId: jid, journal: jm }));
-  });
+    app.get(`/${jid}/archives`, async (req, res) => {
+        if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
+        const archive = await fetchArchive(jid);
+        getLiveJournalMeta(jid).then(jm => res.render('journals/journal_archives', { archive, journalId: jid, journal: jm }));
+    });
 
-  app.get(`/${jid}/archives/:slug`, async (req, res) => {
-    if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
-    const archive = await fetchArchive(jid);
-    getLiveJournalMeta(jid).then(jm => res.render('journals/journal_archives', { archive, journalId: jid, journal: jm, activeSlug: req.params.slug }));
-  });
+    app.get(`/${jid}/archives/:slug`, async (req, res) => {
+        if (!(res.locals.activeJournals || []).some(j => (j.abbr || j.id) === jid)) { res.status(404).render('pages/404'); return; }
+        const archive = await fetchArchive(jid);
+        getLiveJournalMeta(jid).then(jm => res.render('journals/journal_archives', { archive, journalId: jid, journal: jm, activeSlug: req.params.slug }));
+    });
 });
 
 // Journal archive data helper
 async function fetchArchive(journalId) {
-  try {
-    const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
-    const resp = await fetch(`${apiUrl}/api/archive/${journalId}`);
-    if (!resp.ok) return [];
-    return await resp.json();
-  } catch { return []; }
+    try {
+        const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+        const resp = await fetch(`${apiUrl}/api/archive/${journalId}`);
+        if (!resp.ok) return [];
+        return await resp.json();
+    } catch { return []; }
 }
 
 // Editorial board public data
 async function fetchEditorialBoard(journalId) {
-  try {
-    const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
-    const resp = await fetch(`${apiUrl}/api/journals/${journalId}/editorial-board/public`);
-    if (!resp.ok) return [];
-    return await resp.json();
-  } catch { return []; }
+    try {
+        const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+        const resp = await fetch(`${apiUrl}/api/journals/${journalId}/editorial-board/public`);
+        if (!resp.ok) return [];
+        return await resp.json();
+    } catch { return []; }
 }
 
 
@@ -224,16 +224,16 @@ app.get('/invoice', (req, res) => res.render('invoice'));
 
 // Public article page
 app.get('/article/:slug', async (req, res) => {
-  const slug = req.params.slug;
-  try {
-    const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
-    const resp = await fetch(`${apiUrl}/api/archive/article/${encodeURIComponent(slug)}`);
-    if (!resp.ok) { res.status(404).render('pages/404'); return; }
-    const article = await resp.json();
-    res.render('article', { article });
-  } catch {
-    res.status(500).send('Server error');
-  }
+    const slug = req.params.slug;
+    try {
+        const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
+        const resp = await fetch(`${apiUrl}/api/archive/article/${encodeURIComponent(slug)}`);
+        if (!resp.ok) { res.status(404).render('pages/404'); return; }
+        const article = await resp.json();
+        res.render('article', { article });
+    } catch {
+        res.status(500).send('Server error');
+    }
 });
 
 // ==========================================
@@ -251,7 +251,7 @@ const submissionLimiter = rateLimit({
 
 // Ensure uploads folder for manuscripts exists
 const manuscriptDir = path.join(__dirname, 'uploads/manuscripts');
-if (!fs.existsSync(manuscriptDir)){
+if (!fs.existsSync(manuscriptDir)) {
     fs.mkdirSync(manuscriptDir, { recursive: true });
 }
 
@@ -424,64 +424,16 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
             };
             const pickedJournalTitle = journalTitles[journal] || journal;
 
+            const _shBase2 = (ttl, body) => `<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head><body style="margin:0;padding:0;background:#eef2f7;font-family:'Segoe UI',Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:40px 0;"><tr><td align="center"><table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;"><tr><td style="background:#1d4ed8;height:5px;font-size:0;">&nbsp;</td></tr><tr><td style="background:#0f172a;padding:36px 48px 28px;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td><div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px;">ScriptHive Publication</div><div style="font-size:11px;color:#93c5fd;margin-top:5px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">International Research Journals</div></td><td align="right" valign="middle"><div style="background:#1d4ed8;color:#fff;font-size:11px;font-weight:700;padding:5px 14px;letter-spacing:1px;text-transform:uppercase;">ISSN Supported</div></td></tr></table></td></tr><tr><td style="background:#1d4ed8;padding:16px 48px;"><div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:0.3px;">${ttl}</div></td></tr><tr><td style="background:#fff;padding:44px 48px;border-left:1px solid #dde3ed;border-right:1px solid #dde3ed;">${body}</td></tr><tr><td style="background:#f1f5f9;border:1px solid #dde3ed;border-top:3px solid #1d4ed8;padding:28px 48px;"><div style="font-size:13px;font-weight:700;color:#0f172a;">ScriptHive Publication</div><div style="font-size:12px;color:#64748b;margin-top:3px;"><a href="https://scripthive.org" style="color:#1d4ed8;text-decoration:none;">scripthive.org</a>&nbsp;&middot;&nbsp;<a href="mailto:info@scripthive.org" style="color:#1d4ed8;text-decoration:none;">info@scripthive.org</a>&nbsp;&middot;&nbsp;+91 9899916683</div><div style="font-size:11px;color:#94a3b8;margin-top:12px;border-top:1px solid #e2e8f0;padding-top:12px;">Automated email. If unexpected, please ignore or contact us.</div></td></tr><tr><td style="background:#0f172a;height:4px;font-size:0;">&nbsp;</td></tr></table></td></tr></table></body></html>`;
+            const _shRows2 = (rows) => `<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #dde3ed;margin:24px 0;"><thead><tr><td colspan="2" style="background:#0f172a;padding:10px 16px;font-size:11px;font-weight:800;color:#93c5fd;letter-spacing:1.5px;text-transform:uppercase;">Details</td></tr></thead><tbody>${rows.map(([k,v],i)=>`<tr style="background:${i%2===0?'#f8fafc':'#fff'};"><td style="padding:11px 16px;font-size:12px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #e8edf4;width:38%;border-right:1px solid #e8edf4;">${k}</td><td style="padding:11px 16px;font-size:13px;color:#0f172a;font-weight:600;border-bottom:1px solid #e8edf4;">${v}</td></tr>`).join('')}</tbody></table>`;
+
             // 1. Send Author Confirmation Email
             const mailOptionsAuthor = {
                 from: `"ScriptHive Publication" <${process.env.SUBMIT_SENDER_EMAIL || process.env.SENDER_EMAIL}>`,
                 replyTo: 'info@scripthive.org',
                 to: author_email,
                 subject: `Manuscript Submission Received – ScriptHive Publication [ID: ${submissionId}]`,
-                html: `
-                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 650px; margin: 0 auto; color: #1e293b; line-height: 1.6; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-                        <div style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); padding: 30px 40px; text-align: center;">
-                            <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.01em;">ScriptHive Publication</h1>
-                            <span style="display: inline-block; background: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.4); color: #fbbf24; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Manuscript Submission System</span>
-                        </div>
-                        
-                        <div style="padding: 40px; background-color: #ffffff;">
-                            <p style="font-size: 16px; margin-top: 0; color: #0f172a; font-weight: 600;">Dear ${author_name},</p>
-                            
-                            <p style="font-size: 15px; color: #475569;">Thank you for submitting your research manuscript for publication consideration in <strong>${pickedJournalTitle}</strong>.</p>
-                            
-                            <p style="font-size: 15px; color: #475569;">We have successfully received your manuscript file and registered your submission. Your manuscript will now proceed to our Editorial Board for pre-screening followed by a rigorous double-blind peer review.</p>
-                            
-                            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 25px; margin: 25px 0;">
-                                <h3 style="color: #2563eb; margin: 0 0 15px 0; font-size: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; font-weight: 700;">Submission Details:</h3>
-                                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #64748b; font-weight: 600; width: 160px;">• Submission ID:</td>
-                                        <td style="padding: 6px 0; color: #2563eb; font-weight: bold; font-family: monospace;">${submissionId}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #64748b; font-weight: 600;">• Date & Time:</td>
-                                        <td style="padding: 6px 0; color: #0f172a; font-weight: 500;">${timestamp}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #64748b; font-weight: 600;">• Paper Title:</td>
-                                        <td style="padding: 6px 0; color: #0f172a; font-weight: bold; line-height: 1.4;">${paper_title}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #64748b; font-weight: 600;">• Authors:</td>
-                                        <td style="padding: 6px 0; color: #0f172a; font-weight: 500;">${authorsList.join(', ')}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #64748b; font-weight: 600;">• Review Timeline:</td>
-                                        <td style="padding: 6px 0; color: #10b981; font-weight: bold;">7–15 Working Days</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            
-                            <p style="font-size: 15px; color: #475569;">Our review process takes approximately <strong>7 to 15 working days</strong>. In the meantime, you can track the status of your manuscript or submit updates by replying to this email with your submission ID.</p>
-                            
-                            <p style="font-size: 15px; color: #475569; margin-bottom: 0;">Should you have any immediate questions or require assistance, please contact us at <a href="mailto:info@scripthive.org" style="color: #2563eb; text-decoration: none;">info@scripthive.org</a>.</p>
-                            
-                            <div style="margin-top: 35px; border-top: 1px solid #e2e8f0; padding-top: 20px; font-size: 14px;">
-                                <p style="margin: 0; color: #64748b;">Regards,</p>
-                                <p style="margin: 4px 0 0 0; font-weight: bold; color: #2563eb;">ScriptHive Editorial Team</p>
-                                <p style="margin: 0; color: #64748b;"><a href="mailto:info@scripthive.org" style="color: #2563eb; text-decoration: none;">info@scripthive.org</a> | <a href="https://scripthive.org" style="color: #2563eb; text-decoration: none;">www.scripthive.org</a></p>
-                            </div>
-                        </div>
-                    </div>
-                `
+                html: _shBase2('Manuscript Submission Received', `<p style="font-size:16px;color:#0f172a;font-weight:700;margin:0 0 6px;">Dear ${author_name},</p><p style="font-size:15px;color:#475569;margin:0 0 20px;line-height:1.6;">Thank you for submitting your research manuscript to <strong>${pickedJournalTitle}</strong>. We have successfully received your submission and it is now queued for editorial pre-screening followed by double-blind peer review.</p>${_shRows2([['Submission ID',`<span style="font-family:monospace;color:#1d4ed8;font-weight:800;">${submissionId}</span>`],['Journal',pickedJournalTitle],['Paper Title',paper_title],['Authors',authorsList.join(', ')],['Date & Time',timestamp],['Review Timeline','7–15 Working Days']])}<p style="font-size:14px;color:#475569;margin:0 0 8px;line-height:1.6;">Please keep your Submission ID safe — you'll need it to track your paper's status. For any queries, reply to this email with your Submission ID.</p><div style="margin-top:28px;border-top:2px solid #e8edf4;padding-top:20px;font-size:13px;color:#64748b;">Regards,<br/><strong style="color:#0f172a;">ScriptHive Editorial Team</strong><br/><a href="mailto:info@scripthive.org" style="color:#1d4ed8;text-decoration:none;">info@scripthive.org</a></div>`)
             };
 
             // 2. Send Admin Notification Email (with file attachment)
@@ -490,71 +442,7 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
                 replyTo: author_email,
                 to: 'info@scripthive.org',
                 subject: `New Paper Submission: ${submissionId} | ${pickedJournalTitle}`,
-                html: `
-                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 650px; margin: 0 auto; color: #1e293b; line-height: 1.6; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 35px 40px;">
-                            <span style="display: inline-block; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); color: #fbbf24; font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Admin Paper Alert</span>
-                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em;">New Manuscript Submitted</h1>
-                            <p style="color: #94a3b8; margin: 6px 0 0 0; font-size: 14px;">A new paper has been submitted to the ScriptHive publishing platform.</p>
-                        </div>
-                        
-                        <div style="padding: 40px; background-color: #ffffff;">
-                            <div style="border-left: 4px solid #2563eb; padding-left: 15px; margin-bottom: 25px;">
-                                <span style="color: #64748b; font-size: 12px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Security Log Details</span>
-                                <p style="margin: 4px 0 0 0; font-size: 14px; font-weight: 500;">Submitted on: <span style="color: #1e293b; font-weight: bold;">${timestamp}</span> | Submitter IP: <span style="color: #1e293b; font-weight: bold; font-family: monospace;">${ip}</span></p>
-                            </div>
-
-                            <h3 style="color: #0f172a; margin: 0 0 15px 0; font-size: 16px; font-weight: 700; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Manuscript Details</h3>
-                            
-                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 14px;">
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; width: 180px; background-color: #f8fafc;">Target Journal</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #2563eb;">${pickedJournalTitle}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Submission ID</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: #2563eb; font-family: monospace;">${submissionId}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Paper Title</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #0f172a;">${paper_title}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Author Names</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 500;">${authorsList.join(', ')}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Primary Contact Email</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; color: #0f172a;"><a href="mailto:${author_email}" style="color: #2563eb; text-decoration: none; font-weight: 500;">${author_email}</a></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Contact Phone</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 500;">${author_phone || 'Not provided'}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Keywords</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-family: monospace;">${keywords}</td>
-                                </tr>
-                            </table>
-
-                            <h3 style="color: #0f172a; margin: 0 0 10px 0; font-size: 15px; font-weight: 700;">Abstract</h3>
-                            <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 30px; text-align: justify;">
-                                ${abstract.replace(/\n/g, '<br/>')}
-                            </div>
-
-                            <div style="background-color: #f0fdf4; border: 1px dashed #bbf7d0; border-radius: 8px; padding: 15px 20px;">
-                                <h4 style="margin: 0 0 10px 0; font-size: 13px; text-transform: uppercase; color: #166534; letter-spacing: 0.05em;">📎 Manuscript File Attached</h4>
-                                <div style="font-size: 13px; color: #14532d;">
-                                    📄 <strong>File Name:</strong> <span style="font-family: monospace; color: #15803d;">${file.filename}</span>
-                                </div>
-                            </div>
-                            
-                            <div style="margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 12px; color: #94a3b8; text-align: center;">
-                                <p style="margin: 0;">This email is auto-generated by the ScriptHive Website Application Portal.</p>
-                            </div>
-                        </div>
-                    </div>
-                `,
+                html: _shBase2('New Manuscript Submitted — Admin Alert', `<div style="background:#fff3cd;border-left:4px solid #f59e0b;padding:12px 16px;margin-bottom:24px;font-size:13px;color:#92400e;font-weight:600;">New submission received · IP: <span style="font-family:monospace;">${ip}</span> · ${timestamp}</div>${_shRows2([['Submission ID',`<span style="font-family:monospace;color:#1d4ed8;font-weight:800;">${submissionId}</span>`],['Journal',pickedJournalTitle],['Paper Title',`<strong>${paper_title}</strong>`],['Authors',authorsList.join(', ')],['Email',`<a href="mailto:${author_email}" style="color:#1d4ed8;text-decoration:none;">${author_email}</a>`],['Phone',author_phone||'Not provided'],['Keywords',`<span style="font-family:monospace;font-size:12px;">${keywords}</span>`]])}<div style="margin-top:20px;"><div style="background:#0f172a;padding:10px 16px;font-size:11px;font-weight:800;color:#93c5fd;letter-spacing:1.5px;text-transform:uppercase;">Abstract</div><div style="border:1px solid #dde3ed;border-top:none;padding:16px;font-size:14px;color:#334155;line-height:1.7;text-align:justify;">${abstract.replace(/\n/g,'<br/>')}</div></div><div style="margin-top:16px;background:#f0fdf4;border-left:4px solid #22c55e;padding:12px 16px;font-size:13px;color:#166534;font-weight:600;">Manuscript file attached to this email</div>`),
                 attachments: [
                     {
                         filename: file.originalname,
@@ -577,8 +465,8 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
 
             // Only send emails from here if backend API forward FAILED
             // (backend already sends author confirmation + admin notification on success)
-            const backendForwardedOk = submissionId && !submissionId.startsWith('SH-') || 
-                                        (submissionId && submissionId.match(/^SH-\d{4}-[A-Z0-9]{4}$/) && !submissionId.includes('fallback'));
+            const backendForwardedOk = submissionId && !submissionId.startsWith('SH-') ||
+                (submissionId && submissionId.match(/^SH-\d{4}-[A-Z0-9]{4}$/) && !submissionId.includes('fallback'));
             // Simpler check: if submissionId was set from API response (not fallback), skip emails
             // We track this via a flag set during API forward
             if (!_backendForwardSuccess) {
@@ -628,19 +516,22 @@ app.post('/contact', upload.single('attachment'), async (req, res) => {
         const timestamp = new Date().toLocaleString();
 
         // Send emails fire-and-forget
+        const _shBase = (ttl, body) => `<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head><body style="margin:0;padding:0;background:#eef2f7;font-family:'Segoe UI',Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:40px 0;"><tr><td align="center"><table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;"><tr><td style="background:#1d4ed8;height:5px;font-size:0;">&nbsp;</td></tr><tr><td style="background:#0f172a;padding:36px 48px 28px;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td><div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px;">ScriptHive Publication</div><div style="font-size:11px;color:#93c5fd;margin-top:5px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">International Research Journals</div></td><td align="right" valign="middle"><div style="background:#1d4ed8;color:#fff;font-size:11px;font-weight:700;padding:5px 14px;letter-spacing:1px;text-transform:uppercase;">ISSN Supported</div></td></tr></table></td></tr><tr><td style="background:#1d4ed8;padding:16px 48px;"><div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:0.3px;">${ttl}</div></td></tr><tr><td style="background:#fff;padding:44px 48px;border-left:1px solid #dde3ed;border-right:1px solid #dde3ed;">${body}</td></tr><tr><td style="background:#f1f5f9;border:1px solid #dde3ed;border-top:3px solid #1d4ed8;padding:28px 48px;"><div style="font-size:13px;font-weight:700;color:#0f172a;">ScriptHive Publication</div><div style="font-size:12px;color:#64748b;margin-top:3px;"><a href="https://scripthive.org" style="color:#1d4ed8;text-decoration:none;">scripthive.org</a>&nbsp;&middot;&nbsp;<a href="mailto:info@scripthive.org" style="color:#1d4ed8;text-decoration:none;">info@scripthive.org</a>&nbsp;&middot;&nbsp;+91 9899916683</div><div style="font-size:11px;color:#94a3b8;margin-top:12px;border-top:1px solid #e2e8f0;padding-top:12px;">Automated email. If unexpected, please ignore or contact us.</div></td></tr><tr><td style="background:#0f172a;height:4px;font-size:0;">&nbsp;</td></tr></table></td></tr></table></body></html>`;
+        const _shRows = (rows) => `<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #dde3ed;margin:24px 0;"><thead><tr><td colspan="2" style="background:#0f172a;padding:10px 16px;font-size:11px;font-weight:800;color:#93c5fd;letter-spacing:1.5px;text-transform:uppercase;">Details</td></tr></thead><tbody>${rows.map(([k,v],i)=>`<tr style="background:${i%2===0?'#f8fafc':'#fff'};"><td style="padding:11px 16px;font-size:12px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #e8edf4;width:38%;border-right:1px solid #e8edf4;">${k}</td><td style="padding:11px 16px;font-size:13px;color:#0f172a;font-weight:600;border-bottom:1px solid #e8edf4;">${v}</td></tr>`).join('')}</tbody></table>`;
+
         const mailAdmin = {
             from: `"${name} via ScriptHive" <${process.env.SENDER_EMAIL}>`,
             replyTo: email,
             to: 'info@scripthive.org',
             subject: `New Query: ${subject} [${queryId}]`,
-            html: `<h3>New Contact Query</h3><p><b>ID:</b> ${queryId}</p><p><b>Name:</b> ${name}</p><p><b>Email:</b> ${email}</p><p><b>Phone:</b> ${phone || '—'}</p><p><b>Subject:</b> ${subject}</p><p><b>Message:</b><br/>${message.replace(/\n/g, '<br/>')}</p>`
+            html: _shBase('New Contact Inquiry', `<p style="font-size:15px;color:#0f172a;font-weight:700;margin:0 0 20px;">New contact query received via scripthive.org</p>${_shRows([['Query ID',`<span style="font-family:monospace;color:#1d4ed8;font-weight:800;">${queryId}</span>`],['Name',name],['Email',`<a href="mailto:${email}" style="color:#1d4ed8;text-decoration:none;">${email}</a>`],['Phone',phone||'—'],['Subject',subject]])}<div style="background:#f8fafc;border-left:4px solid #1d4ed8;padding:16px 20px;margin-top:8px;"><div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Message</div><div style="font-size:14px;color:#334155;line-height:1.7;">${message.replace(/\n/g,'<br/>')}</div></div>`)
         };
         const mailUser = {
             from: `"ScriptHive Publication" <${process.env.SENDER_EMAIL}>`,
             replyTo: 'info@scripthive.org',
             to: email,
             subject: `Query Received – ScriptHive [Ref: ${queryId}]`,
-            html: `<p>Dear ${name},</p><p>Thank you for contacting ScriptHive. Your query has been logged with reference <strong>${queryId}</strong>. We will respond within 24–48 business hours.</p><p>Regards,<br/>ScriptHive Editorial Team</p>`
+            html: _shBase('Query Received', `<p style="font-size:16px;color:#0f172a;font-weight:700;margin:0 0 6px;">Dear ${name},</p><p style="font-size:15px;color:#475569;margin:0 0 24px;line-height:1.6;">Thank you for reaching out to ScriptHive Publication. We have received your query and our team will respond within <strong>24–48 business hours</strong>.</p>${_shRows([['Reference ID',`<span style="font-family:monospace;color:#1d4ed8;font-weight:800;">${queryId}</span>`],['Subject',subject],['Status','Received — Under Review']])}<p style="font-size:13px;color:#64748b;margin:20px 0 0;line-height:1.6;">For urgent queries, reach us at <a href="mailto:info@scripthive.org" style="color:#1d4ed8;text-decoration:none;">info@scripthive.org</a> or call <strong>+91 9899916683</strong>.</p><div style="margin-top:28px;border-top:2px solid #e8edf4;padding-top:20px;font-size:13px;color:#64748b;">Regards,<br/><strong style="color:#0f172a;">ScriptHive Editorial Team</strong></div>`)
         };
         Promise.all([
             transporter.sendMail(mailAdmin),
@@ -661,7 +552,7 @@ const uploadDirs = [
     'uploads/editorial-board/photos'
 ];
 uploadDirs.forEach(dir => {
-    if (!fs.existsSync(dir)){
+    if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
     }
 });
@@ -751,64 +642,16 @@ app.post('/api/editorial-board/apply', (req, res) => {
             // Set fallback if journalName is missing
             const pickedJournal = journalName || 'ScriptHive Global Journal of Vedic and Sanskrit Research (SGJVSR)';
 
+            const _shBase3 = (ttl, body) => `<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head><body style="margin:0;padding:0;background:#eef2f7;font-family:'Segoe UI',Arial,sans-serif;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:40px 0;"><tr><td align="center"><table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;"><tr><td style="background:#1d4ed8;height:5px;font-size:0;">&nbsp;</td></tr><tr><td style="background:#0f172a;padding:36px 48px 28px;"><table width="100%" cellpadding="0" cellspacing="0"><tr><td><div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px;">ScriptHive Publication</div><div style="font-size:11px;color:#93c5fd;margin-top:5px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">International Research Journals</div></td><td align="right" valign="middle"><div style="background:#1d4ed8;color:#fff;font-size:11px;font-weight:700;padding:5px 14px;letter-spacing:1px;text-transform:uppercase;">ISSN Supported</div></td></tr></table></td></tr><tr><td style="background:#1d4ed8;padding:16px 48px;"><div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:0.3px;">${ttl}</div></td></tr><tr><td style="background:#fff;padding:44px 48px;border-left:1px solid #dde3ed;border-right:1px solid #dde3ed;">${body}</td></tr><tr><td style="background:#f1f5f9;border:1px solid #dde3ed;border-top:3px solid #1d4ed8;padding:28px 48px;"><div style="font-size:13px;font-weight:700;color:#0f172a;">ScriptHive Publication</div><div style="font-size:12px;color:#64748b;margin-top:3px;"><a href="https://scripthive.org" style="color:#1d4ed8;text-decoration:none;">scripthive.org</a>&nbsp;&middot;&nbsp;<a href="mailto:info@scripthive.org" style="color:#1d4ed8;text-decoration:none;">info@scripthive.org</a>&nbsp;&middot;&nbsp;+91 9899916683</div><div style="font-size:11px;color:#94a3b8;margin-top:12px;border-top:1px solid #e2e8f0;padding-top:12px;">Automated email. If unexpected, please ignore or contact us.</div></td></tr><tr><td style="background:#0f172a;height:4px;font-size:0;">&nbsp;</td></tr></table></td></tr></table></body></html>`;
+            const _shRows3 = (rows) => `<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #dde3ed;margin:24px 0;"><thead><tr><td colspan="2" style="background:#0f172a;padding:10px 16px;font-size:11px;font-weight:800;color:#93c5fd;letter-spacing:1.5px;text-transform:uppercase;">Details</td></tr></thead><tbody>${rows.map(([k,v],i)=>`<tr style="background:${i%2===0?'#f8fafc':'#fff'};"><td style="padding:11px 16px;font-size:12px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #e8edf4;width:38%;border-right:1px solid #e8edf4;">${k}</td><td style="padding:11px 16px;font-size:13px;color:#0f172a;font-weight:600;border-bottom:1px solid #e8edf4;">${v}</td></tr>`).join('')}</tbody></table>`;
+
             // 1. CONFIRMATION EMAIL TO APPLICANT
             const mailOptionsCandidate = {
                 from: `"ScriptHive Editorial Team" <${process.env.EDITORIAL_SENDER_EMAIL || process.env.SENDER_EMAIL}>`,
                 replyTo: 'editor@scripthive.org',
                 to: email,
                 subject: `Application Received – Editorial Board | ${pickedJournal}`,
-                html: `
-                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 650px; margin: 0 auto; color: #1e293b; line-height: 1.6; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-                        <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); padding: 30px 40px; text-align: center;">
-                            <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.01em;">ScriptHive Publication</h1>
-                            <span style="display: inline-block; background: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.4); color: #fbbf24; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.05em;">Editorial Board System</span>
-                        </div>
-                        
-                        <div style="padding: 40px; background-color: #ffffff;">
-                            <p style="font-size: 16px; margin-top: 0; color: #0f172a; font-weight: 600;">Dear ${name},</p>
-                            
-                            <p style="font-size: 15px; color: #475569;">Thank you for applying to join the Editorial Board of <strong>${pickedJournal}</strong>.</p>
-                            
-                            <p style="font-size: 15px; color: #475569;">We have successfully received your application and supporting documents. Our editorial management team will review your profile and contact you shortly regarding the next steps.</p>
-                            
-                            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 25px; margin: 25px 0;">
-                                <h3 style="color: #1e3a8a; margin: 0 0 15px 0; font-size: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; font-weight: 700;">Application Details:</h3>
-                                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #64748b; font-weight: 600; width: 180px;">• Applied Journal:</td>
-                                        <td style="padding: 6px 0; color: #1e3a8a; font-weight: bold;">${pickedJournal}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #64748b; font-weight: 600; width: 180px;">• Name:</td>
-                                        <td style="padding: 6px 0; color: #0f172a; font-weight: 500;">${name}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #64748b; font-weight: 600;">• Degree:</td>
-                                        <td style="padding: 6px 0; color: #0f172a; font-weight: 500;">${degree}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #64748b; font-weight: 600;">• Department & College:</td>
-                                        <td style="padding: 6px 0; color: #0f172a; font-weight: 500;">${institution}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 6px 0; color: #64748b; font-weight: 600;">• Current Position:</td>
-                                        <td style="padding: 6px 0; color: #0f172a; font-weight: 500;">${post}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            
-                            <p style="font-size: 15px; color: #475569;">Our Senior Editorial Board typically completes credential evaluations within <strong>7 to 10 working days</strong>. In the meantime, should you have any queries or wish to submit additional details, please feel free to reply directly to this email.</p>
-                            
-                            <p style="font-size: 15px; color: #475569; margin-bottom: 0;">Thank you for your interest in contributing to academic excellence.</p>
-                            
-                            <div style="margin-top: 35px; border-top: 1px solid #e2e8f0; padding-top: 20px; font-size: 14px;">
-                                <p style="margin: 0; color: #64748b;">Regards,</p>
-                                <p style="margin: 4px 0 0 0; font-weight: bold; color: #1e3a8a;">ScriptHive Editorial Team</p>
-                                <p style="margin: 0; color: #64748b;"><a href="mailto:editor@scripthive.org" style="color: #3b82f6; text-decoration: none;">editor@scripthive.org</a> | <a href="https://scripthive.org" style="color: #3b82f6; text-decoration: none;">www.scripthive.org</a></p>
-                            </div>
-                        </div>
-                    </div>
-                `
+                html: _shBase3('Editorial Board Application Received', `<p style="font-size:16px;color:#0f172a;font-weight:700;margin:0 0 6px;">Dear ${name},</p><p style="font-size:15px;color:#475569;margin:0 0 20px;line-height:1.6;">Thank you for applying to join the Editorial Board of <strong>${pickedJournal}</strong>. We have successfully received your application and supporting documents. Our editorial management team will review your profile and contact you within <strong>7–10 working days</strong>.</p>${_shRows3([['Application Ref',`<span style="font-family:monospace;color:#1d4ed8;font-weight:800;">${appId}</span>`],['Applied Journal',pickedJournal],['Name',name],['Degree',degree],['Institution',institution],['Current Post',post]])}<p style="font-size:13px;color:#64748b;margin:20px 0 0;line-height:1.6;">For any queries, reply to this email or contact <a href="mailto:editor@scripthive.org" style="color:#1d4ed8;text-decoration:none;">editor@scripthive.org</a></p><div style="margin-top:28px;border-top:2px solid #e8edf4;padding-top:20px;font-size:13px;color:#64748b;">Regards,<br/><strong style="color:#0f172a;">ScriptHive Editorial Team</strong></div>`)
             };
 
             // 2. ADMIN NOTIFICATION EMAIL TO info@scripthive.org (With physical file attachments from disk)
@@ -817,73 +660,7 @@ app.post('/api/editorial-board/apply', (req, res) => {
                 replyTo: email,
                 to: 'info@scripthive.org',
                 subject: `New Editorial Board Application – ${name} | ${pickedJournal}`,
-                html: `
-                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 650px; margin: 0 auto; color: #1e293b; line-height: 1.6; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                        <!-- Glassmorphic Styled Academic Header -->
-                        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 35px 40px;">
-                            <span style="display: inline-block; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); color: #fbbf24; font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Admin Alert System</span>
-                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em;">New Board Application</h1>
-                            <p style="color: #94a3b8; margin: 6px 0 0 0; font-size: 14px;">A new candidate professor has applied to join the ScriptHive Publication Editorial Board.</p>
-                        </div>
-                        
-                        <!-- Body Grid -->
-                        <div style="padding: 40px; background-color: #ffffff;">
-                            <div style="border-left: 4px solid #3b82f6; padding-left: 15px; margin-bottom: 25px;">
-                                <span style="color: #64748b; font-size: 12px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Security Log Details</span>
-                                <p style="margin: 4px 0 0 0; font-size: 14px; font-weight: 500;">Submitted on: <span style="color: #1e293b; font-weight: bold;">${timestamp}</span> | Candidate IP: <span style="color: #1e293b; font-weight: bold; font-family: monospace;">${ip}</span></p>
-                            </div>
-
-                            <h3 style="color: #0f172a; margin: 0 0 15px 0; font-size: 16px; font-weight: 700; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Candidate Profile Details</h3>
-                            
-                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 14px;">
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; width: 180px; background-color: #f8fafc;">Applied Journal</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #1e3a8a;">${pickedJournal}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Application Ref</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: #2563eb; font-family: monospace;">${appId}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Full Name</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #0f172a;">${name}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Email Address</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; color: #0f172a;"><a href="mailto:${email}" style="color: #2563eb; text-decoration: none; font-weight: 500;">${email}</a></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Contact Number</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 500;">${phone}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Highest Degree</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; color: #0f172a;">${degree}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Department & College</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; color: #0f172a;">${institution}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #475569; background-color: #f8fafc;">Current Post</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #f1f5f9; color: #0f172a;">${post}</td>
-                                </tr>
-                            </table>
-
-                            <div style="background-color: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 15px 20px;">
-                                <h4 style="margin: 0 0 10px 0; font-size: 13px; text-transform: uppercase; color: #475569; letter-spacing: 0.05em;">📎 Uploaded Documents</h4>
-                                <div style="font-size: 13px; color: #0f172a; display: flex; flex-direction: column; gap: 6px;">
-                                    <div>📄 <strong>Resume File:</strong> <span style="font-family: monospace; color: #64748b;">${resumeFile.filename}</span></div>
-                                    <div>🖼️ <strong>Applicant Photo:</strong> <span style="font-family: monospace; color: #64748b;">${photoFile.filename}</span></div>
-                                </div>
-                            </div>
-                            
-                            <div style="margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 12px; color: #94a3b8; text-align: center;">
-                                <p style="margin: 0;">This email is auto-generated by the ScriptHive Website Application Portal.</p>
-                            </div>
-                        </div>
-                    </div>
-                `,
+                html: _shBase3('New Editorial Board Application — Admin Alert', `<div style="background:#fff3cd;border-left:4px solid #f59e0b;padding:12px 16px;margin-bottom:24px;font-size:13px;color:#92400e;font-weight:600;">New application received · IP: <span style="font-family:monospace;">${ip}</span> · ${timestamp}</div>${_shRows3([['Application Ref',`<span style="font-family:monospace;color:#1d4ed8;font-weight:800;">${appId}</span>`],['Journal',pickedJournal],['Full Name',name],['Email',`<a href="mailto:${email}" style="color:#1d4ed8;text-decoration:none;">${email}</a>`],['Phone',phone],['Degree',degree],['Institution',institution],['Post',post]])}<div style="margin-top:16px;background:#f0fdf4;border-left:4px solid #22c55e;padding:12px 16px;font-size:13px;color:#166534;font-weight:600;">Resume &amp; photo files attached to this email</div>`),
                 attachments: [
                     {
                         filename: resumeFile.originalname,
