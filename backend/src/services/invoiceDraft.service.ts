@@ -26,10 +26,11 @@ export async function ensureDraftInvoiceForSubmission(submissionId: string): Pro
   let addonsTotal = 0;
   const addonItems: { description: string; amount: number }[] = [];
   if (sub.addons && Array.isArray(sub.addons)) {
-    for (const addon of sub.addons as { label?: string; price?: number; currency?: string }[]) {
+    for (const addon of sub.addons as { label?: string; price?: number; priceUsd?: number; currency?: string }[]) {
       if (addon.price && addon.label) {
-        // Addons priced in INR — convert if USD invoice
-        const addonAmt = isIndia ? addon.price : Math.round((addon.price / 83) * 100) / 100;
+        const addonAmt = isIndia
+          ? addon.price
+          : (addon.priceUsd ?? Math.round((addon.price / 83) * 100) / 100);
         addonItems.push({ description: addon.label, amount: addonAmt });
         addonsTotal += addonAmt;
       }

@@ -7,16 +7,16 @@ import { CarouselPanel } from "@/components/settings/CarouselPanel";
 import { settingsService } from "@/services/settings.service";
 import { DEFAULT_APC_INR, DEFAULT_APC_USD, parseApcSettings } from "@/utils/apcAmounts";
 
-interface AddonService { id: string; label: string; price: number; currency: "INR"; enabled: boolean }
+interface AddonService { id: string; label: string; price: number; priceUsd: number | null; currency: "INR"; enabled: boolean }
 
 const DEFAULT_ADDONS: AddonService[] = [
-  { id: "doi_only", label: "DOI Only", price: 350, currency: "INR", enabled: true },
-  { id: "fast_review", label: "Fast Review", price: 699, currency: "INR", enabled: true },
-  { id: "plagiarism_report", label: "Plagiarism Report (350 words)", price: 150, currency: "INR", enabled: true },
-  { id: "certificate_soft", label: "Certificate Soft Copy", price: 200, currency: "INR", enabled: true },
-  { id: "certificate_hard", label: "Certificate Hard Copy (Speed Post)", price: 350, currency: "INR", enabled: true },
-  { id: "featured_paper", label: "Featured Paper", price: 1000, currency: "INR", enabled: true },
-  { id: "paper_hard_copy", label: "Paper Hard Copy (Speed Post)", price: 999, currency: "INR", enabled: true }
+  { id: "doi_only", label: "DOI Only", price: 350, priceUsd: null, currency: "INR", enabled: true },
+  { id: "fast_review", label: "Fast Review", price: 699, priceUsd: null, currency: "INR", enabled: true },
+  { id: "plagiarism_report", label: "Plagiarism Report (350 words)", price: 150, priceUsd: null, currency: "INR", enabled: true },
+  { id: "certificate_soft", label: "Certificate Soft Copy", price: 200, priceUsd: null, currency: "INR", enabled: true },
+  { id: "certificate_hard", label: "Certificate Hard Copy (Speed Post)", price: 350, priceUsd: null, currency: "INR", enabled: true },
+  { id: "featured_paper", label: "Featured Paper", price: 1000, priceUsd: null, currency: "INR", enabled: true },
+  { id: "paper_hard_copy", label: "Paper Hard Copy (Speed Post)", price: 999, priceUsd: null, currency: "INR", enabled: true }
 ];
 
 type SettingsTab = "pricing" | "payments" | "doi" | "media" | "carousel" | "addons";
@@ -178,14 +178,15 @@ export const SettingsPage = () => {
         ) : activeTab === "addons" ? (
           <div className="space-y-4 p-6" role="tabpanel">
             <p className="text-sm text-gray-600">
-              Add-on services available for authors at submission. Price in INR. Toggle to enable/disable. Admin can edit anytime.
+              Add-on services available for authors at submission. Set INR price (India authors) and USD price (international authors). Toggle to enable/disable.
             </p>
             <div className="overflow-hidden rounded-xl border border-gray-200">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
                     <th className="px-4 py-3 text-left">Service</th>
-                    <th className="px-4 py-3 text-right w-32">Price (₹)</th>
+                    <th className="px-4 py-3 text-right w-28">Price (₹)</th>
+                    <th className="px-4 py-3 text-right w-28">Price ($)</th>
                     <th className="px-4 py-3 text-center w-20">Enabled</th>
                     <th className="px-4 py-3 w-10"></th>
                   </tr>
@@ -206,6 +207,17 @@ export const SettingsPage = () => {
                           min={0}
                           value={addon.price}
                           onChange={(e) => setAddons((prev) => prev.map((a, i) => i === idx ? { ...a, price: Number(e.target.value) } : a))}
+                          className="w-24 rounded border border-gray-200 px-2 py-1 text-right font-mono text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                        />
+                      </td>
+                      <td className="px-4 py-2 text-right">
+                        <input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          value={addon.priceUsd ?? ""}
+                          placeholder="auto"
+                          onChange={(e) => setAddons((prev) => prev.map((a, i) => i === idx ? { ...a, priceUsd: e.target.value ? Number(e.target.value) : null } : a))}
                           className="w-24 rounded border border-gray-200 px-2 py-1 text-right font-mono text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
                         />
                       </td>
@@ -232,7 +244,7 @@ export const SettingsPage = () => {
             </div>
             <button
               type="button"
-              onClick={() => setAddons((prev) => [...prev, { id: `custom_${Date.now()}`, label: "New service", price: 0, currency: "INR", enabled: true }])}
+              onClick={() => setAddons((prev) => [...prev, { id: `custom_${Date.now()}`, label: "New service", price: 0, priceUsd: null, currency: "INR", enabled: true }])}
               className="inline-flex items-center gap-2 rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-500 hover:border-green-400 hover:text-green-700"
             >
               <Plus className="h-4 w-4" /> Add service
