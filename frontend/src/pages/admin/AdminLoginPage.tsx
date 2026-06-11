@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, BookOpen, FileText, Users, Award, Shield, UserCircle } from "lucide-react";
+import { Eye, EyeOff, FileText, Users, Award, Shield, UserCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 type LoginMode = "team" | "superadmin";
