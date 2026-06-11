@@ -7,6 +7,8 @@ import { AuthorProtectedRoute } from "./components/author/AuthorProtectedRoute";
 import { AuthorLayout } from "./components/author/AuthorLayout";
 import { AuthorLoginPage } from "./pages/author/AuthorLoginPage";
 import { AuthorRegisterPage } from "./pages/author/AuthorRegisterPage";
+import { AuthorForgotPasswordPage } from "./pages/author/AuthorForgotPasswordPage";
+import { AuthorResetPasswordPage } from "./pages/author/AuthorResetPasswordPage";
 import { AuthorDashboardPage } from "./pages/author/AuthorDashboardPage";
 import { AuthorSubmitPage } from "./pages/author/AuthorSubmitPage";
 import { AuthorSubmissionDetailPage } from "./pages/author/AuthorSubmissionDetailPage";
@@ -63,6 +65,8 @@ const App = () => (
 
           <Route path="/author/login" element={<AuthorLoginPage />} />
           <Route path="/author/register" element={<AuthorRegisterPage />} />
+          <Route path="/author/forgot-password" element={<AuthorForgotPasswordPage />} />
+          <Route path="/author/reset-password" element={<AuthorResetPasswordPage />} />
           <Route
             path="/author/*"
             element={

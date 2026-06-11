@@ -3,11 +3,13 @@ import { body } from "express-validator";
 import {
   changeAuthorPassword,
   deleteAuthorAccount,
+  forgotAuthorPassword,
   loginAuthor,
   logoutAuthor,
   meAuthor,
   refreshAuthor,
-  registerAuthor
+  registerAuthor,
+  resetAuthorPassword
 } from "../controllers/authorAuth.controller.js";
 import { authenticateAuthor } from "../middlewares/author.middleware.js";
 import { handleValidation } from "../middlewares/validate.middleware.js";
@@ -47,6 +49,8 @@ authorAuthRouter.post(
   loginAuthor
 );
 
+authorAuthRouter.post("/forgot-password", body("email").isEmail().withMessage("Valid email required"), handleValidation, forgotAuthorPassword);
+authorAuthRouter.post("/reset-password", body("token").notEmpty(), body("password").notEmpty(), handleValidation, resetAuthorPassword);
 authorAuthRouter.get("/refresh", refreshAuthor);
 authorAuthRouter.post("/logout", logoutAuthor);
 authorAuthRouter.get("/me", authenticateAuthor, meAuthor);

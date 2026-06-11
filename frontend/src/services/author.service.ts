@@ -24,7 +24,7 @@ export interface AuthorStats {
 export const authorService = {
   getStats: () => authorApiJson<AuthorStats>("/stats"),
   getProfile: () => authorApiJson<AuthorUser>("/profile"),
-  updateProfile: (body: Partial<Pick<AuthorUser, "name" | "phone" | "country" | "affiliations">>) =>
+  updateProfile: (body: Partial<Pick<AuthorUser, "name" | "phone" | "country" | "state" | "address" | "affiliations">>) =>
     authorApiJson<AuthorUser>("/profile", { method: "PUT", body: JSON.stringify(body) }),
   changePassword: (currentPassword: string, newPassword: string) =>
     fetch("/api/author/auth/password", {

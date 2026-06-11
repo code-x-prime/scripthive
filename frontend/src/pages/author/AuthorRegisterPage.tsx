@@ -16,6 +16,8 @@ export function AuthorRegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState("");
+  const [state, setState] = useState("");
+  const [address, setAddress] = useState("");
   const [affiliations, setAffiliations] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -53,6 +55,8 @@ export function AuthorRegisterPage() {
         password,
         ...(phone.trim() ? { phone: phone.trim() } : {}),
         ...(country.trim() ? { country: country.trim() } : {}),
+        ...(state.trim() ? { state: state.trim() } : {}),
+        ...(address.trim() ? { address: address.trim() } : {}),
         ...(affiliations.trim() ? { affiliations: affiliations.trim() } : {})
       });
       navigate("/author/dashboard", { replace: true });
@@ -117,6 +121,8 @@ export function AuthorRegisterPage() {
 
           <Field label="Phone (optional)" value={phone} onChange={setPhone} autoComplete="tel" placeholder="+1-555-0100" />
           <Field label="Country (optional)" value={country} onChange={setCountry} autoComplete="country-name" placeholder="India" />
+          <Field label="State / Province (optional)" value={state} onChange={setState} autoComplete="address-level1" placeholder="Maharashtra" />
+          <Field label="Address (optional)" value={address} onChange={setAddress} autoComplete="street-address" placeholder="123 Street, City" />
           <label className="block text-sm font-medium text-gray-700">
             Affiliation (optional)
             <textarea

@@ -15,6 +15,8 @@ export function AuthorProfilePage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState("");
+  const [state, setState] = useState("");
+  const [address, setAddress] = useState("");
   const [affiliations, setAffiliations] = useState("");
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -39,6 +41,8 @@ export function AuthorProfilePage() {
         setName(profile.name);
         setPhone(profile.phone ?? "");
         setCountry(profile.country ?? "");
+        setState(profile.state ?? "");
+        setAddress(profile.address ?? "");
         setAffiliations(profile.affiliations ?? "");
       } catch (e) {
         setProfileError(e instanceof Error ? e.message : "Failed to load profile");
@@ -61,6 +65,8 @@ export function AuthorProfilePage() {
         name: name.trim(),
         phone: phone.trim(),
         country: country.trim(),
+        state: state.trim(),
+        address: address.trim(),
         affiliations: affiliations.trim()
       });
       updateAuthor(updated);
@@ -144,6 +150,8 @@ export function AuthorProfilePage() {
           <Field label="Full name *" value={name} onChange={setName} placeholder="Dr. Jane Smith" />
           <Field label="Phone" value={phone} onChange={setPhone} placeholder="+91 98765 43210" />
           <Field label="Country" value={country} onChange={setCountry} placeholder="India" />
+          <Field label="State / Province" value={state} onChange={setState} placeholder="Maharashtra" />
+          <Field label="Address" value={address} onChange={setAddress} placeholder="123 Street, City" />
         </div>
         <div className="mt-4">
           <label className="block text-sm font-semibold text-slate-700 mb-1.5">

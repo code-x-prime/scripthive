@@ -23,12 +23,14 @@ const authorCookieOptions = {
 };
 
 export const registerAuthor = async (req: Request, res: Response): Promise<void> => {
-  const { name, email, password, phone, country, affiliations } = req.body as {
+  const { name, email, password, phone, country, state, address, affiliations } = req.body as {
     name: string;
     email: string;
     password: string;
     phone?: string;
     country?: string;
+    state?: string;
+    address?: string;
     affiliations?: string;
   };
 
@@ -59,6 +61,8 @@ export const registerAuthor = async (req: Request, res: Response): Promise<void>
       passwordHash,
       phone: phone?.trim() || null,
       country: country?.trim() || null,
+      state: state?.trim() || null,
+      address: address?.trim() || null,
       affiliations: affiliations?.trim() || null
     }
   });
@@ -82,6 +86,8 @@ export const registerAuthor = async (req: Request, res: Response): Promise<void>
       email: author.email,
       phone: author.phone,
       country: author.country,
+      state: (author as unknown as Record<string,unknown>).state ?? null,
+      address: (author as unknown as Record<string,unknown>).address ?? null,
       affiliations: author.affiliations
     }
   });
@@ -116,6 +122,8 @@ export const loginAuthor = async (req: Request, res: Response): Promise<void> =>
       email: author.email,
       phone: author.phone,
       country: author.country,
+      state: (author as unknown as Record<string,unknown>).state ?? null,
+      address: (author as unknown as Record<string,unknown>).address ?? null,
       affiliations: author.affiliations
     }
   });
@@ -200,6 +208,56 @@ export const changeAuthorPassword = async (req: AuthorRequest, res: Response): P
   await prisma.authorRefreshToken.deleteMany({ where: { authorId } });
   res.clearCookie("authorRefreshToken", { path: "/api/author/auth" });
   res.json({ message: "Password updated. Please sign in again." });
+};
+
+export const forgotAuthorPassword = async (req: Request, res: Response): Promise<void> => {
+  const { email } = req.body as { email: string };
+  const normalized = email?.trim().toLowerCase() ?? "";
+  if (!normalized) { res.status(400).json({ message: "Email is required" }); return; }
+
+  const author = await prisma.author.findUnique({ where: { email: normalized } });
+  // Always respond OK — don't leak whether email exists
+  if (!author || !author.isActive) {
+    res.json({ message: "If this email is registered, you will receive a reset link." });
+    return;
+  }
+
+  const token = uuidv4();
+  await prisma.authorPasswordResetToken.deleteMany({ where: { authorId: author.id } });
+  await prisma.authorPasswordResetToken.create({
+    data: { authorId: author.id, token, expiresAt: new Date(Date.now() + 60 * 60 * 1000) }
+  });
+
+  const { sendMail } = await import("../services/email.service.js");
+  const resetUrl = `${env.FRONTEND_URL}/author/reset-password?token=${token}`;
+  await sendMail({
+    to: author.email,
+    subject: "Reset your ScriptHive author password",
+    html: `<p>Dear ${author.name},</p><p>Click the link below to reset your password. This link expires in 1 hour.</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>If you did not request this, ignore this email.</p>`
+  }).catch(() => {});
+
+  res.json({ message: "If this email is registered, you will receive a reset link." });
+};
+
+export const resetAuthorPassword = async (req: Request, res: Response): Promise<void> => {
+  const { token, password } = req.body as { token: string; password: string };
+  if (!token || !password) { res.status(400).json({ message: "Token and password are required" }); return; }
+
+  const check = validateAuthorPassword(password);
+  if (!check.valid) { res.status(400).json({ message: check.message }); return; }
+
+  const record = await prisma.authorPasswordResetToken.findUnique({ where: { token }, include: { author: true } });
+  if (!record || record.expiresAt < new Date()) {
+    res.status(400).json({ message: "Reset link is invalid or has expired. Please request a new one." });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+  await prisma.author.update({ where: { id: record.authorId }, data: { passwordHash } });
+  await prisma.authorPasswordResetToken.delete({ where: { token } });
+  await prisma.authorRefreshToken.deleteMany({ where: { authorId: record.authorId } });
+
+  res.json({ message: "Password reset successful. Please sign in with your new password." });
 };
 
 export const deleteAuthorAccount = async (req: AuthorRequest, res: Response): Promise<void> => {

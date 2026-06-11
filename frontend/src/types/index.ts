@@ -39,6 +39,8 @@ export interface AuthorUser {
   email: string;
   phone?: string | null;
   country?: string | null;
+  state?: string | null;
+  address?: string | null;
   affiliations?: string | null;
 }
 

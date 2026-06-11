@@ -201,10 +201,12 @@ export const createAuthorSubmission = async (req: AuthorRequest, res: Response):
 
 export const updateAuthorProfile = async (req: AuthorRequest, res: Response): Promise<void> => {
   const authorId = req.author!.authorId;
-  const { name, phone, country, affiliations } = req.body as {
+  const { name, phone, country, state, address, affiliations } = req.body as {
     name?: string;
     phone?: string;
     country?: string;
+    state?: string;
+    address?: string;
     affiliations?: string;
   };
   const updated = await prisma.author.update({
@@ -213,15 +215,20 @@ export const updateAuthorProfile = async (req: AuthorRequest, res: Response): Pr
       ...(name?.trim() ? { name: name.trim() } : {}),
       ...(phone !== undefined ? { phone: phone.trim() || null } : {}),
       ...(country !== undefined ? { country: country.trim() || null } : {}),
+      ...(state !== undefined ? { state: state.trim() || null } : {}),
+      ...(address !== undefined ? { address: address.trim() || null } : {}),
       ...(affiliations !== undefined ? { affiliations: affiliations.trim() || null } : {})
     }
   });
+  const u = updated as unknown as Record<string, unknown>;
   res.json({
     id: updated.id,
     name: updated.name,
     email: updated.email,
     phone: updated.phone,
     country: updated.country,
+    state: u.state ?? null,
+    address: u.address ?? null,
     affiliations: updated.affiliations
   });
 };
