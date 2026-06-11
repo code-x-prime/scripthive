@@ -10,13 +10,28 @@ import type { Invoice } from "../../types";
 
 const paidStatuses = new Set(["paid", "Paid", "PAID"]);
 
+const Logo = () => (
+  <div className="flex items-center gap-3">
+    <div className="flex h-10 w-10 items-center justify-center bg-white/10 rounded-lg">
+      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-white" stroke="currentColor" strokeWidth={2}>
+        <path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <div className="text-white font-bold text-lg tracking-tight leading-tight">ScriptHive Publication</div>
+      <div className="text-[#93c5fd] text-xs font-semibold tracking-widest uppercase">Article Processing Charge</div>
+    </div>
+  </div>
+);
+
 export const PaymentPage = () => {
   const { id } = useParams<{ id: string }>();
-  const [invoice, setInvoice]   = useState<Invoice | null>(null);
+  const [invoice, setInvoice]     = useState<Invoice | null>(null);
   const [payConfig, setPayConfig] = useState<PublicPaymentConfig | null>(null);
-  const [loading, setLoading]   = useState(true);
-  const [result, setResult]     = useState<string | null>(null);
-  const [error, setError]       = useState<string | null>(null);
+  const [loading, setLoading]     = useState(true);
+  const [result, setResult]       = useState<string | null>(null);
+  const [error, setError]         = useState<string | null>(null);
+  const [selectedGateway, setSelectedGateway] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -69,8 +84,9 @@ export const PaymentPage = () => {
     return (
       <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="w-full max-w-lg bg-white border border-slate-200 shadow-sm p-8 text-center">
-          <div className="text-5xl mb-4">✅</div>
-          <h1 className="text-2xl font-bold text-green-800">Payment Complete</h1>
+          <Logo />
+          <div className="mt-6 text-5xl">✅</div>
+          <h1 className="mt-3 text-2xl font-bold text-green-800">Payment Complete</h1>
           <p className="mt-2 text-slate-500">This invoice has already been settled. Thank you!</p>
           {invoice.submissionId && (
             <p className="mt-3 text-xs text-slate-400 font-mono">Submission ID: {invoice.submissionId}</p>
@@ -84,8 +100,9 @@ export const PaymentPage = () => {
     return (
       <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="w-full max-w-lg bg-white border border-slate-200 shadow-sm p-8 text-center">
-          <div className="text-5xl mb-4">🎉</div>
-          <h1 className="text-2xl font-bold text-green-800">Payment Successful!</h1>
+          <Logo />
+          <div className="mt-6 text-5xl">🎉</div>
+          <h1 className="mt-3 text-2xl font-bold text-green-800">Payment Successful!</h1>
           <p className="mt-2 text-slate-600 text-sm">{result}</p>
           {invoice.submissionId && (
             <p className="mt-3 text-xs text-slate-400 font-mono">Submission ID: {invoice.submissionId}</p>
@@ -110,23 +127,31 @@ export const PaymentPage = () => {
     );
   }
 
-  const showRazorpay = cur === "INR" && payConfig?.razorpay.enabled && (inrProvider === "razorpay" || !payConfig.smepay.enabled);
-  const showSmepay   = cur === "INR" && payConfig?.smepay.enabled   && (inrProvider === "smepay"   || !payConfig.razorpay.enabled);
-  const showPayPal   = cur === "USD" && payConfig?.paypal.enabled;
+  const showRazorpay = cur === "INR" && !!(payConfig?.razorpay.enabled) && (inrProvider === "razorpay" || !payConfig?.smepay.enabled);
+  const showSmepay   = cur === "INR" && !!(payConfig?.smepay.enabled)   && (inrProvider === "smepay"   || !payConfig?.razorpay.enabled);
+  const showPayPal   = cur === "USD" && !!(payConfig?.paypal.enabled);
 
   const fmtAmt = (n: number) => n.toLocaleString(cur === "INR" ? "en-IN" : "en-US", {
     minimumFractionDigits: cur === "INR" ? 0 : 2,
     maximumFractionDigits: cur === "INR" ? 0 : 2
   });
 
+  // Build gateway options
+  type GWOption = { key: string; label: string; sub: string };
+  const gwOptions: GWOption[] = [];
+  if (showRazorpay) gwOptions.push({ key: "razorpay", label: "Razorpay", sub: "UPI · Cards · Net Banking" });
+  if (showSmepay)   gwOptions.push({ key: "smepay",   label: "SMEPay",   sub: "UPI / QR Code" });
+  if (showPayPal)   gwOptions.push({ key: "paypal",   label: "PayPal",   sub: "International · USD" });
+
+  const activeGW = selectedGateway ?? (gwOptions[0]?.key ?? null);
+
   return (
     <main className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
 
-        {/* Header */}
-        <div className="bg-[#0f172a] px-8 py-6">
-          <div className="text-white font-bold text-xl tracking-tight">ScriptHive Publication</div>
-          <div className="text-[#93c5fd] text-xs font-semibold tracking-widest uppercase mt-1">Article Processing Charge</div>
+        {/* Header with logo */}
+        <div className="bg-[#0f172a] px-8 py-5">
+          <Logo />
         </div>
 
         {/* Blue title bar */}
@@ -137,7 +162,7 @@ export const PaymentPage = () => {
         {/* Body */}
         <div className="bg-white border-x border-[#dde3ed] px-8 py-7 space-y-5">
 
-          {/* Submission info */}
+          {/* Invoice Details */}
           <div className="border border-[#dde3ed]">
             <div className="bg-[#0f172a] px-4 py-2.5">
               <span className="text-[#93c5fd] text-xs font-bold uppercase tracking-widest">Invoice Details</span>
@@ -168,16 +193,15 @@ export const PaymentPage = () => {
             </table>
           </div>
 
-          {/* Line items */}
+          {/* Breakdown — item names only, no price */}
           {items.length > 0 && (
             <div className="border border-[#dde3ed]">
               <div className="bg-[#0f172a] px-4 py-2.5">
                 <span className="text-[#93c5fd] text-xs font-bold uppercase tracking-widest">Breakdown</span>
               </div>
               {items.map((item, i) => (
-                <div key={i} className={`flex justify-between items-center px-4 py-2.5 border-b border-[#e8edf4] ${i % 2 === 0 ? "bg-slate-50" : "bg-white"}`}>
-                  <span className="text-sm text-slate-600">{item.description}</span>
-                  <span className="font-mono font-semibold text-slate-800">{sym}{fmtAmt(item.amount)}</span>
+                <div key={i} className={`flex items-center px-4 py-2.5 border-b border-[#e8edf4] gap-2 ${i % 2 === 0 ? "bg-slate-50" : "bg-white"}`}>
+                  <span className="text-sm text-slate-700">{item.description}</span>
                 </div>
               ))}
             </div>
@@ -189,27 +213,38 @@ export const PaymentPage = () => {
             <span className="font-mono font-extrabold text-[#1d4ed8] text-2xl">{sym}{fmtAmt(payable)}</span>
           </div>
 
-          {/* Gateway info */}
-          {payConfig && cur === "INR" && (
-            <p className="text-xs text-slate-400 text-center">
-              Gateway: {inrProvider === "smepay" ? "SMEPay" : "Razorpay"} · {payConfig[inrProvider as "razorpay" | "smepay"]?.mode} mode
-            </p>
+          {/* Gateway selector */}
+          {gwOptions.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Select Payment Method</p>
+              {gwOptions.map((gw) => (
+                <button
+                  key={gw.key}
+                  type="button"
+                  onClick={() => setSelectedGateway(gw.key)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 border-2 transition-colors text-left ${
+                    activeGW === gw.key
+                      ? "border-[#1d4ed8] bg-[#eff6ff]"
+                      : "border-[#dde3ed] bg-white hover:border-slate-300"
+                  }`}
+                >
+                  <div className={`h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    activeGW === gw.key ? "border-[#1d4ed8]" : "border-slate-300"
+                  }`}>
+                    {activeGW === gw.key && <div className="h-2 w-2 rounded-full bg-[#1d4ed8]" />}
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-slate-900">{gw.label}</div>
+                    <div className="text-xs text-slate-500">{gw.sub}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
           )}
 
-          {/* Payment buttons */}
-          <div className="space-y-3 pt-1">
-            {showPayPal && (
-              <PayPalButton
-                invoiceId={invoice.id}
-                clientId={payConfig?.paypal.clientId ?? ""}
-                onSuccess={(tid) => setResult(`Transaction ID: ${tid}`)}
-                onError={() => toast.error("PayPal payment failed.")}
-              />
-            )}
-            {cur === "USD" && !showPayPal && (
-              <p className="text-sm text-amber-700 text-center">PayPal not configured. Contact journal office.</p>
-            )}
-            {showRazorpay && (
+          {/* Payment button — hidden until gateway selected, renders actual button */}
+          <div>
+            {activeGW === "razorpay" && showRazorpay && (
               <RazorpayButton
                 invoiceId={invoice.id}
                 razorpayKeyId={payConfig?.razorpay.keyId}
@@ -217,15 +252,26 @@ export const PaymentPage = () => {
                 onError={() => toast.error("Razorpay payment failed.")}
               />
             )}
-            {showSmepay && (
+            {activeGW === "smepay" && showSmepay && (
               <SMEPayButton
                 invoiceId={invoice.id}
                 onSuccess={(tid) => setResult(`Transaction ID: ${tid}`)}
                 onError={() => toast.error("SMEPay payment failed.")}
               />
             )}
+            {activeGW === "paypal" && showPayPal && (
+              <PayPalButton
+                invoiceId={invoice.id}
+                clientId={payConfig?.paypal.clientId ?? ""}
+                onSuccess={(tid) => setResult(`Transaction ID: ${tid}`)}
+                onError={() => toast.error("PayPal payment failed.")}
+              />
+            )}
             {cur === "INR" && !showRazorpay && !showSmepay && (
               <p className="text-sm text-amber-700 text-center">No INR gateway configured. Add keys in Admin → Settings.</p>
+            )}
+            {cur === "USD" && !showPayPal && (
+              <p className="text-sm text-amber-700 text-center">PayPal not configured. Contact journal office.</p>
             )}
           </div>
         </div>
