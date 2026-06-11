@@ -1,11 +1,11 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { FilePlus, LayoutDashboard, LogOut, User, BookOpen, ChevronRight } from "lucide-react";
+import { FilePlus, LayoutDashboard, LogOut, BookOpen, ChevronRight, Package } from "lucide-react";
 import { useAuthorAuth } from "@/contexts/AuthorAuthContext";
 
 const NAV = [
   { to: "/author/dashboard", label: "My Submissions", icon: LayoutDashboard },
   { to: "/author/submit",    label: "Submit Paper",   icon: FilePlus },
-  { to: "/author/profile",   label: "Profile",        icon: User }
+  { to: "/author/addons",    label: "Add-On Services", icon: Package }
 ];
 
 export function AuthorLayout() {

@@ -14,6 +14,7 @@ import { AuthorSubmitPage } from "./pages/author/AuthorSubmitPage";
 import { AuthorSubmissionDetailPage } from "./pages/author/AuthorSubmissionDetailPage";
 import { AuthorEditSubmissionPage } from "./pages/author/AuthorEditSubmissionPage";
 import { AuthorProfilePage } from "./pages/author/AuthorProfilePage";
+import { AuthorAddonsPage } from "./pages/author/AuthorAddonsPage";
 import { AppProvider } from "./contexts/AppContext";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
 import { ForgotPasswordPage } from "./pages/admin/ForgotPasswordPage";
@@ -82,6 +83,7 @@ const App = () => (
             <Route path="submissions/:id" element={<AuthorSubmissionDetailPage />} />
             <Route path="invoices/:id" element={<InvoiceViewPage />} />
             <Route path="profile" element={<AuthorProfilePage />} />
+            <Route path="addons" element={<AuthorAddonsPage />} />
           </Route>
 
           <Route path="/admin/login" element={<AdminLoginPage />} />
