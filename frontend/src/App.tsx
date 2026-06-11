@@ -64,32 +64,16 @@ const App = () => (
           />
           <Route path="/articles/:id" element={<Navigate to="/journals" replace />} />
 
-          <Route path="/author/login" element={
-            window.location.hostname === "admin.scripthive.org"
-              ? <>{window.location.replace("https://author.scripthive.org/author/login")}</>
-              : <AuthorLoginPage />
-          } />
-          <Route path="/author/register" element={
-            window.location.hostname === "admin.scripthive.org"
-              ? <>{window.location.replace("https://author.scripthive.org/author/register")}</>
-              : <AuthorRegisterPage />
-          } />
-          <Route path="/author/forgot-password" element={
-            window.location.hostname === "admin.scripthive.org"
-              ? <>{window.location.replace("https://author.scripthive.org/author/forgot-password")}</>
-              : <AuthorForgotPasswordPage />
-          } />
-          <Route path="/author/reset-password" element={
-            window.location.hostname === "admin.scripthive.org"
-              ? <>{window.location.replace("https://author.scripthive.org/author/reset-password" + window.location.search)}</>
-              : <AuthorResetPasswordPage />
-          } />
+          <Route path="/author/login" element={<AuthorLoginPage />} />
+          <Route path="/author/register" element={<AuthorRegisterPage />} />
+          <Route path="/author/forgot-password" element={<AuthorForgotPasswordPage />} />
+          <Route path="/author/reset-password" element={<AuthorResetPasswordPage />} />
           <Route
             path="/author/*"
             element={
-              window.location.hostname === "admin.scripthive.org"
-                ? <>{window.location.replace("https://author.scripthive.org/author/login")}</>
-                : <AuthorProtectedRoute><AuthorLayout /></AuthorProtectedRoute>
+              <AuthorProtectedRoute>
+                <AuthorLayout />
+              </AuthorProtectedRoute>
             }
           >
             <Route index element={<Navigate to="dashboard" replace />} />
