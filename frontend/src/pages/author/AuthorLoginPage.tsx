@@ -162,7 +162,7 @@ export function AuthorLoginPage() {
             <div className="mt-6 space-y-2.5 text-center text-sm">
               <p><Link to="/author/forgot-password" className="font-semibold text-blue-600 hover:underline">Forgot password?</Link></p>
               <p className="text-slate-500">New author? <Link to="/author/register" className="font-semibold text-blue-600 hover:underline">Create account</Link></p>
-              <p className="text-slate-400">Staff? <Link to="/admin/login" className="text-slate-500 hover:text-blue-600 hover:underline">Admin login</Link></p>
+              <p className="text-slate-400">Staff? <a href="https://admin.scripthive.org/admin/login" className="text-slate-500 hover:text-blue-600 hover:underline">Admin login</a></p>
             </div>
           </div>
         </div>
