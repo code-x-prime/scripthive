@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { AuthAlert } from "@/components/author/AuthAlert";
 import { useAuthorAuth } from "@/contexts/AuthorAuthContext";
@@ -75,10 +75,7 @@ export function AuthorLoginPage() {
         style={{background:"linear-gradient(160deg,#0f172a 0%,#1e3a8a 100%)"}}>
         <div>
           <div className="flex items-center gap-3 mb-16">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{background:"rgba(37,99,235,0.3)"}}>
-              <BookOpen className="h-5 w-5 text-white" />
-            </div>
+            <img src="/logo.png" alt="ScriptHive" className="h-10 w-10 object-contain" />
             <div>
               <p className="text-white font-bold text-sm leading-tight">ScriptHive</p>
               <p className="text-xs font-semibold" style={{color:"#93c5fd",letterSpacing:"0.08em"}}>AUTHOR PORTAL</p>
@@ -110,9 +107,7 @@ export function AuthorLoginPage() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-3 mb-8">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-700">
-              <BookOpen className="h-5 w-5 text-white" />
-            </div>
+            <img src="/logo.png" alt="ScriptHive" className="h-10 w-10 object-contain" />
             <div>
               <p className="font-bold text-slate-900 text-sm">ScriptHive</p>
               <p className="text-xs text-blue-600 font-semibold tracking-widest">AUTHOR PORTAL</p>

@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { FilePlus, LayoutDashboard, LogOut, BookOpen, ChevronRight, Package } from "lucide-react";
+import { FilePlus, LayoutDashboard, LogOut, ChevronRight, Package } from "lucide-react";
 import { useAuthorAuth } from "@/contexts/AuthorAuthContext";
 
 const NAV = [
@@ -27,9 +27,7 @@ export function AuthorLayout() {
       <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white sticky top-0 h-screen overflow-y-auto print:hidden">
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-600 text-white">
-            <BookOpen className="h-5 w-5" />
-          </div>
+          <img src="/logo.png" alt="ScriptHive" className="h-9 w-9 object-contain" />
           <div>
             <p className="text-sm font-bold text-slate-900">ScriptHive</p>
             <p className="text-xs text-green-600 font-medium">Author Portal</p>
@@ -87,7 +85,7 @@ export function AuthorLayout() {
         {/* Top bar */}
         <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm print:hidden">
           <div className="flex items-center gap-2 text-sm text-slate-500">
-            <BookOpen className="h-4 w-4 text-green-600" />
+            <img src="/logo.png" alt="ScriptHive" className="h-5 w-5 object-contain" />
             <ChevronRight className="h-3 w-3" />
             <span className="font-medium text-slate-900">Author Portal</span>
           </div>

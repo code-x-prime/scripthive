@@ -63,9 +63,7 @@ export const AdminLoginPage = () => {
       <div className="hidden lg:flex lg:w-1/2 bg-green-800 flex-col justify-between p-12 relative overflow-hidden">
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-white" />
-            </div>
+            <img src="/logo.png" alt="ScriptHive" className="h-10 w-10 object-contain" />
             <span className="text-white font-heading text-xl font-semibold">ScriptHive</span>
           </div>
           <p className="text-green-200 text-sm">Publication </p>
@@ -106,9 +104,7 @@ export const AdminLoginPage = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-slate-50">
         <div className="w-full max-w-md">
           <div className="flex items-center gap-2 mb-6 lg:hidden">
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-white" />
-            </div>
+            <img src="/logo.png" alt="ScriptHive" className="h-8 w-8 object-contain" />
             <span className="font-heading text-lg font-semibold text-slate-800">ScriptHive</span>
           </div>
 
