@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { BookOpen, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { AuthAlert } from "@/components/author/AuthAlert";
+import { AuthPageLayout } from "@/components/author/AuthPageLayout";
 import { PasswordRequirements } from "@/components/author/PasswordRequirements";
 import { isPasswordValid, passwordValidationMessage } from "@/utils/passwordPolicy";
 
@@ -18,14 +19,13 @@ export function AuthorResetPasswordPage() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm text-center">
-          <p className="text-slate-600">Invalid reset link.</p>
-          <Link to="/author/forgot-password" className="mt-4 block text-sm font-semibold text-green-600 hover:underline">
-            Request a new one
+      <AuthPageLayout title="Invalid link" subtitle="This reset link is not valid.">
+        <div className="text-center py-4">
+          <Link to="/author/forgot-password" className="text-sm font-semibold text-blue-600 hover:underline">
+            Request a new reset link
           </Link>
         </div>
-      </div>
+      </AuthPageLayout>
     );
   }
 
@@ -53,59 +53,50 @@ export function AuthorResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-green-600 text-white shadow-lg">
-            <BookOpen className="h-7 w-7" />
-          </div>
-          <h1 className="font-heading text-2xl font-bold text-slate-900">Set new password</h1>
-          <p className="mt-1.5 text-sm text-slate-500">Choose a strong password for your account</p>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <form onSubmit={onSubmit} className="space-y-5">
-            <AuthAlert message={error} title="Could not reset password" />
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">New password</label>
-              <div className="relative">
-                <input
-                  type={showPass ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="new-password"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 pr-11 text-sm text-slate-900 placeholder:text-slate-400 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-colors"
-                  placeholder="New password"
-                />
-                <button type="button" onClick={() => setShowPass(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                  {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              <PasswordRequirements password={password} showWhenEmpty />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Confirm password</label>
-              <input
-                type="password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                autoComplete="new-password"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-colors"
-                placeholder="Confirm password"
-              />
-              {confirm && password !== confirm && (
-                <p className="mt-1 text-xs text-red-600">Passwords do not match.</p>
-              )}
-            </div>
-            <button type="submit"
-              disabled={submitting || !isPasswordValid(password) || password !== confirm}
-              className="w-full rounded-xl bg-green-600 py-3 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60 transition-colors shadow-sm">
-              {submitting ? "Resetting…" : "Reset password"}
+    <AuthPageLayout title="Set new password" subtitle="Choose a strong password for your account">
+      <form onSubmit={onSubmit} className="space-y-5">
+        <AuthAlert message={error} title="Could not reset password" />
+        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+          New password
+          <div className="relative mt-1.5">
+            <input
+              type={showPass ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+              placeholder="New password"
+              className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 pr-11 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none transition-colors font-normal normal-case tracking-normal"
+            />
+            <button type="button" onClick={() => setShowPass(v => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
-          </form>
-        </div>
-      </div>
-    </div>
+          </div>
+          <div className="font-normal normal-case tracking-normal">
+            <PasswordRequirements password={password} showWhenEmpty />
+          </div>
+        </label>
+        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+          Confirm password
+          <input
+            type="password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            autoComplete="new-password"
+            placeholder="Confirm password"
+            className="mt-1.5 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none transition-colors font-normal normal-case tracking-normal"
+          />
+          {confirm && password !== confirm && (
+            <p className="mt-1 text-xs text-red-600 normal-case tracking-normal font-normal">Passwords do not match.</p>
+          )}
+        </label>
+        <button type="submit"
+          disabled={submitting || !isPasswordValid(password) || password !== confirm}
+          className="w-full py-3.5 rounded-xl text-sm font-black text-white disabled:opacity-60 shadow-lg transition-all"
+          style={{ background: "linear-gradient(135deg,#2563eb,#1e40af)", boxShadow: "0 10px 25px rgba(37,99,235,0.25)" }}>
+          {submitting ? "Resetting…" : "Reset Password →"}
+        </button>
+      </form>
+    </AuthPageLayout>
   );
 }

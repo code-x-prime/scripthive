@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen } from "lucide-react";
 import { AuthAlert } from "@/components/author/AuthAlert";
+import { AuthPageLayout } from "@/components/author/AuthPageLayout";
 import { isValidEmail } from "@/utils/passwordPolicy";
 
 export function AuthorForgotPasswordPage() {
@@ -34,53 +34,42 @@ export function AuthorForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-green-600 text-white shadow-lg">
-            <BookOpen className="h-7 w-7" />
-          </div>
-          <h1 className="font-heading text-2xl font-bold text-slate-900">Reset your password</h1>
-          <p className="mt-1.5 text-sm text-slate-500">Enter your registered email to receive a reset link</p>
+    <AuthPageLayout title="Reset your password" subtitle="Enter your registered email to receive a reset link">
+      {sent ? (
+        <div className="text-center space-y-4 py-4">
+          <div className="text-5xl">📧</div>
+          <h2 className="font-bold text-slate-900">Check your inbox</h2>
+          <p className="text-sm text-slate-500">
+            If <strong>{email}</strong> is registered, a reset link has been sent. Check spam if not received.
+          </p>
+          <Link to="/author/login" className="block text-sm font-semibold text-blue-600 hover:underline mt-4">
+            ← Back to sign in
+          </Link>
         </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          {sent ? (
-            <div className="text-center space-y-4">
-              <div className="text-5xl">📧</div>
-              <h2 className="font-semibold text-slate-900">Check your inbox</h2>
-              <p className="text-sm text-slate-500">
-                If <strong>{email}</strong> is registered, a reset link has been sent. Check spam if not received.
-              </p>
-              <Link to="/author/login" className="block text-sm font-semibold text-green-600 hover:underline mt-4">
-                ← Back to sign in
-              </Link>
-            </div>
-          ) : (
-            <form onSubmit={onSubmit} className="space-y-5">
-              <AuthAlert message={error} title="Request failed" />
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email address</label>
-                <input
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-colors"
-                  placeholder="you@university.edu"
-                />
-              </div>
-              <button type="submit" disabled={submitting || !email.trim()}
-                className="w-full rounded-xl bg-green-600 py-3 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60 transition-colors shadow-sm">
-                {submitting ? "Sending…" : "Send reset link"}
-              </button>
-              <p className="text-center text-sm text-slate-500">
-                <Link to="/author/login" className="font-semibold text-green-600 hover:underline">← Back to sign in</Link>
-              </p>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
+      ) : (
+        <form onSubmit={onSubmit} className="space-y-5">
+          <AuthAlert message={error} title="Request failed" />
+          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+            Email address
+            <input
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1.5 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none transition-colors font-normal normal-case tracking-normal"
+              placeholder="you@university.edu"
+            />
+          </label>
+          <button type="submit" disabled={submitting || !email.trim()}
+            className="w-full py-3.5 rounded-xl text-sm font-black text-white disabled:opacity-60 shadow-lg transition-all"
+            style={{ background: "linear-gradient(135deg,#2563eb,#1e40af)", boxShadow: "0 10px 25px rgba(37,99,235,0.25)" }}>
+            {submitting ? "Sending…" : "Send Reset Link →"}
+          </button>
+          <p className="text-center text-sm text-slate-500">
+            <Link to="/author/login" className="font-semibold text-blue-600 hover:underline">← Back to sign in</Link>
+          </p>
+        </form>
+      )}
+    </AuthPageLayout>
   );
 }
