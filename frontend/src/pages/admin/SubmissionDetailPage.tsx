@@ -455,6 +455,17 @@ export const SubmissionDetailPage = () => {
           </Card>
 
           <Card title="Payment">
+            {/* Refund alert — advance paid but submission rejected */}
+            {row.status === "Rejected" && row.advancePaid && invoice ? (
+              <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-red-700 mb-1">⚠️ Refund Required</p>
+                <p className="text-sm text-red-800 font-semibold">
+                  Author paid {invoice.currency === "INR" ? "₹" : "$"}{invoice.total} in advance.
+                </p>
+                <p className="text-xs text-red-600 mt-1">Submission rejected — please process refund to author.</p>
+                <p className="text-xs text-gray-500 mt-1">Author: {row.authorEmail}</p>
+              </div>
+            ) : null}
             {invoice ? (
               <div className="space-y-2 text-sm">
                 <p>
@@ -468,6 +479,9 @@ export const SubmissionDetailPage = () => {
                     {invoice.total}
                   </span>
                 </p>
+                {row.advancePaid ? (
+                  <span className="inline-block rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700">Advance Paid</span>
+                ) : null}
                 <StatusBadge status={invoice.status} />
                 <Link to="/admin/payments/pending" className="inline-block text-sm font-medium text-green-700 hover:underline">
                   Open payments →

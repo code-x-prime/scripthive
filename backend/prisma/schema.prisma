@@ -215,6 +215,8 @@ model Submission {
   paymentMethod  String?
   paymentId      String?
   paidAt         DateTime?
+  advancePaid    Boolean   @default(false)
+  advancePaidAt  DateTime?
   doiRecord      DoiRecord?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt

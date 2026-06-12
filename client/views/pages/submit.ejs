@@ -1003,9 +1003,26 @@
       successOverlay.classList.remove('active');
     });
 
-    document.getElementById('proceed-payment-btn') && document.getElementById('proceed-payment-btn').addEventListener('click', function() {
+    document.getElementById('proceed-payment-btn') && document.getElementById('proceed-payment-btn').addEventListener('click', async function() {
       if (!window._paymentSubmissionId) return;
-      window.open('https://admin.scripthive.org/pay/' + window._paymentSubmissionId, '_blank');
+      var btn = document.getElementById('proceed-payment-btn');
+      btn.disabled = true; btn.textContent = '⏳ Creating invoice...';
+      try {
+        const res = await fetch('https://api.scripthive.org/api/payments/advance/create-invoice', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ submissionId: window._paymentSubmissionId })
+        });
+        const data = await res.json();
+        if (data.status === 'success' && data.data && data.data.invoiceId) {
+          window.open('https://admin.scripthive.org/pay/' + window._paymentSubmissionId, '_blank');
+        } else {
+          alert(data.message || 'Could not create invoice. Please try again.');
+          btn.disabled = false; btn.textContent = '🔒 Proceed to Payment';
+        }
+      } catch(e) {
+        alert('Network error. Please try again.');
+        btn.disabled = false; btn.textContent = '🔒 Proceed to Payment';
+      }
     });
 
     document.getElementById('pay-smepay-btn') && document.getElementById('pay-smepay-btn').addEventListener('click', async function() {

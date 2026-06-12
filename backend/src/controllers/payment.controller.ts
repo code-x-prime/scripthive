@@ -9,6 +9,7 @@ import { getPublicPaymentConfig, resolvePaymentConfig } from "../services/paymen
 import { sendPaymentReceiptEmail } from "../services/email.service.js";
 import { loadApcRates } from "../services/apcSettings.service.js";
 import { generateInvoiceId, getFinancialYear } from "../utils/generateId.js";
+import { createAdvanceInvoice } from "../services/invoiceDraft.service.js";
 import Razorpay from "razorpay";
 
 const paidStatuses = new Set(["Paid", "paid", "PAID"]);
@@ -56,7 +57,7 @@ async function markInvoicePaid(
   });
   await prisma.submission.updateMany({
     where: { id: invoice.submissionId },
-    data: { paymentStatus: "Paid", paymentMethod: method, paymentId, paidAt: new Date(), productionStatus: "ReadyForPreparation" }
+    data: { paymentStatus: "Paid", paymentMethod: method, paymentId, paidAt: new Date(), productionStatus: "ReadyForPreparation", advancePaid: true, advancePaidAt: new Date() }
   });
   void writeAuditLog({
     action: "payment_received",
@@ -304,6 +305,18 @@ export const verifySmepayOrderController = async (req: Request, res: Response): 
   }
   await markInvoicePaid(invoice, "SMEPay", orderSlug, `smepay_slug:${orderSlug}`);
   res.json({ status: "success", data: { transactionId: orderSlug } });
+};
+
+/* ── Advance invoice (before accept) ────────────────────────────────────── */
+export const createAdvanceInvoiceController = async (req: Request, res: Response): Promise<void> => {
+  const { submissionId } = req.body as { submissionId?: string };
+  if (!submissionId) { res.status(400).json({ message: "submissionId required" }); return; }
+  try {
+    const result = await createAdvanceInvoice(submissionId);
+    res.json({ status: "success", data: result });
+  } catch (e) {
+    res.status(400).json({ message: e instanceof Error ? e.message : "Failed to create invoice" });
+  }
 };
 
 /* ── Admin list ──────────────────────────────────────────────────────────── */

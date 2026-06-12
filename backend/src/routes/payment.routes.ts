@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   capturePayPalOrderController,
+  createAdvanceInvoiceController,
   createPayPalOrderController,
   createRazorpayOrderController,
   createSmepayOrderController,
@@ -15,6 +16,7 @@ import { authenticate, requirePermission } from "../middlewares/auth.middleware.
 export const paymentRouter = Router();
 
 paymentRouter.get("/config", getPaymentConfigController);
+paymentRouter.post("/advance/create-invoice", createAdvanceInvoiceController);
 paymentRouter.get("/test/:gateway", authenticate, requirePermission("payments", "read"), testPaymentConnection);
 paymentRouter.get("/", authenticate, requirePermission("payments", "read"), listPayments);
 paymentRouter.post("/paypal/create-order", createPayPalOrderController);

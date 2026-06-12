@@ -146,6 +146,8 @@ export interface Submission {
   paymentMethod?: string | null;
   paymentId?: string | null;
   paidAt?: IsoDateString | null;
+  advancePaid?: boolean;
+  advancePaidAt?: IsoDateString | null;
   volumeId?: number | null;
   issueId?: number | null;
   partId?: number | null;
