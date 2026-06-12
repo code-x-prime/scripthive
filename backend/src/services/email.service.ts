@@ -35,8 +35,17 @@ function baseTemplate(title: string, preheader: string, body: string): string {
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td>
-            <div style="font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;line-height:1.2;">ScriptHive Publication</div>
-            <div style="font-size:11px;color:#93c5fd;margin-top:5px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">International Research Journals</div>
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="padding-right:12px;vertical-align:middle;">
+                  <img src="https://scripthive.org/images/only%20Logo.png" alt="ScriptHive" width="40" height="40" style="display:block;object-fit:contain;" />
+                </td>
+                <td style="vertical-align:middle;">
+                  <div style="font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;line-height:1.2;">ScriptHive Publication</div>
+                  <div style="font-size:11px;color:#93c5fd;margin-top:5px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">International Research Journals</div>
+                </td>
+              </tr>
+            </table>
           </td>
           <td align="right" valign="middle">
             <div style="background:#1d4ed8;color:#ffffff;font-size:11px;font-weight:700;padding:5px 14px;letter-spacing:1px;text-transform:uppercase;">ISSN Supported</div>

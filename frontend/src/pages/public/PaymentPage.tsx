@@ -12,11 +12,7 @@ const paidStatuses = new Set(["paid", "Paid", "PAID"]);
 
 const Logo = () => (
   <div className="flex items-center gap-3">
-    <div className="flex h-10 w-10 items-center justify-center bg-white/10 rounded-lg">
-      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-white" stroke="currentColor" strokeWidth={2}>
-        <path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    </div>
+    <img src="/logo.png" alt="ScriptHive" className="h-10 w-10 object-contain" />
     <div>
       <div className="text-white font-bold text-lg tracking-tight leading-tight">ScriptHive Publication</div>
       <div className="text-[#93c5fd] text-xs font-semibold tracking-widest uppercase">Article Processing Charge</div>
