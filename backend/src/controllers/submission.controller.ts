@@ -141,11 +141,24 @@ export const createSubmission = async (req: Request, res: Response): Promise<voi
     return;
   }
   try {
-    await sendSubmissionConfirmationEmail(created.authorEmail, created.authorName, created.id);
+    const jrnl = await prisma.journal.findUnique({ where: { id: created.journalId }, select: { name: true } }).catch(() => null);
+    await sendSubmissionConfirmationEmail(created.authorEmail, created.authorName, created.id, jrnl?.name ?? undefined);
   } catch (err) {
     logger.warn({ message: "Author confirmation email failed", submissionId: created.id, err });
   }
   try {
+    // Attach manuscript if it's a local file path (not R2/http URL)
+    let manuscriptAttachment: { filename: string; content: Buffer; contentType: string } | null = null;
+    if (created.manuscriptPath && !created.manuscriptPath.startsWith("http")) {
+      try {
+        const buf = fs.readFileSync(created.manuscriptPath);
+        manuscriptAttachment = {
+          filename: path.basename(created.manuscriptPath),
+          content: buf,
+          contentType: "application/pdf"
+        };
+      } catch { /* file missing — skip */ }
+    }
     await sendMail({
       to: env.ADMIN_EMAIL,
       subject: `New Paper Submission: ${created.id}`,
@@ -161,7 +174,8 @@ export const createSubmission = async (req: Request, res: Response): Promise<voi
           <tr><td style="padding:6px 12px;color:#555;">Submitted At</td><td style="padding:6px 12px;">${created.createdAt.toUTCString()}</td></tr>
         </table>
         <p style="margin-top:16px;color:#888;font-size:12px;">Replying to this email will go directly to the author.</p>
-      `
+      `,
+      ...(manuscriptAttachment ? { attachments: [manuscriptAttachment] } : {})
     });
   } catch (err) {
     logger.warn({ message: "Admin alert email failed", submissionId: created.id, err });
@@ -236,7 +250,7 @@ export const updateSubmissionStatus = async (req: Request, res: Response): Promi
     return;
   }
   const id = String(req.params.id);
-  const prev = await prisma.submission.findUnique({ where: { id } });
+  const prev = await prisma.submission.findUnique({ where: { id }, include: { journal: true } });
   if (!prev) {
     res.status(404).json({ message: "Submission not found" });
     return;
@@ -256,7 +270,7 @@ export const updateSubmissionStatus = async (req: Request, res: Response): Promi
       if (status === "UnderReview") {
         await sendUnderReviewEmail(row.authorEmail, row.authorName, row.title);
       } else if (status === "Accepted") {
-        await sendAcceptedEmail(row.authorEmail, row.authorName, row.title, row.id);
+        await sendAcceptedEmail(row.authorEmail, row.authorName, row.title, row.id, (prev as unknown as {journal?: {name?: string}})?.journal?.name ?? undefined);
         try {
           await ensureDraftInvoiceForSubmission(id);
         } catch (err) {

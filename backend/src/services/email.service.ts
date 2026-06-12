@@ -152,18 +152,21 @@ export const sendMail = async ({ to, subject, html, replyTo, attachments }: Send
 export const sendSubmissionConfirmationEmail = async (
   authorEmail: string,
   authorName: string,
-  submissionId: string
+  submissionId: string,
+  journalName?: string
 ): Promise<void> => {
+  const rows: [string, string][] = [
+    ["Submission ID", submissionId],
+    ...(journalName ? [["Journal", journalName] as [string, string]] : []),
+    ["Status", "Received — Pending Review"],
+    ["Next Step", "Editorial Pre-screening (1–3 days)"],
+  ];
   const body = `
     ${greeting(authorName)}
     <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
       Thank you for submitting your manuscript to <strong>ScriptHive Publication</strong>. We have successfully received your submission and it is now queued for editorial pre-screening.
     </p>
-    ${infoCard([
-    ["Submission ID", submissionId],
-    ["Status", "Received — Pending Review"],
-    ["Next Step", "Editorial Pre-screening (1–3 days)"],
-  ])}
+    ${infoCard(rows)}
     <p style="margin:0 0 8px;font-size:14px;color:#374151;line-height:1.6;">
       Our editorial team will review your manuscript and you will receive an update within <strong>7–15 working days</strong>.
     </p>
@@ -260,11 +263,13 @@ export const sendAcceptedEmail = async (
   authorEmail: string,
   authorName: string,
   title: string,
-  submissionId?: string
+  submissionId?: string,
+  journalName?: string
 ): Promise<void> => {
   const infoRows: [string, string][] = [];
   if (submissionId) infoRows.push(["Submission ID", submissionId]);
-  infoRows.push(["Manuscript", title]);
+  infoRows.push(["Manuscript Title", title]);
+  if (journalName) infoRows.push(["Journal", journalName]);
   infoRows.push(["Decision", "Accepted"]);
   infoRows.push(["Next Step", "APC payment & production"]);
 

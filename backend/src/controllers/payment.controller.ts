@@ -323,7 +323,7 @@ export const createAdvanceInvoiceController = async (req: Request, res: Response
 export const listPayments = async (_req: Request, res: Response): Promise<void> => {
   const [invoices, paidUsd, paidInr, pendingCount, overdueCount, totalInvoices, apc] = await Promise.all([
     prisma.invoice.findMany({
-      include: { submission: { include: { journal: true } } },
+      include: { submission: { include: { journal: true, authorUser: true } } },
       orderBy: { updatedAt: "desc" }
     }),
     prisma.invoice.aggregate({ where: { status: "Paid", currency: "USD" }, _sum: { total: true } }),

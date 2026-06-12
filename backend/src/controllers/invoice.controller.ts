@@ -12,27 +12,48 @@ import type { AuthRequest } from "../middlewares/auth.middleware.js";
 export const createInvoice = async (req: Request, res: Response): Promise<void> => {
   const body = req.body as {
     submissionId: string;
-    customerName: string;
-    customerEmail: string;
-    subtotal: number;
-    tax: number;
+    customerName?: string;
+    customerEmail?: string;
+    subtotal?: number;
+    tax?: number;
     total: number;
-    items: Prisma.InputJsonValue;
+    items?: Prisma.InputJsonValue;
     currency: string;
+    status?: string;
   };
-  // Count invoices in current financial year (Apr-Mar) for proper numbering reset
+
+  if (!body.submissionId || !body.total || !body.currency) {
+    res.status(400).json({ message: "submissionId, total, currency required" });
+    return;
+  }
+
+  // Auto-fill customerName/customerEmail from submission if not provided
+  let customerName = body.customerName;
+  let customerEmail = body.customerEmail;
+  if (!customerName || !customerEmail) {
+    const sub = await prisma.submission.findUnique({ where: { id: body.submissionId }, select: { authorName: true, authorEmail: true } });
+    if (!sub) { res.status(404).json({ message: "Submission not found" }); return; }
+    customerName = customerName || sub.authorName;
+    customerEmail = customerEmail || sub.authorEmail;
+  }
+
   const now = new Date();
   const fy = getFinancialYear(now);
   const fyCount = await prisma.invoice.count({
-    where: {
-      createdAt: { gte: fy.start, lte: fy.end },
-      id: { startsWith: "SH/" }
-    }
+    where: { createdAt: { gte: fy.start, lte: fy.end }, id: { startsWith: "SH/" } }
   });
   const invoice = await prisma.invoice.create({
     data: {
       id: generateInvoiceId(now, fyCount + 1),
-      ...body
+      submissionId: body.submissionId,
+      customerName: customerName!,
+      customerEmail: customerEmail!,
+      items: body.items ?? [],
+      subtotal: body.subtotal ?? body.total,
+      tax: body.tax ?? 0,
+      total: body.total,
+      currency: body.currency,
+      status: body.status ?? "Paid"
     }
   });
   res.status(201).json(invoice);
