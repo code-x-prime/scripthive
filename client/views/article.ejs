@@ -71,10 +71,10 @@
         <i class="fa-solid fa-arrow-left" style="font-size:0.7rem;"></i>
         <%= art.journal?.name || jid %> — Back to Archives
       </a>
-      <div class="art-title"><%= art.title %></div>
+      <div class="art-title"><%- art.title %></div>
       <div class="art-authors">
         <i class="fa-solid fa-user-pen" style="margin-right:6px;font-size:0.85rem;color:#93c5fd;"></i>
-        <%= art.authorName %><%= art.coAuthors ? ', ' + art.coAuthors : '' %>
+        <%- art.authorName %><%- art.coAuthors ? ', ' + art.coAuthors : '' %>
       </div>
       <div class="art-meta-chips">
         <% if (issueLabel) { %><span class="art-chip"><i class="fa-solid fa-book-open"></i> <%= issueLabel %></span><% } %>
@@ -108,7 +108,7 @@
         <div class="art-section-label">Abstract</div>
         <div class="art-abstract">
           <% if (art.abstract) { %>
-            <%- art.abstract.replace(/<[^>]*>/g,'') %>
+            <%- art.abstract %>
           <% } else { %>
             <span style="color:#94a3b8;">Abstract not available.</span>
           <% } %>
