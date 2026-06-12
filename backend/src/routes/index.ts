@@ -17,6 +17,9 @@ import { authorRouter } from "./author.routes.js";
 import { submissionRouter } from "./submission.routes.js";
 import { userRouter } from "./user.routes.js";
 
+import { authenticate } from "../middlewares/auth.middleware.js";
+import { generateCertificateForSubmission } from "../controllers/certificate.controller.js";
+
 export const apiRouter = Router();
 
 apiRouter.use("/dashboard", dashboardRouter);
@@ -36,3 +39,4 @@ apiRouter.use("/settings", settingsRouter);
 apiRouter.use("/media", mediaRouter);
 apiRouter.use("/carousel", carouselRouter);
 apiRouter.use("/contact", contactRouter);
+apiRouter.get("/certificate/:id", authenticate, generateCertificateForSubmission);

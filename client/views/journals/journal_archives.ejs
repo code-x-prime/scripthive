@@ -508,9 +508,13 @@
           selVol=null; selIss=null; selPart=null; applyFilters(); buildTree();
         });
 
-        // Override applyFilters to use tree state
         window._treeState = function(){ return {vol:selVol, iss:selIss, part:selPart}; };
-        buildTree();
+        // Build after DOM ready so applyFilters is defined
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', buildTree);
+        } else {
+          buildTree();
+        }
       })();
       </script>
       <% } %>

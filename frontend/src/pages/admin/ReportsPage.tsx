@@ -926,22 +926,45 @@ export const ReportsPage = () => {
                         </a>
                       )}
                     </div>
-                    <button type="button"
-                      onClick={() => {
-                        setEditingId(art.id);
-                        setEditForm({
-                          title: art.title, authorName: art.authorName,
-                          coAuthors: art.coAuthors ?? "", abstract: art.abstract,
-                          keywords: art.keywords, pdfPublicPath: art.pdfPublicPath ?? "",
-                          country: art.country ?? "", affiliations: art.affiliations ?? "",
-                          pageStart: art.pageStart != null ? String(art.pageStart) : "",
-                          pageEnd: art.pageEnd != null ? String(art.pageEnd) : "",
-                          slug: art.slug ?? ""
-                        });
-                      }}
-                      className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50">
-                      <Pencil size={12} /> Edit
-                    </button>
+                    <div className="flex flex-col gap-1.5 shrink-0">
+                      <button type="button"
+                        onClick={() => {
+                          setEditingId(art.id);
+                          setEditForm({
+                            title: art.title, authorName: art.authorName,
+                            coAuthors: art.coAuthors ?? "", abstract: art.abstract,
+                            keywords: art.keywords, pdfPublicPath: art.pdfPublicPath ?? "",
+                            country: art.country ?? "", affiliations: art.affiliations ?? "",
+                            pageStart: art.pageStart != null ? String(art.pageStart) : "",
+                            pageEnd: art.pageEnd != null ? String(art.pageEnd) : "",
+                            slug: art.slug ?? ""
+                          });
+                        }}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50">
+                        <Pencil size={12} /> Edit
+                      </button>
+                      {art.pdfPublicPath && (
+                        <a href={art.pdfPublicPath} target="_blank" rel="noreferrer"
+                          className="inline-flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs text-blue-700 hover:bg-blue-100">
+                          <Download size={12} /> Publish Paper
+                        </a>
+                      )}
+                      <button type="button"
+                        onClick={async () => {
+                          try {
+                            const { apiJson: aj } = await import("@/services/api");
+                            await aj(`/invoices/from-submission/${encodeURIComponent(art.id)}`, { method: "POST" });
+                            toast.success("Invoice created");
+                          } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+                        }}
+                        className="inline-flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs text-green-700 hover:bg-green-100">
+                        <FileText size={12} /> Invoice
+                      </button>
+                      <a href={`/api/certificate/${encodeURIComponent(art.id)}`} target="_blank" rel="noreferrer"
+                        className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs text-amber-700 hover:bg-amber-100">
+                        <Download size={12} /> Certificate
+                      </a>
+                    </div>
                   </div>
                 </div>
               ))}

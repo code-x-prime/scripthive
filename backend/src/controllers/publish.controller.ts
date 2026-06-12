@@ -261,7 +261,7 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
       const siteUrl = process.env.CLIENT_URL ?? "https://scripthive.org";
       const journalAbbr = ((submission.journal as unknown as {abbr?: string})?.abbr ?? submission.journalId).toLowerCase();
       const articlePageUrl = articleSlug
-        ? `${siteUrl}/journals/${journalAbbr}/archive/${articleSlug}`
+        ? `${siteUrl}/article/${encodeURIComponent(articleSlug)}`
         : undefined;
       const pubDateStr = _month
         ? `${_month} ${year}`
