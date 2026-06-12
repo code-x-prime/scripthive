@@ -238,7 +238,7 @@ export const createRazorpayOrderController = async (req: Request, res: Response)
   const check = await assertPayableInvoice(resolvedInvoiceId);
   if ("error" in check) { res.status(check.error.status).json({ message: check.error.message }); return; }
   const { invoice } = check;
-  const order = await createRazorpayOrder(invoice.id, Math.round(invoice.total * 100));
+  const order = await createRazorpayOrder(invoice.id, Math.round(invoice.total * 100), invoice.submissionId ?? undefined);
   await prisma.invoice.update({
     where: { id: invoice.id },
     data: { method: "Razorpay", notes: `razorpay_order_id:${order.orderId}`, gatewayOrderId: order.orderId }

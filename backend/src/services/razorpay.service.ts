@@ -15,14 +15,19 @@ async function getClient(): Promise<Razorpay> {
 
 export const createRazorpayOrder = async (
   invoiceId: string,
-  amountInPaise: number
+  amountInPaise: number,
+  submissionId?: string
 ): Promise<{ orderId: string; amount: number; currency: string; keyId: string }> => {
   const cfg = await resolvePaymentConfig();
   const razorpay = await getClient();
   const order = await razorpay.orders.create({
     amount: amountInPaise,
     currency: "INR",
-    receipt: invoiceId
+    receipt: submissionId ?? invoiceId,
+    notes: {
+      submission_id: submissionId ?? "",
+      invoice_id: invoiceId
+    } as Record<string, string>
   });
   return {
     orderId: order.id,
