@@ -6,6 +6,7 @@ interface SendMailParams {
   subject: string;
   html: string;
   replyTo?: string;
+  attachments?: { filename: string; content: Buffer; contentType?: string }[];
 }
 
 /* ── Base template ─────────────────────────────────────────────────────────── */
@@ -47,9 +48,7 @@ function baseTemplate(title: string, preheader: string, body: string): string {
               </tr>
             </table>
           </td>
-          <td align="right" valign="middle">
-            <div style="background:#1d4ed8;color:#ffffff;font-size:11px;font-weight:700;padding:5px 14px;letter-spacing:1px;text-transform:uppercase;">ISSN Supported</div>
-          </td>
+          <td></td>
         </tr>
       </table>
     </td>
@@ -103,6 +102,9 @@ function baseTemplate(title: string, preheader: string, body: string): string {
 </html>`;
 }
 
+/* ── sendMail with optional attachments ────────────────────────────────────── */
+interface Attachment { filename: string; content: Buffer; contentType?: string; }
+
 /* ── Shared components ─────────────────────────────────────────────────────── */
 function greeting(name: string): string {
   return `<p style="margin:0 0 16px;font-size:16px;color:#374151;">Dear <strong>${name}</strong>,</p>`;
@@ -135,13 +137,14 @@ function divider(): string {
 }
 
 /* ── sendMail ──────────────────────────────────────────────────────────────── */
-export const sendMail = async ({ to, subject, html, replyTo }: SendMailParams): Promise<void> => {
+export const sendMail = async ({ to, subject, html, replyTo, attachments }: SendMailParams): Promise<void> => {
   await emailTransporter.sendMail({
     from: env.SMTP_FROM,
     to,
     subject,
     html,
-    ...(replyTo ? { replyTo } : {})
+    ...(replyTo ? { replyTo } : {}),
+    ...(attachments?.length ? { attachments } : {})
   });
 };
 
@@ -256,19 +259,22 @@ export const sendUnderReviewEmail = async (
 export const sendAcceptedEmail = async (
   authorEmail: string,
   authorName: string,
-  title: string
+  title: string,
+  submissionId?: string
 ): Promise<void> => {
+  const infoRows: [string, string][] = [];
+  if (submissionId) infoRows.push(["Submission ID", submissionId]);
+  infoRows.push(["Manuscript", title]);
+  infoRows.push(["Decision", "Accepted"]);
+  infoRows.push(["Next Step", "APC payment & production"]);
+
   const body = `
     ${greeting(authorName)}
     <div style="text-align:center;margin:0 0 24px;">${badge("🎉 Accepted for Publication", "#16a34a", "#dcfce7")}</div>
     <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
       Congratulations! We are delighted to inform you that your manuscript has been <strong>accepted for publication</strong> in a ScriptHive journal.
     </p>
-    ${infoCard([
-    ["Manuscript", title],
-    ["Decision", "Accepted"],
-    ["Next Step", "APC payment & production"],
-  ])}
+    ${infoCard(infoRows)}
     <p style="margin:0 0 16px;font-size:14px;color:#374151;line-height:1.6;">
       You will shortly receive instructions regarding the <strong>Article Processing Charge (APC)</strong> and the production process. Please complete the payment to proceed to publication.
     </p>
@@ -277,7 +283,7 @@ export const sendAcceptedEmail = async (
   `;
   await sendMail({
     to: authorEmail,
-    subject: `🎉 Manuscript Accepted — ${title}`,
+    subject: `🎉 Manuscript Accepted — ${submissionId ?? title}`,
     html: baseTemplate("Manuscript Accepted", `Congratulations! Your manuscript has been accepted.`, body)
   });
 };
@@ -387,8 +393,17 @@ export const sendArticlePublishedEmail = async (
   authorName: string,
   title: string,
   doiLink: string,
-  journalName: string
+  journalName: string,
+  articlePageUrl?: string,
+  certData?: {
+    volume: string;
+    issue: string;
+    pubDate: string;
+    issn: string;
+    certId: string;
+  }
 ): Promise<void> => {
+  const viewUrl = articlePageUrl || doiLink;
   const body = `
     ${greeting(authorName)}
     <div style="text-align:center;margin:0 0 24px;">${badge("🌟 Now Published", "#2563eb", "#eff6ff")}</div>
@@ -401,15 +416,37 @@ export const sendArticlePublishedEmail = async (
     ["Status", "Published"],
     ...(doiLink ? [["DOI", `<a href="${doiLink}" style="color:#2563eb;">${doiLink}</a>`] as [string, string]] : []),
   ])}
-    ${doiLink ? ctaButton("📖 View Published Article", doiLink) : ""}
+    ${viewUrl ? ctaButton("📖 View Published Article", viewUrl) : ""}
     ${divider()}
     <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">
       Share your published article with your network. Thank you for contributing to open-access research with ScriptHive.
     </p>
   `;
+  // Generate certificate PDF if data provided
+  let certPdf: Buffer | null = null;
+  if (certData) {
+    try {
+      const { generateCertificatePdf } = await import("./certificate.service.js");
+      certPdf = await generateCertificatePdf({
+        authorName,
+        paperTitle: title,
+        journalName,
+        volume: certData.volume,
+        issue: certData.issue,
+        pubDate: certData.pubDate,
+        issn: certData.issn,
+        certId: certData.certId
+      });
+    } catch (e) {
+      // Non-blocking — send email without certificate if PDF fails
+      console.warn("[Certificate] PDF generation failed:", e instanceof Error ? e.message : e);
+    }
+  }
+
   await sendMail({
     to: authorEmail,
     subject: `🌟 Your Article is Published — ${title}`,
-    html: baseTemplate("Article Published", `Your article "${title}" is now published.`, body)
+    html: baseTemplate("Article Published", `Your article "${title}" is now published.`, body),
+    ...(certPdf ? { attachments: [{ filename: "Publication_Certificate.pdf", content: certPdf, contentType: "application/pdf" }] } : {})
   });
 };

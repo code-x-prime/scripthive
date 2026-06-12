@@ -6,9 +6,9 @@ import {
   Line, LineChart, Pie, PieChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis
 } from "recharts";
-import { BookOpen, DollarSign, FileSpreadsheet, FileText, Hash, Loader2, Printer, Activity, Users, X, Download, Check, Pencil } from "lucide-react";
+import { BookOpen, DollarSign, FileSpreadsheet, FileText, Hash, Loader2, Printer, Activity, Upload, Users, X, Download, Check, Pencil } from "lucide-react";
 import { reportsService, type ReportsPayload, type ActivityPayload, type UserActivitySummary, type AuditLogEntry } from "@/services/reports.service";
-import { apiJson } from "@/services/api";
+import { apiFetch, apiJson } from "@/services/api";
 import type { Submission } from "@/types";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -545,6 +545,22 @@ export const ReportsPage = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{ title: string; authorName: string; coAuthors: string; abstract: string; keywords: string; pdfPublicPath: string; country: string; affiliations: string; pageStart: string; pageEnd: string; slug: string; }>({ title: "", authorName: "", coAuthors: "", abstract: "", keywords: "", pdfPublicPath: "", country: "", affiliations: "", pageStart: "", pageEnd: "", slug: "" });
   const [saving, setSaving] = useState(false);
+  const [pdfUploading, setPdfUploading] = useState(false);
+
+  const uploadReplacePdf = async (id: string, file: File) => {
+    setPdfUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await apiFetch(`/submissions/${encodeURIComponent(id)}/upload-production`, { method: "POST", body: fd });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json() as { pdfPublicPath?: string; url?: string };
+      const url = data.pdfPublicPath ?? data.url ?? "";
+      setEditForm((p) => ({ ...p, pdfPublicPath: url }));
+      toast.success("PDF uploaded — save to confirm");
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Upload failed"); }
+    finally { setPdfUploading(false); }
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -984,10 +1000,24 @@ export const ReportsPage = () => {
                       <input value={editForm.slug} onChange={(e) => setEditForm((p) => ({ ...p, slug: e.target.value }))}
                         className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-mono" />
                     </label>
-                    <label className="block text-xs font-medium text-slate-600">PDF URL / Path
-                      <input value={editForm.pdfPublicPath} onChange={(e) => setEditForm((p) => ({ ...p, pdfPublicPath: e.target.value }))}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-mono" />
-                    </label>
+                    <div className="block text-xs font-medium text-slate-600">
+                      Replace PDF File
+                      <div className="mt-1 flex items-center gap-2">
+                        <label className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100">
+                          <Upload size={12} />
+                          {pdfUploading ? "Uploading…" : "Choose PDF"}
+                          <input type="file" accept=".pdf" className="hidden"
+                            disabled={pdfUploading}
+                            onChange={(e) => { const f = e.target.files?.[0]; if (f && editingId) void uploadReplacePdf(editingId, f); e.target.value = ""; }} />
+                        </label>
+                        {editForm.pdfPublicPath && (
+                          <a href={editForm.pdfPublicPath} target="_blank" rel="noreferrer"
+                            className="text-xs text-green-700 hover:underline truncate max-w-[180px]">
+                            {editForm.pdfPublicPath.split("/").pop() ?? "current.pdf"}
+                          </a>
+                        )}
+                      </div>
+                    </div>
                     <div className="flex gap-2 pt-2">
                       <button type="button" disabled={saving} onClick={() => void saveEdit(editingId)}
                         className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-5 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50">

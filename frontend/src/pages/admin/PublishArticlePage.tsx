@@ -54,6 +54,19 @@ export const PublishArticlePage = () => {
   const [publishing, setPublishing]   = useState(false);
 
   const editorRef = useRef(null);
+  const titleEditorRef = useRef(null);
+  const authorEditorRef = useRef(null);
+
+  const inlineEditorConfig = useMemo(() => ({
+    readonly: false, height: 80,
+    toolbarButtonSize: "small" as const,
+    buttons: ["bold","italic","underline","superscript","subscript","|","undo","redo"],
+    removeButtons: ["file","video","image","speechRecognize","spellcheck","source"],
+    showXPathInStatusbar: false, showCharsCounter: false, showWordsCounter: false,
+    askBeforePasteHTML: false, askBeforePasteFromWord: false,
+    defaultActionOnPaste: "insert_clear_html" as const,
+    style: { background: "#ffffff", color: "#0f172a", fontSize: "14px", fontFamily: "Poppins, sans-serif" }
+  }), []);
 
   const joditConfig = useMemo(() => ({
     readonly: false, height: 300,
@@ -322,14 +335,18 @@ export const PublishArticlePage = () => {
         <div className="space-y-5 p-6">
           <div>
             <label className={labelClass}>Article Title <span className="text-red-400">*</span></label>
-            <input value={form.title} onChange={(e) => setField("title", e.target.value)}
-              placeholder="Enter full article title" className={inputClass} />
+            <div className="overflow-hidden rounded-lg border border-slate-200">
+              <JoditEditor ref={titleEditorRef} value={form.title} config={{...inlineEditorConfig, placeholder: "Enter full article title"}}
+                onBlur={(c: string) => setField("title", c)} />
+            </div>
           </div>
 
           <div>
             <label className={labelClass}>Author Name <span className="text-red-400">*</span></label>
-            <input value={form.authorName} onChange={(e) => setField("authorName", e.target.value)}
-              placeholder="Author names separated by comma" className={inputClass} />
+            <div className="overflow-hidden rounded-lg border border-slate-200">
+              <JoditEditor ref={authorEditorRef} value={form.authorName} config={{...inlineEditorConfig, placeholder: "Author names separated by comma"}}
+                onBlur={(c: string) => setField("authorName", c)} />
+            </div>
           </div>
 
           <div>
@@ -378,19 +395,14 @@ export const PublishArticlePage = () => {
             </label>
           </div>
 
-          {/* Month + Reference No + Year */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          {/* Month + Year */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Month</label>
               <select value={form.month} onChange={(e) => setField("month", e.target.value)} className={inputClass}>
                 <option value="">Select month</option>
                 {MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}
               </select>
-            </div>
-            <div>
-              <label className={labelClass}>Reference No.</label>
-              <input value={form.refNo} onChange={(e) => setField("refNo", e.target.value)}
-                placeholder="Auto-filled from article no." className={inputClass} />
             </div>
             <div>
               <label className={labelClass}>Year <span className="text-red-400">*</span></label>
@@ -434,7 +446,7 @@ export const PublishArticlePage = () => {
                 className={inputClass} disabled={!selectedIssue}>
                 <option value="">Select</option>
                 {(selectedIssue?.parts ?? []).map((p) => (
-                  <option key={p.id} value={String(p.id)}>{/^part\s/i.test(p.name) ? p.name : `Part ${p.name}`}</option>
+                  <option key={p.id} value={String(p.id)}>{/^part\s/i.test(p.name) || /special\s*issue/i.test(p.name) ? p.name : `Part ${p.name}`}</option>
                 ))}
               </select>
             </div>

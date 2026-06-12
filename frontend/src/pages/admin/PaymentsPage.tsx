@@ -2,7 +2,7 @@ import { fmtDate } from "@/utils/formatDate";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Download, FileText, Mail, Search, Send, Star, X } from "lucide-react";
+import { Download, FileText, Mail, Plus, Search, Send, Star, X } from "lucide-react";
 import { apiJson } from "@/services/api";
 import { paymentService } from "@/services/payment.service";
 import { apcAmountForCurrency } from "@/utils/apcAmounts";
@@ -46,6 +46,11 @@ export const PaymentsPage = () => {
   const [payMethod, setPayMethod] = useState("UPI");
   const [payUTR, setPayUTR] = useState("");
   const [payRemarks, setPayRemarks] = useState("");
+  const [manualInvModal, setManualInvModal] = useState(false);
+  const [manualSubId, setManualSubId] = useState("");
+  const [manualAmt, setManualAmt] = useState("");
+  const [manualCur, setManualCur] = useState("INR");
+  const [manualSaving, setManualSaving] = useState(false);
 
   // inline amount editing state: invoiceId -> draft value
   const [editingAmount, setEditingAmount] = useState<Record<string, string>>({});
@@ -231,6 +236,13 @@ export const PaymentsPage = () => {
               { key: "title", label: "Paper Title", getValue: (r) => r.submission?.title ?? "" },
               { key: "customerName", label: "Author", getValue: (r) => r.customerName },
               { key: "customerEmail", label: "Email", getValue: (r) => r.customerEmail },
+              { key: "address", label: "Address", getValue: (r) => (r.submission as unknown as {authorUser?: {address?: string | null}})?.authorUser?.address ?? "" },
+              { key: "state", label: "State", getValue: (r) => (r.submission as unknown as {authorUser?: {state?: string | null}})?.authorUser?.state ?? "" },
+              { key: "addons", label: "Add-On Services", getValue: (r) => {
+                const addons = (r.submission as unknown as {addons?: {label?: string}[]})?.addons;
+                if (!Array.isArray(addons) || addons.length === 0) return "";
+                return addons.map((a) => a.label ?? "").filter(Boolean).join(", ");
+              }},
               { key: "total", label: "Amount", getValue: (r) => String(r.total) },
               { key: "currency", label: "Currency", getValue: (r) => r.currency },
               { key: "method", label: "Payment Method", getValue: (r) => r.method ?? "" },
@@ -247,6 +259,16 @@ export const PaymentsPage = () => {
           <Download className="h-4 w-4" />
           Export CSV
         </button>
+        {isCompleted && canWriteInvoice && (
+          <button
+            type="button"
+            onClick={() => setManualInvModal(true)}
+            className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 shrink-0"
+          >
+            <Plus className="h-4 w-4" />
+            Create Manual Invoice
+          </button>
+        )}
       </div>
 
       {loading ? (
@@ -364,7 +386,7 @@ export const PaymentsPage = () => {
                         {inv.total} <span className="text-xs font-semibold text-gray-500">{inv.currency}</span>
                       </span>
                     )}
-                    {Array.isArray(inv.items) && (inv.items as {description:string;amount:number}[]).length > 1 && (
+                    {!editingAmount[inv.id] && Array.isArray(inv.items) && (inv.items as {description:string;amount:number}[]).length > 1 && (
                       <div className="mt-0.5 space-y-0.5">
                         {(inv.items as {description:string;amount:number}[]).map((item, i) => (
                           <p key={i} className="text-xs text-gray-400 whitespace-nowrap">{item.description}: {inv.currency === "INR" ? "₹" : "$"}{item.amount}</p>
@@ -625,6 +647,64 @@ export const PaymentsPage = () => {
                 onClick={() => setMarkPaidModal(null)}
                 className="rounded-lg border border-gray-200 px-4 text-sm text-gray-600 hover:bg-gray-50"
               >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Manual Invoice Modal */}
+      {manualInvModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true">
+          <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-heading text-lg text-gray-900">Create Manual Invoice</h2>
+              <button type="button" onClick={() => setManualInvModal(false)} className="rounded-lg p-1 text-gray-400 hover:bg-gray-100"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="space-y-3">
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Submission ID
+                <input type="text" value={manualSubId} onChange={(e) => setManualSubId(e.target.value)}
+                  placeholder="SH-2026-XXXX"
+                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Amount
+                <input type="number" min={0} step="0.01" value={manualAmt} onChange={(e) => setManualAmt(e.target.value)}
+                  placeholder="0"
+                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Currency
+                <select value={manualCur} onChange={(e) => setManualCur(e.target.value)}
+                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <option value="INR">INR</option>
+                  <option value="USD">USD</option>
+                </select>
+              </label>
+            </div>
+            <div className="mt-5 flex gap-3">
+              <button type="button" disabled={manualSaving || !manualSubId.trim() || !manualAmt}
+                onClick={async () => {
+                  setManualSaving(true);
+                  try {
+                    await apiJson(`/invoices`, {
+                      method: "POST",
+                      body: JSON.stringify({ submissionId: manualSubId.trim(), total: parseFloat(manualAmt), currency: manualCur, status: "Paid" })
+                    });
+                    toast.success("Invoice created");
+                    setManualInvModal(false);
+                    setManualSubId(""); setManualAmt(""); setManualCur("INR");
+                    void load();
+                  } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+                  finally { setManualSaving(false); }
+                }}
+                className="flex-1 rounded-lg bg-green-600 py-2.5 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50">
+                {manualSaving ? "Creating…" : "Create Invoice"}
+              </button>
+              <button type="button" onClick={() => setManualInvModal(false)}
+                className="rounded-lg border border-gray-200 px-4 text-sm text-gray-600 hover:bg-gray-50">
                 Cancel
               </button>
             </div>

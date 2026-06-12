@@ -177,7 +177,6 @@
         </div>
         <div class="arch-hero-btns">
           <a href="/submit?journal=<%= journal.abbr %>" class="arch-hero-btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Paper</a>
-          <a href="/<%= journal.abbr %>" class="arch-hero-btn-outline"><i class="fa-solid fa-arrow-left"></i> Back to Journal</a>
         </div>
       </div>
       <div class="arch-hero-visual">
@@ -302,7 +301,7 @@
           %>
           <div class="filter-check-item">
             <input type="checkbox" id="fp_<%= p %>" class="filter-part" value="<%= p %>">
-            <label for="fp_<%= p %>"><span>Part <%= p %></span><span class="fcount"><%= cnt %></span></label>
+            <label for="fp_<%= p %>"><span><%= (/^part\s/i.test(p) || /special\s*issue/i.test(p)) ? p : 'Part ' + p %></span><span class="fcount"><%= cnt %></span></label>
           </div>
           <% }); %>
         </div>
@@ -329,7 +328,8 @@
         <% issues.forEach(function(iss) {
           var sameParts = issues.filter(function(i){ return i.vol.number === iss.vol.number && i.iss.number === iss.iss.number; });
           var showPart = sameParts.length > 1;
-          var issLabel = 'Vol. ' + iss.vol.number + ', Issue ' + iss.iss.number + (showPart ? ' — Part ' + iss.part.name : '') + ' (' + iss.vol.year + ')';
+          var partLabel = iss.part.name ? (/^part\s/i.test(iss.part.name) || /special\s*issue/i.test(iss.part.name) ? iss.part.name : 'Part ' + iss.part.name) : '';
+          var issLabel = 'Vol. ' + iss.vol.number + ', Issue ' + iss.iss.number + (showPart ? ' — ' + partLabel : '') + ' (' + iss.vol.year + ')';
         %>
         <div class="issue-block" data-year="<%= iss.vol.year %>" data-vol="<%= iss.vol.number %>" data-iss="<%= iss.iss.number %>">
           <div class="vol-heading"><%= issLabel %></div>
@@ -394,93 +394,123 @@
     <!-- RIGHT: Filter + Journal Info -->
     <div class="arch-right-col">
 
-      <!-- Filter Articles — cascading dropdowns -->
+      <!-- Filter Articles — tree accordion -->
       <% if (issues.length > 0) { %>
       <%
-        // Build data map for cascade — pass to JS
         var issueDataJson = JSON.stringify(issues.map(function(i){
           return { vol: i.vol.number, year: i.vol.year, iss: i.iss.number, part: i.part.name, count: i.articles.length };
         }));
         var seenVols2 = {}; issues.forEach(function(i){ seenVols2[i.vol.number]=i.vol.year; });
         var volList = Object.keys(seenVols2).map(Number).sort(function(a,b){return b-a;});
-        var seenParts2 = {}; issues.forEach(function(i){ seenParts2[i.part.name]=true; });
-        var multiPart = Object.keys(seenParts2).length > 1;
       %>
+      <style>
+        .tree-filter { font-family:inherit; }
+        .tree-vol { margin-bottom:4px; }
+        .tree-vol-hdr {
+          display:flex; align-items:center; justify-content:space-between;
+          padding:8px 12px; background:#f1f5f9; border-radius:8px; cursor:pointer;
+          font-size:0.88rem; font-weight:700; color:#0f172a;
+          user-select:none; transition:background 0.2s;
+        }
+        .tree-vol-hdr:hover { background:#e2e8f0; }
+        .tree-vol-hdr.active { background:#dbeafe; color:#1d4ed8; }
+        .tree-vol-hdr .tv-arrow { font-size:0.7rem; color:#94a3b8; transition:transform 0.2s; }
+        .tree-vol-hdr.open .tv-arrow { transform:rotate(180deg); }
+        .tree-iss-list { display:none; padding:4px 0 4px 12px; }
+        .tree-iss-list.open { display:block; }
+        .tree-iss { margin-bottom:2px; }
+        .tree-iss-hdr {
+          display:flex; align-items:center; justify-content:space-between;
+          padding:6px 10px; border-radius:6px; cursor:pointer;
+          font-size:0.84rem; font-weight:600; color:#334155;
+          user-select:none; transition:background 0.2s;
+        }
+        .tree-iss-hdr:hover { background:#f8fafc; }
+        .tree-iss-hdr.active { background:#eff6ff; color:#2563eb; }
+        .tree-iss-hdr .ti-arrow { font-size:0.65rem; color:#cbd5e1; transition:transform 0.2s; }
+        .tree-iss-hdr.open .ti-arrow { transform:rotate(180deg); }
+        .tree-part-list { display:none; padding:2px 0 2px 12px; }
+        .tree-part-list.open { display:block; }
+        .tree-part-item {
+          padding:5px 10px; font-size:0.82rem; font-weight:500; color:#475569;
+          border-radius:6px; cursor:pointer; transition:background 0.2s;
+        }
+        .tree-part-item:hover { background:#f1f5f9; }
+        .tree-part-item.active { background:#dbeafe; color:#1d4ed8; font-weight:700; }
+      </style>
       <div class="filter-card">
         <div class="filter-card-title">
           Filter
           <button class="filter-clear" id="filterClearAll">Clear</button>
         </div>
-
-        <div class="filter-group">
-          <div class="filter-group-label">Volume</div>
-          <select id="dropVol" class="arch-filter-select">
-            <option value="">Select Volume</option>
-            <% volList.forEach(function(v){ %><option value="<%= v %>">Vol. <%= v %> (<%= seenVols2[v] %>)</option><% }); %>
-          </select>
-        </div>
-
-        <div class="filter-group" id="issGrp" style="display:none;">
-          <div class="filter-group-label">Issue</div>
-          <select id="dropIss" class="arch-filter-select">
-            <option value="">Select Issue</option>
-          </select>
-        </div>
-
-        <% if (multiPart) { %>
-        <div class="filter-group" id="partGrp" style="display:none;">
-          <div class="filter-group-label">Part</div>
-          <select id="dropPart" class="arch-filter-select">
-            <option value="">Select Part</option>
-          </select>
-        </div>
-        <% } %>
+        <div class="tree-filter" id="treeFilter"></div>
       </div>
       <script>
       (function(){
         var DATA = <%- issueDataJson %>;
-        var multiPart = <%= multiPart ? 'true' : 'false' %>;
 
+        function partLabel(p){ return (/^part\s/i.test(p)||/special\s*issue/i.test(p))?p:'Part '+p; }
         function getUniq(arr){ var s={}; arr.forEach(function(v){s[v]=true;}); return Object.keys(s).sort(function(a,b){return Number(b)-Number(a);}); }
 
-        var dropVol  = document.getElementById('dropVol');
-        var dropIss  = document.getElementById('dropIss');
-        var dropPart = document.getElementById('dropPart');
-        var issGrp   = document.getElementById('issGrp');
-        var partGrp  = document.getElementById('partGrp');
+        var selVol=null, selIss=null, selPart=null;
+        var container = document.getElementById('treeFilter');
 
-        dropVol && dropVol.addEventListener('change', function(){
-          var v = this.value;
-          dropIss && (dropIss.innerHTML = '<option value="">Select Issue</option>');
-          dropPart && (dropPart.innerHTML = '<option value="">Select Part</option>');
-          issGrp && (issGrp.style.display = 'none');
-          partGrp && (partGrp.style.display = 'none');
-          if (!v) { applyFilters(); return; }
-          var issList = getUniq(DATA.filter(function(d){return String(d.vol)===v;}).map(function(d){return String(d.iss);}));
-          issList.forEach(function(n){
-            var o=document.createElement('option'); o.value=n; o.textContent='Issue '+n;
-            dropIss && dropIss.appendChild(o);
+        function buildTree(){
+          container.innerHTML='';
+          var vols = getUniq(DATA.map(function(d){return String(d.vol);}));
+          vols.forEach(function(v){
+            var year = (DATA.find(function(d){return String(d.vol)===v;})||{}).year||'';
+            var volDiv = document.createElement('div'); volDiv.className='tree-vol';
+            var volHdr = document.createElement('div');
+            volHdr.className='tree-vol-hdr'+(selVol===v?' active open':'');
+            volHdr.innerHTML='<span>Volume '+v+' <span style="font-weight:400;color:#64748b;font-size:0.8rem;">('+year+')</span></span><span class="tv-arrow">▼</span>';
+            var issList = document.createElement('div');
+            issList.className='tree-iss-list'+(selVol===v?' open':'');
+
+            var issues = getUniq(DATA.filter(function(d){return String(d.vol)===v;}).map(function(d){return String(d.iss);}));
+            issues.forEach(function(n){
+              var issDiv = document.createElement('div'); issDiv.className='tree-iss';
+              var issHdr = document.createElement('div');
+              var parts = getUniq(DATA.filter(function(d){return String(d.vol)===v&&String(d.iss)===n;}).map(function(d){return d.part;}));
+              var multiP = parts.length > 1;
+              issHdr.className='tree-iss-hdr'+(selVol===v&&selIss===n&&!multiP?' active':'')+(selVol===v&&selIss===n&&multiP?' open':'');
+              issHdr.innerHTML='<span>Issue '+n+'</span>'+(multiP?'<span class="ti-arrow">▼</span>':'');
+              issHdr.addEventListener('click', function(e){
+                e.stopPropagation();
+                if(!multiP){ selVol=v; selIss=n; selPart=null; applyFilters(); buildTree(); return; }
+                selVol=v; selIss=(selIss===n?null:n); selPart=null; applyFilters(); buildTree();
+              });
+              issDiv.appendChild(issHdr);
+              if(multiP){
+                var partList = document.createElement('div');
+                partList.className='tree-part-list'+(selVol===v&&selIss===n?' open':'');
+                parts.forEach(function(p){
+                  var pi = document.createElement('div');
+                  pi.className='tree-part-item'+(selVol===v&&selIss===n&&selPart===p?' active':'');
+                  pi.textContent=partLabel(p);
+                  pi.addEventListener('click', function(e){ e.stopPropagation(); selVol=v; selIss=n; selPart=p; applyFilters(); buildTree(); });
+                  partList.appendChild(pi);
+                });
+                issDiv.appendChild(partList);
+              }
+              issList.appendChild(issDiv);
+            });
+
+            volHdr.addEventListener('click', function(){
+              selVol=(selVol===v?null:v); selIss=null; selPart=null; applyFilters(); buildTree();
+            });
+            volDiv.appendChild(volHdr); volDiv.appendChild(issList);
+            container.appendChild(volDiv);
           });
-          issGrp && (issGrp.style.display = '');
-          applyFilters();
+        }
+
+        document.getElementById('filterClearAll').addEventListener('click', function(){
+          selVol=null; selIss=null; selPart=null; applyFilters(); buildTree();
         });
 
-        dropIss && dropIss.addEventListener('change', function(){
-          var v = dropVol ? dropVol.value : '';
-          var n = this.value;
-          dropPart && (dropPart.innerHTML = '<option value="">Select Part</option>');
-          partGrp && (partGrp.style.display = 'none');
-          if (multiPart && v && n) {
-            var parts = getUniq(DATA.filter(function(d){return String(d.vol)===v&&String(d.iss)===n;}).map(function(d){return d.part;}));
-            if (parts.length > 1) {
-              parts.forEach(function(p){ var o=document.createElement('option'); o.value=p; o.textContent='Part '+p; dropPart && dropPart.appendChild(o); });
-              partGrp && (partGrp.style.display = '');
-            }
-          }
-          applyFilters();
-        });
-
-        dropPart && dropPart.addEventListener('change', applyFilters);
+        // Override applyFilters to use tree state
+        window._treeState = function(){ return {vol:selVol, iss:selIss, part:selPart}; };
+        buildTree();
       })();
       </script>
       <% } %>
@@ -548,9 +578,10 @@
   function applyFilters() {
     var q = (document.getElementById('archSearch') ? document.getElementById('archSearch').value : '').toLowerCase().trim();
     var selYear = getDropVal('dropYear');
-    var selVol  = getDropVal('dropVol');
-    var selIss  = getDropVal('dropIss');
-    var selPart = getDropVal('dropPart');
+    var treeState = window._treeState ? window._treeState() : {vol:null,iss:null,part:null};
+    var selVol  = treeState.vol  || getDropVal('dropVol');
+    var selIss  = treeState.iss  || getDropVal('dropIss');
+    var selPart = treeState.part || getDropVal('dropPart');
     var rows = document.querySelectorAll('.art-row');
     var visible = 0;
 

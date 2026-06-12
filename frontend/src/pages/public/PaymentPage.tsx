@@ -164,15 +164,9 @@ export const PaymentPage = () => {
               <span className="text-[#93c5fd] text-xs font-bold uppercase tracking-widest">Invoice Details</span>
             </div>
             <table className="w-full text-sm">
-              {invoice.submissionId && (
-                <tr className="bg-slate-50">
-                  <td className="px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-slate-500 border-b border-[#e8edf4] w-[42%] border-r border-r-[#e8edf4]">Submission ID</td>
-                  <td className="px-4 py-2.5 font-bold text-[#1d4ed8] font-mono border-b border-[#e8edf4]">{invoice.submissionId}</td>
-                </tr>
-              )}
-              <tr className="bg-white">
-                <td className="px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-slate-500 border-b border-[#e8edf4] border-r border-r-[#e8edf4]">Invoice No.</td>
-                <td className="px-4 py-2.5 font-mono text-slate-700 border-b border-[#e8edf4]">{invoice.id}</td>
+              <tr className="bg-slate-50">
+                <td className="px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-slate-500 border-b border-[#e8edf4] w-[42%] border-r border-r-[#e8edf4]">Manuscript ID</td>
+                <td className="px-4 py-2.5 font-bold text-[#1d4ed8] font-mono border-b border-[#e8edf4]">{invoice.submissionId || invoice.id}</td>
               </tr>
               {invoice.customerName && (
                 <tr className="bg-slate-50">

@@ -258,12 +258,29 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
     });
 
     try {
+      const siteUrl = process.env.CLIENT_URL ?? "https://scripthive.org";
+      const journalAbbr = ((submission.journal as unknown as {abbr?: string})?.abbr ?? submission.journalId).toLowerCase();
+      const articlePageUrl = articleSlug
+        ? `${siteUrl}/journals/${journalAbbr}/archive/${articleSlug}`
+        : undefined;
+      const pubDateStr = _month
+        ? `${_month} ${year}`
+        : new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+      const journalIssn = (submission.journal as unknown as { issn?: string | null })?.issn ?? "";
       await sendArticlePublishedEmail(
         submission.authorEmail,
         authorName || submission.authorName,
         title || submission.title,
         assignDoi ? (finalDoiLink ?? "") : "",
-        submission.journal?.name ?? ""
+        submission.journal?.name ?? "",
+        articlePageUrl,
+        {
+          volume: `Vol. ${volume}, Issue ${issue}`,
+          issue,
+          pubDate: pubDateStr,
+          issn: journalIssn,
+          certId: `SH-${year}-${_refNo ?? submissionId.slice(-3)}`
+        }
       );
     } catch (err) {
       logger.warn({ message: "Article published email failed", submissionId, err });

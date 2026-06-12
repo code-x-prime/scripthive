@@ -256,7 +256,7 @@ export const updateSubmissionStatus = async (req: Request, res: Response): Promi
       if (status === "UnderReview") {
         await sendUnderReviewEmail(row.authorEmail, row.authorName, row.title);
       } else if (status === "Accepted") {
-        await sendAcceptedEmail(row.authorEmail, row.authorName, row.title);
+        await sendAcceptedEmail(row.authorEmail, row.authorName, row.title, row.id);
         try {
           await ensureDraftInvoiceForSubmission(id);
         } catch (err) {
@@ -384,7 +384,7 @@ export const bulkUpdateStatus = async (req: Request, res: Response): Promise<voi
     if (sub.status === status) continue;
     try {
       if (status === "Accepted") {
-        await sendAcceptedEmail(sub.authorEmail, sub.authorName, sub.title);
+        await sendAcceptedEmail(sub.authorEmail, sub.authorName, sub.title, sub.id);
         try { await ensureDraftInvoiceForSubmission(sub.id); } catch (_) { /* ignore */ }
       } else if (status === "Rejected") {
         await sendRejectedEmail(sub.authorEmail, sub.authorName, sub.title);
@@ -436,7 +436,7 @@ export const downloadProductionFile = async (req: Request, res: Response): Promi
 
   const raw = s.pdfPublicPath;
   if (raw.startsWith("http://") || raw.startsWith("https://")) {
-    res.redirect(raw);
+    res.json({ url: raw, filename: `article-${id}.pdf` });
     return;
   }
   const abs = path.normalize(path.isAbsolute(raw) ? raw : path.resolve(process.cwd(), raw));

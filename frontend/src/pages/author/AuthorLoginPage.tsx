@@ -77,7 +77,7 @@ export function AuthorLoginPage() {
           <div className="flex items-center gap-3 mb-16">
             <img src="/logo.png" alt="ScriptHive" className="h-10 w-10 object-contain" />
             <div>
-              <p className="text-white font-bold text-sm leading-tight">ScriptHive</p>
+              <p className="text-white font-bold text-sm leading-tight">ScriptHive Publication</p>
               <p className="text-xs font-semibold" style={{color:"#93c5fd",letterSpacing:"0.08em"}}>AUTHOR PORTAL</p>
             </div>
           </div>
@@ -109,7 +109,7 @@ export function AuthorLoginPage() {
           <div className="flex lg:hidden items-center gap-3 mb-8">
             <img src="/logo.png" alt="ScriptHive" className="h-10 w-10 object-contain" />
             <div>
-              <p className="font-bold text-slate-900 text-sm">ScriptHive</p>
+              <p className="font-bold text-slate-900 text-sm">ScriptHive Publication</p>
               <p className="text-xs text-blue-600 font-semibold tracking-widest">AUTHOR PORTAL</p>
             </div>
           </div>
@@ -162,7 +162,6 @@ export function AuthorLoginPage() {
             <div className="mt-6 space-y-2.5 text-center text-sm">
               <p><Link to="/author/forgot-password" className="font-semibold text-blue-600 hover:underline">Forgot password?</Link></p>
               <p className="text-slate-500">New author? <Link to="/author/register" className="font-semibold text-blue-600 hover:underline">Create account</Link></p>
-              <p className="text-slate-400">Staff? <a href="https://admin.scripthive.org/admin/login" className="text-slate-500 hover:text-blue-600 hover:underline">Admin login</a></p>
             </div>
           </div>
         </div>
