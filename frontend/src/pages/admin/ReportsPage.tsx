@@ -959,20 +959,10 @@ export const ReportsPage = () => {
                         className="inline-flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs text-green-700 hover:bg-green-100">
                         <FileText size={12} /> Invoice
                       </button>
-                      <button type="button"
-                        onClick={async () => {
-                          try {
-                            const res = await apiFetch(`/certificate/${encodeURIComponent(art.id)}`);
-                            if (!res.ok) throw new Error("Certificate generation failed");
-                            const blob = await res.blob();
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement("a"); a.href=url; a.download=`certificate-${art.id}.pdf`; a.click();
-                            URL.revokeObjectURL(url);
-                          } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
-                        }}
+                      <a href={`/api/certificate/${encodeURIComponent(art.id)}`} target="_blank" rel="noreferrer"
                         className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs text-amber-700 hover:bg-amber-100">
                         <Download size={12} /> Certificate
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </div>

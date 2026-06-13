@@ -39,4 +39,4 @@ apiRouter.use("/settings", settingsRouter);
 apiRouter.use("/media", mediaRouter);
 apiRouter.use("/carousel", carouselRouter);
 apiRouter.use("/contact", contactRouter);
-apiRouter.get("/certificate/:id", authenticate, generateCertificateForSubmission);
+apiRouter.get("/certificate/:id", generateCertificateForSubmission);
