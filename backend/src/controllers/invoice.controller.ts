@@ -120,8 +120,8 @@ export const createDraftFromSubmission = async (req: Request, res: Response): Pr
     res.status(404).json({ message: "Submission not found" });
     return;
   }
-  if (sub.status !== "Accepted") {
-    res.status(400).json({ message: "Only accepted submissions can have an APC invoice" });
+  if (!["Accepted", "Published"].includes(sub.status)) {
+    res.status(400).json({ message: "Only accepted or published submissions can have an APC invoice" });
     return;
   }
   await ensureDraftInvoiceForSubmission(submissionId);

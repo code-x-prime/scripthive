@@ -943,12 +943,12 @@ export const ReportsPage = () => {
                         className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50">
                         <Pencil size={12} /> Edit
                       </button>
-                      {art.pdfPublicPath && (
-                        <a href={art.pdfPublicPath} target="_blank" rel="noreferrer"
-                          className="inline-flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs text-blue-700 hover:bg-blue-100">
-                          <Download size={12} /> Publish Paper
-                        </a>
-                      )}
+                      <button type="button"
+                        disabled={!art.pdfPublicPath}
+                        onClick={() => art.pdfPublicPath && window.open(art.pdfPublicPath, "_blank")}
+                        className="inline-flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs text-blue-700 hover:bg-blue-100 disabled:opacity-40">
+                        <Download size={12} /> Publish Paper
+                      </button>
                       <button type="button"
                         onClick={async () => {
                           try {
@@ -959,10 +959,20 @@ export const ReportsPage = () => {
                         className="inline-flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs text-green-700 hover:bg-green-100">
                         <FileText size={12} /> Invoice
                       </button>
-                      <a href={`/api/certificate/${encodeURIComponent(art.id)}`} target="_blank" rel="noreferrer"
+                      <button type="button"
+                        onClick={async () => {
+                          try {
+                            const res = await apiFetch(`/certificate/${encodeURIComponent(art.id)}`);
+                            if (!res.ok) throw new Error("Certificate generation failed");
+                            const blob = await res.blob();
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a"); a.href=url; a.download=`certificate-${art.id}.pdf`; a.click();
+                            URL.revokeObjectURL(url);
+                          } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+                        }}
                         className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs text-amber-700 hover:bg-amber-100">
                         <Download size={12} /> Certificate
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </div>
