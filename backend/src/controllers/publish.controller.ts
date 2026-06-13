@@ -179,7 +179,7 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
       issueRecord.period = _month.trim();
     }
 
-    const partLabel = (part || "A").replace(/[^A-Ca-c]/gi, "").toUpperCase() || "A";
+    const partLabel = (part || "A").trim() || "A";
     let partRecord = await prisma.part.findFirst({
       where: { issueId: issueRecord.id, name: partLabel }
     });
