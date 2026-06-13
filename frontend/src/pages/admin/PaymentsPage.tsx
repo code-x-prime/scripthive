@@ -664,7 +664,7 @@ export const PaymentsPage = () => {
             </div>
             <div className="space-y-3">
               <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Submission ID
+                Submission ID <span className="font-normal text-gray-400">(e.g. SH-2026-KTCT — not invoice ID)</span>
                 <input type="text" value={manualSubId} onChange={(e) => setManualSubId(e.target.value)}
                   placeholder="SH-2026-XXXX"
                   className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
