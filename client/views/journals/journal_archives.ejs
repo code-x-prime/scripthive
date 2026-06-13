@@ -477,8 +477,8 @@
               issHdr.innerHTML='<span>Issue '+n+'</span>'+(multiP?'<span class="ti-arrow">▼</span>':'');
               issHdr.addEventListener('click', function(e){
                 e.stopPropagation();
-                if(!multiP){ selVol=v; selIss=n; selPart=null; applyFilters(); buildTree(); return; }
-                selVol=v; selIss=(selIss===n?null:n); selPart=null; applyFilters(); buildTree();
+                if(!multiP){ selVol=v; selIss=n; selPart=null; (window.applyFilters||function(){})() buildTree(); return; }
+                selVol=v; selIss=(selIss===n?null:n); selPart=null; (window.applyFilters||function(){})() buildTree();
               });
               issDiv.appendChild(issHdr);
               if(multiP){
@@ -488,7 +488,7 @@
                   var pi = document.createElement('div');
                   pi.className='tree-part-item'+(selVol===v&&selIss===n&&selPart===p?' active':'');
                   pi.textContent=partLabel(p);
-                  pi.addEventListener('click', function(e){ e.stopPropagation(); selVol=v; selIss=n; selPart=p; applyFilters(); buildTree(); });
+                  pi.addEventListener('click', function(e){ e.stopPropagation(); selVol=v; selIss=n; selPart=p; (window.applyFilters||function(){})() buildTree(); });
                   partList.appendChild(pi);
                 });
                 issDiv.appendChild(partList);
@@ -497,7 +497,7 @@
             });
 
             volHdr.addEventListener('click', function(){
-              selVol=(selVol===v?null:v); selIss=null; selPart=null; applyFilters(); buildTree();
+              selVol=(selVol===v?null:v); selIss=null; selPart=null; (window.applyFilters||function(){})() buildTree();
             });
             volDiv.appendChild(volHdr); volDiv.appendChild(issList);
             container.appendChild(volDiv);
@@ -505,7 +505,7 @@
         }
 
         document.getElementById('filterClearAll').addEventListener('click', function(){
-          selVol=null; selIss=null; selPart=null; applyFilters(); buildTree();
+          selVol=null; selIss=null; selPart=null; (window.applyFilters||function(){})() buildTree();
         });
 
         window._treeState = function(){ return {vol:selVol, iss:selIss, part:selPart}; };
@@ -579,7 +579,7 @@
     return el ? el.value : '';
   }
 
-  function applyFilters() {
+  window.applyFilters = function applyFilters() {
     var q = (document.getElementById('archSearch') ? document.getElementById('archSearch').value : '').toLowerCase().trim();
     var selYear = getDropVal('dropYear');
     var treeState = window._treeState ? window._treeState() : {vol:null,iss:null,part:null};
@@ -637,7 +637,7 @@
     });
 
     // Tree filter handles clear + auto-select — just run applyFilters on load
-    applyFilters();
+    (window.applyFilters||function(){})()
   });
 })();
 </script>
