@@ -636,24 +636,8 @@
       if (el) el.addEventListener('change', applyFilters);
     });
 
-    var clearBtn = document.getElementById('filterClearAll');
-    if (clearBtn) clearBtn.addEventListener('click', function() {
-      ['dropYear','dropVol','dropIss','dropPart'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      if (s) s.value = '';
-      applyFilters();
-    });
-
-    // Auto-select first volume on load
-    var volDrop = document.getElementById('dropVol');
-    if (volDrop && volDrop.options.length > 1) {
-      volDrop.value = volDrop.options[1].value;
-      volDrop.dispatchEvent(new Event('change'));
-    } else {
-      applyFilters();
-    }
+    // Tree filter handles clear + auto-select — just run applyFilters on load
+    applyFilters();
   });
 })();
 </script>

@@ -952,8 +952,7 @@ export const ReportsPage = () => {
                       <button type="button"
                         onClick={async () => {
                           try {
-                            const { apiJson: aj } = await import("@/services/api");
-                            await aj(`/invoices/from-submission/${encodeURIComponent(art.id)}`, { method: "POST" });
+                            await apiJson(`/invoices/from-submission/${encodeURIComponent(art.id)}`, { method: "POST" });
                             toast.success("Invoice created");
                           } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
                         }}
