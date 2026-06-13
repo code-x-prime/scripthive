@@ -472,27 +472,23 @@
               var issDiv = document.createElement('div'); issDiv.className='tree-iss';
               var issHdr = document.createElement('div');
               var parts = getUniq(DATA.filter(function(d){return String(d.vol)===v&&String(d.iss)===n;}).map(function(d){return d.part;}));
-              var multiP = parts.length > 1;
-              issHdr.className='tree-iss-hdr'+(selVol===v&&selIss===n&&!multiP?' active':'')+(selVol===v&&selIss===n&&multiP?' open':'');
-              issHdr.innerHTML='<span>Issue '+n+'</span>'+(multiP?'<span class="ti-arrow">▼</span>':'');
+              issHdr.className='tree-iss-hdr'+(selVol===v&&selIss===n?' open':'');
+              issHdr.innerHTML='<span>Issue '+n+'</span><span class="ti-arrow">▼</span>';
               issHdr.addEventListener('click', function(e){
                 e.stopPropagation();
-                if(!multiP){ selVol=v; selIss=n; selPart=null; (window.applyFilters||function(){})(); buildTree(); return; }
                 selVol=v; selIss=(selIss===n?null:n); selPart=null; (window.applyFilters||function(){})(); buildTree();
               });
               issDiv.appendChild(issHdr);
-              if(multiP){
-                var partList = document.createElement('div');
-                partList.className='tree-part-list'+(selVol===v&&selIss===n?' open':'');
-                parts.forEach(function(p){
-                  var pi = document.createElement('div');
-                  pi.className='tree-part-item'+(selVol===v&&selIss===n&&selPart===p?' active':'');
-                  pi.textContent=partLabel(p);
-                  pi.addEventListener('click', function(e){ e.stopPropagation(); selVol=v; selIss=n; selPart=p; (window.applyFilters||function(){})(); buildTree(); });
-                  partList.appendChild(pi);
-                });
-                issDiv.appendChild(partList);
-              }
+              var partList = document.createElement('div');
+              partList.className='tree-part-list'+(selVol===v&&selIss===n?' open':'');
+              parts.forEach(function(p){
+                var pi = document.createElement('div');
+                pi.className='tree-part-item'+(selVol===v&&selIss===n&&selPart===p?' active':'');
+                pi.textContent=partLabel(p);
+                pi.addEventListener('click', function(e){ e.stopPropagation(); selVol=v; selIss=n; selPart=p; (window.applyFilters||function(){})(); buildTree(); });
+                partList.appendChild(pi);
+              });
+              issDiv.appendChild(partList);
               issList.appendChild(issDiv);
             });
 
