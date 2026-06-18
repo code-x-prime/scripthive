@@ -670,7 +670,7 @@ export const PaymentsPage = () => {
                   onFocus={async () => {
                     if (subList.length === 0) {
                       try {
-                        const data = await apiJson<{id:string;title:string;authorName:string}[]>("/submissions?status=Accepted&limit=200");
+                        const data = await apiJson<{id:string;title:string;authorName:string}[]>("/submissions?limit=500");
                         setSubList(Array.isArray(data) ? data : []);
                       } catch { /* ignore */ }
                     }
@@ -702,9 +702,9 @@ export const PaymentsPage = () => {
                 onClick={async () => {
                   setManualSaving(true);
                   try {
-                    await apiJson(`/invoices`, {
+                    await apiJson(`/invoices/manual`, {
                       method: "POST",
-                      body: JSON.stringify({ submissionId: manualSubId.trim(), total: parseFloat(manualAmt), currency: manualCur, status: "Paid" })
+                      body: JSON.stringify({ submissionId: manualSubId.trim(), total: parseFloat(manualAmt), currency: manualCur })
                     });
                     toast.success("Invoice created");
                     setManualInvModal(false);

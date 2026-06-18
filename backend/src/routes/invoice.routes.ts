@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createDraftFromSubmission,
   createInvoice,
+  createManualInvoice,
   downloadInvoicePdf,
   getInvoice,
   listInvoices,
@@ -14,6 +15,7 @@ import { requireAuth, requirePermission } from "../middlewares/auth.middleware.j
 export const invoiceRouter = Router();
 
 invoiceRouter.post("/", requireAuth, requirePermission("invoices", "write"), createInvoice);
+invoiceRouter.post("/manual", requireAuth, requirePermission("invoices", "write"), createManualInvoice);
 invoiceRouter.post(
   "/from-submission/:submissionId",
   requireAuth,

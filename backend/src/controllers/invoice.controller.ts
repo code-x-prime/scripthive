@@ -268,6 +268,66 @@ export const markInvoicePaidManual = async (req: Request, res: Response): Promis
   res.json({ success: true, message: "Marked as paid — submission moved to Ready for Preparation", invoiceId: finalInvoiceId });
 };
 
+export const createManualInvoice = async (req: Request, res: Response): Promise<void> => {
+  const { submissionId, total, currency, customerName, customerEmail, method, notes } = req.body as {
+    submissionId: string;
+    total: number;
+    currency: string;
+    customerName?: string;
+    customerEmail?: string;
+    method?: string;
+    notes?: string;
+  };
+
+  if (!submissionId || !total || !currency) {
+    res.status(400).json({ message: "submissionId, total, currency required" });
+    return;
+  }
+
+  const sub = await prisma.submission.findUnique({
+    where: { id: submissionId },
+    include: { journal: true }
+  });
+  if (!sub) { res.status(404).json({ message: "Submission not found" }); return; }
+
+  const now = new Date();
+  const fy = getFinancialYear(now);
+  const fyCount = await prisma.invoice.count({
+    where: { createdAt: { gte: fy.start, lte: fy.end }, id: { startsWith: "SH/" } }
+  });
+  const invoiceId = generateInvoiceId(now, fyCount + 1);
+
+  const invoice = await prisma.invoice.create({
+    data: {
+      id: invoiceId,
+      submissionId,
+      customerName: customerName ?? sub.authorName,
+      customerEmail: customerEmail ?? sub.authorEmail,
+      items: [{ description: "Article Processing Charge (APC)", amount: total }],
+      subtotal: total,
+      tax: 0,
+      total,
+      currency: currency.toUpperCase(),
+      status: "Paid",
+      paidAt: now,
+      method: method ?? "Manual",
+      notes: notes ?? "Manual invoice created by admin"
+    }
+  });
+
+  await prisma.submission.update({
+    where: { id: submissionId },
+    data: {
+      paymentStatus: "Paid",
+      paymentMethod: method ?? "Manual",
+      paidAt: now,
+      productionStatus: sub.productionStatus ?? "ReadyForPreparation"
+    }
+  });
+
+  res.status(201).json(invoice);
+};
+
 export const downloadInvoicePdf = async (req: Request, res: Response): Promise<void> => {
   const id = String(req.params.id);
   let invoice = await prisma.invoice.findUnique({
