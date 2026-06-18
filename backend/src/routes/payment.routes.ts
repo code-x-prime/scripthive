@@ -7,6 +7,7 @@ import {
   createSmepayOrderController,
   getPaymentConfigController,
   listPayments,
+  smepayWebhookController,
   testPaymentConnection,
   verifyRazorpayPaymentController,
   verifySmepayOrderController
@@ -25,3 +26,4 @@ paymentRouter.post("/razorpay/create-order", createRazorpayOrderController);
 paymentRouter.post("/razorpay/verify", verifyRazorpayPaymentController);
 paymentRouter.post("/smepay/create-order", createSmepayOrderController);
 paymentRouter.post("/smepay/verify", verifySmepayOrderController);
+paymentRouter.post("/smepay/webhook", smepayWebhookController);

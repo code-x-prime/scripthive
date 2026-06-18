@@ -22,14 +22,20 @@ export async function createSmepayOrder(
   invoiceId: string,
   amountInRupees: number,
   customerEmail: string,
-  customerName: string
+  customerName: string,
+  submissionId?: string
 ): Promise<{ orderSlug: string; paymentUrl: string; orderId: string }> {
   const cfg = await resolvePaymentConfig();
   if (!cfg.smepay.enabled) throw new Error("SMEPay is not configured");
 
   const token = await getAccessToken(cfg.smepay.clientId, cfg.smepay.clientSecret, cfg.smepay.mode);
-  const callbackUrl = `${env.FRONTEND_URL ?? "http://localhost:5173"}/pay/${encodeURIComponent(invoiceId)}?smepay=1`;
-  const safeOrderId = `INV-${invoiceId.replace(/[^A-Za-z0-9_-]/g, "-")}-${Date.now()}`;
+  // callback_url must be a backend API endpoint — SMEPay POSTs to it
+  const backendBase = env.BACKEND_PUBLIC_URL ?? env.FRONTEND_URL ?? "http://localhost:3001";
+  const callbackUrl = `${backendBase}/api/payments/smepay/webhook`;
+  // ref_id shown in SMEPay dashboard — use submission ID if available
+  const safeOrderId = submissionId
+    ? submissionId.replace(/[^A-Za-z0-9_-]/g, "-")
+    : `INV-${invoiceId.replace(/[^A-Za-z0-9_-]/g, "-")}-${Date.now()}`;
 
   const res = await fetch(`${baseUrl(cfg.smepay.mode)}/api/wiz/external/order/create`, {
     method: "POST",

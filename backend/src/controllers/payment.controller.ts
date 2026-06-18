@@ -280,7 +280,8 @@ export const createSmepayOrderController = async (req: Request, res: Response): 
     invoice.id,
     Math.round(invoice.total),
     sub?.authorEmail ?? invoice.customerEmail,
-    sub?.authorName ?? "Customer"
+    sub?.authorName ?? "Customer",
+    invoice.submissionId ?? undefined
   );
   await prisma.invoice.update({
     where: { id: invoice.id },
@@ -317,6 +318,39 @@ export const createAdvanceInvoiceController = async (req: Request, res: Response
   } catch (e) {
     res.status(400).json({ message: e instanceof Error ? e.message : "Failed to create invoice" });
   }
+};
+
+/* ── SMEPay webhook (POST from SMEPay after payment) ─────────────────────── */
+export const smepayWebhookController = async (req: Request, res: Response): Promise<void> => {
+  // SMEPay sends: { status, transaction_id, ref_id, amount, ... }
+  const body = req.body as {
+    status?: string;
+    transaction_id?: string;
+    ref_id?: string;
+    amount?: string;
+    slug?: string;
+  };
+
+  // Always respond 200 fast so SMEPay doesn't retry
+  res.status(200).json({ received: true });
+
+  if (body.status !== "SUCCESS") return;
+
+  const orderSlug = body.slug ?? body.transaction_id ?? "";
+  if (!orderSlug) return;
+
+  // Find invoice by gatewayOrderId (slug stored at order creation)
+  const invoice = await prisma.invoice.findFirst({
+    where: { gatewayOrderId: orderSlug, status: { not: "Paid" } }
+  });
+  if (!invoice) return;
+
+  await markInvoicePaid(
+    { id: invoice.id, submissionId: invoice.submissionId, customerEmail: invoice.customerEmail, total: invoice.total, currency: invoice.currency },
+    "SMEPay",
+    orderSlug,
+    `smepay_webhook:${orderSlug}`
+  );
 };
 
 /* ── Admin list ──────────────────────────────────────────────────────────── */
