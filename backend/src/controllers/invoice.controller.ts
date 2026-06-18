@@ -94,12 +94,12 @@ export const sendInvoiceLink = async (req: Request, res: Response): Promise<void
     res.status(404).json({ message: "Invoice not found" });
     return;
   }
-  const paymentLink = `${env.FRONTEND_URL}/pay/${invoice.submissionId}`;
+  const paymentLink = `${env.FRONTEND_URL}/pay/${invoice.submissionId ?? invoice.id}`;
   const journal = invoice.submission?.journal;
   await sendPaymentLinkEmail(
     invoice.customerEmail,
     invoice.customerName,
-    invoice.submissionId,
+    invoice.submissionId ?? invoice.id,
     paymentLink,
     journal?.name,
     journal?.issn,
@@ -357,7 +357,7 @@ export const downloadInvoicePdf = async (req: Request, res: Response): Promise<v
 
   const pdfBuffer = await generateInvoicePdf({
     invoiceId: invoice.id,
-    submissionId: invoice.submissionId,
+    submissionId: invoice.submissionId ?? "",
     customerName: invoice.customerName,
     customerEmail: invoice.customerEmail,
     items,

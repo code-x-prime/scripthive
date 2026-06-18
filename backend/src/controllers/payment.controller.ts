@@ -28,7 +28,7 @@ async function assertPayableInvoice(invoiceId: string) {
 }
 
 async function markInvoicePaid(
-  invoice: { id: string; submissionId: string; customerEmail: string; total: number; currency: string },
+  invoice: { id: string; submissionId: string | null; customerEmail: string; total: number; currency: string },
   method: string,
   paymentId: string,
   notes: string
@@ -55,10 +55,12 @@ async function markInvoicePaid(
     where: { id: finalInvoiceId },
     data: { status: "Paid", paidAt: new Date(), method, notes, gatewayPayId: paymentId }
   });
-  await prisma.submission.updateMany({
-    where: { id: invoice.submissionId },
-    data: { paymentStatus: "Paid", paymentMethod: method, paymentId, paidAt: new Date(), productionStatus: "ReadyForPreparation", advancePaid: true, advancePaidAt: new Date() }
-  });
+  if (invoice.submissionId) {
+    await prisma.submission.updateMany({
+      where: { id: invoice.submissionId },
+      data: { paymentStatus: "Paid", paymentMethod: method, paymentId, paidAt: new Date(), productionStatus: "ReadyForPreparation", advancePaid: true, advancePaidAt: new Date() }
+    });
+  }
   void writeAuditLog({
     action: "payment_received",
     resource: "invoice",
@@ -69,18 +71,20 @@ async function markInvoicePaid(
   let journalName: string | undefined;
   let issn: string | null | undefined;
   let eIssn: string | null | undefined;
-  try {
-    const sub = await prisma.submission.findUnique({
-      where: { id: invoice.submissionId },
-      include: { journal: true }
-    });
-    if (sub?.journal) {
-      journalName = sub.journal.name;
-      issn = sub.journal.issn;
-      eIssn = sub.journal.eIssn;
+  if (invoice.submissionId) {
+    try {
+      const sub = await prisma.submission.findUnique({
+        where: { id: invoice.submissionId },
+        include: { journal: true }
+      });
+      if (sub?.journal) {
+        journalName = sub.journal.name;
+        issn = sub.journal.issn;
+        eIssn = sub.journal.eIssn;
+      }
+    } catch (e) {
+      console.error("Failed to load journal details for receipt email:", e);
     }
-  } catch (e) {
-    console.error("Failed to load journal details for receipt email:", e);
   }
 
   await sendPaymentReceiptEmail(
@@ -89,7 +93,7 @@ async function markInvoicePaid(
     invoice.total,
     invoice.currency,
     paymentId,
-    invoice.submissionId,
+    invoice.submissionId ?? undefined,
     journalName,
     issn,
     eIssn
@@ -100,7 +104,7 @@ async function markInvoicePaid(
     invoice.total,
     invoice.currency,
     paymentId,
-    invoice.submissionId,
+    invoice.submissionId ?? undefined,
     journalName,
     issn,
     eIssn
