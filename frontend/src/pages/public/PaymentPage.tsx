@@ -41,8 +41,24 @@ export const PaymentPage = () => {
         ]);
         if (invoiceRes.status === 404) { setInvoice(null); setError("Invoice not found."); return; }
         if (!invoiceRes.ok) throw new Error("Something went wrong. Please try again.");
-        setInvoice((await invoiceRes.json()) as Invoice);
+        const inv = (await invoiceRes.json()) as Invoice;
+        setInvoice(inv);
         if (configRes?.data) setPayConfig(configRes.data);
+
+        // Auto-verify SMEPay after redirect callback
+        const params = new URLSearchParams(window.location.search);
+        const smepayCallback = params.get("smepay");
+        const orderSlug = params.get("slug") ?? inv.gatewayOrderId;
+        if (smepayCallback === "1" && orderSlug && !paidStatuses.has(inv.status)) {
+          try {
+            const verify = await paymentService.verifySmepay(inv.id, orderSlug);
+            if (verify.data?.transactionId || verify.data?.alreadyPaid) {
+              setResult(`Transaction ID: ${verify.data.transactionId ?? orderSlug}`);
+            }
+          } catch {
+            // verification failed silently — user can retry
+          }
+        }
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Something went wrong.");
         setError("Could not load invoice.");
