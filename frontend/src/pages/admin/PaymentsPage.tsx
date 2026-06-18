@@ -47,11 +47,13 @@ export const PaymentsPage = () => {
   const [payUTR, setPayUTR] = useState("");
   const [payRemarks, setPayRemarks] = useState("");
   const [manualInvModal, setManualInvModal] = useState(false);
-  const [manualSubId, setManualSubId] = useState("");
+  const [manualName, setManualName] = useState("");
+  const [manualEmail, setManualEmail] = useState("");
   const [manualAmt, setManualAmt] = useState("");
   const [manualCur, setManualCur] = useState("INR");
+  const [manualMethod, setManualMethod] = useState("Cash");
+  const [manualNotes, setManualNotes] = useState("");
   const [manualSaving, setManualSaving] = useState(false);
-  const [subList, setSubList] = useState<{id: string; title: string; authorName: string}[]>([]);
 
   // inline amount editing state: invoiceId -> draft value
   const [editingAmount, setEditingAmount] = useState<Record<string, string>>({});
@@ -665,50 +667,70 @@ export const PaymentsPage = () => {
             </div>
             <div className="space-y-3">
               <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Select Submission
-                <select value={manualSubId} onChange={(e) => setManualSubId(e.target.value)}
-                  onFocus={async () => {
-                    if (subList.length === 0) {
-                      try {
-                        const data = await apiJson<{id:string;title:string;authorName:string}[]>("/submissions?limit=500");
-                        setSubList(Array.isArray(data) ? data : []);
-                      } catch { /* ignore */ }
-                    }
-                  }}
-                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                  <option value="">— Select submission —</option>
-                  {subList.map(s => (
-                    <option key={s.id} value={s.id}>{s.id} — {s.authorName} — {s.title?.slice(0,40)}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Amount
-                <input type="number" min={0} step="0.01" value={manualAmt} onChange={(e) => setManualAmt(e.target.value)}
-                  placeholder="0"
+                Customer Name
+                <input type="text" value={manualName} onChange={(e) => setManualName(e.target.value)}
+                  placeholder="Author / Customer name"
                   className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
               </label>
               <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
-                Currency
-                <select value={manualCur} onChange={(e) => setManualCur(e.target.value)}
+                Customer Email
+                <input type="email" value={manualEmail} onChange={(e) => setManualEmail(e.target.value)}
+                  placeholder="email@example.com"
+                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                  Amount
+                  <input type="number" min={0} step="0.01" value={manualAmt} onChange={(e) => setManualAmt(e.target.value)}
+                    placeholder="0"
+                    className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                </label>
+                <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                  Currency
+                  <select value={manualCur} onChange={(e) => setManualCur(e.target.value)}
+                    className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <option value="INR">INR</option>
+                    <option value="USD">USD</option>
+                  </select>
+                </label>
+              </div>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Payment Method
+                <select value={manualMethod} onChange={(e) => setManualMethod(e.target.value)}
                   className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                  <option value="INR">INR</option>
-                  <option value="USD">USD</option>
+                  <option value="Cash">Cash</option>
+                  <option value="UPI">UPI</option>
+                  <option value="NEFT/RTGS">NEFT / RTGS</option>
+                  <option value="Cheque/DD">Cheque / DD</option>
+                  <option value="Other">Other</option>
                 </select>
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-gray-600">
+                Remarks / Reference (optional)
+                <input type="text" value={manualNotes} onChange={(e) => setManualNotes(e.target.value)}
+                  placeholder="UTR / cheque no. / any notes"
+                  className="h-10 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
               </label>
             </div>
             <div className="mt-5 flex gap-3">
-              <button type="button" disabled={manualSaving || !manualSubId.trim() || !manualAmt}
+              <button type="button" disabled={manualSaving || !manualName.trim() || !manualAmt}
                 onClick={async () => {
                   setManualSaving(true);
                   try {
                     await apiJson(`/invoices/manual`, {
                       method: "POST",
-                      body: JSON.stringify({ submissionId: manualSubId.trim(), total: parseFloat(manualAmt), currency: manualCur })
+                      body: JSON.stringify({
+                        customerName: manualName.trim(),
+                        customerEmail: manualEmail.trim() || undefined,
+                        total: parseFloat(manualAmt),
+                        currency: manualCur,
+                        method: manualMethod,
+                        notes: manualNotes.trim() || undefined
+                      })
                     });
                     toast.success("Invoice created");
                     setManualInvModal(false);
-                    setManualSubId(""); setManualAmt(""); setManualCur("INR");
+                    setManualName(""); setManualEmail(""); setManualAmt(""); setManualCur("INR"); setManualMethod("Cash"); setManualNotes("");
                     void load();
                   } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
                   finally { setManualSaving(false); }

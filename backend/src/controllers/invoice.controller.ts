@@ -270,7 +270,7 @@ export const markInvoicePaidManual = async (req: Request, res: Response): Promis
 
 export const createManualInvoice = async (req: Request, res: Response): Promise<void> => {
   const { submissionId, total, currency, customerName, customerEmail, method, notes } = req.body as {
-    submissionId: string;
+    submissionId?: string;
     total: number;
     currency: string;
     customerName?: string;
@@ -279,16 +279,24 @@ export const createManualInvoice = async (req: Request, res: Response): Promise<
     notes?: string;
   };
 
-  if (!submissionId || !total || !currency) {
-    res.status(400).json({ message: "submissionId, total, currency required" });
+  if (!total || !currency) {
+    res.status(400).json({ message: "total and currency required" });
+    return;
+  }
+  if (!customerName && !submissionId) {
+    res.status(400).json({ message: "customerName or submissionId required" });
     return;
   }
 
-  const sub = await prisma.submission.findUnique({
-    where: { id: submissionId },
-    include: { journal: true }
-  });
-  if (!sub) { res.status(404).json({ message: "Submission not found" }); return; }
+  let resolvedName = customerName;
+  let resolvedEmail = customerEmail ?? "";
+
+  if (submissionId) {
+    const sub = await prisma.submission.findUnique({ where: { id: submissionId } });
+    if (!sub) { res.status(404).json({ message: "Submission not found" }); return; }
+    resolvedName = resolvedName ?? sub.authorName;
+    resolvedEmail = resolvedEmail || sub.authorEmail;
+  }
 
   const now = new Date();
   const fy = getFinancialYear(now);
@@ -300,9 +308,9 @@ export const createManualInvoice = async (req: Request, res: Response): Promise<
   const invoice = await prisma.invoice.create({
     data: {
       id: invoiceId,
-      submissionId,
-      customerName: customerName ?? sub.authorName,
-      customerEmail: customerEmail ?? sub.authorEmail,
+      ...(submissionId ? { submissionId } : {}),
+      customerName: resolvedName!,
+      customerEmail: resolvedEmail,
       items: [{ description: "Article Processing Charge (APC)", amount: total }],
       subtotal: total,
       tax: 0,
@@ -315,15 +323,12 @@ export const createManualInvoice = async (req: Request, res: Response): Promise<
     }
   });
 
-  await prisma.submission.update({
-    where: { id: submissionId },
-    data: {
-      paymentStatus: "Paid",
-      paymentMethod: method ?? "Manual",
-      paidAt: now,
-      productionStatus: sub.productionStatus ?? "ReadyForPreparation"
-    }
-  });
+  if (submissionId) {
+    await prisma.submission.update({
+      where: { id: submissionId },
+      data: { paymentStatus: "Paid", paymentMethod: method ?? "Manual", paidAt: now }
+    });
+  }
 
   res.status(201).json(invoice);
 };
