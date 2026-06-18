@@ -237,8 +237,8 @@ model DoiRecord {
 
 model Invoice {
   id            String     @id
-  submissionId  String
-  submission    Submission @relation(fields: [submissionId], references: [id])
+  submissionId  String?
+  submission    Submission? @relation(fields: [submissionId], references: [id])
   customerName  String
   customerEmail String
   address       String?
