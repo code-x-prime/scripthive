@@ -20,10 +20,10 @@ interface InvoicePdfData {
   createdAt: Date;
   paidAt?: Date | null;
   method?: string | null;
-  journalName?: string | null;
-  issn?: string | null;
-  eIssn?: string | null;
-  paperTitle?: string | null;
+  journalName?: string | null | undefined;
+  issn?: string | null | undefined;
+  eIssn?: string | null | undefined;
+  paperTitle?: string | null | undefined;
 }
 
 function fmtDate(d: Date | null | undefined): string {

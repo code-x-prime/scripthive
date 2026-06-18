@@ -276,10 +276,10 @@ export const createSmepayOrderController = async (req: Request, res: Response): 
   const check = await assertPayableInvoice(resolvedInvoiceId);
   if ("error" in check) { res.status(check.error.status).json({ message: check.error.message }); return; }
   const { invoice } = check;
-  const sub = await prisma.submission.findUnique({
+  const sub = invoice.submissionId ? await prisma.submission.findUnique({
     where: { id: invoice.submissionId },
     select: { authorName: true, authorEmail: true }
-  });
+  }) : null;
   const order = await createSmepayOrder(
     invoice.id,
     Math.round(invoice.total),
