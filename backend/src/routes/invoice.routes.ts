@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createDraftFromSubmission,
   createInvoice,
+  downloadInvoicePdf,
   getInvoice,
   listInvoices,
   markInvoicePaidManual,
@@ -21,6 +22,7 @@ invoiceRouter.post(
 );
 invoiceRouter.get("/", requireAuth, requirePermission("invoices", "read"), listInvoices);
 // Invoice IDs contain "/" (e.g. SH/26-27/001) — must use wildcard routes
+invoiceRouter.get("/:id(*)/pdf", downloadInvoicePdf);
 invoiceRouter.get("/:id(*)", getInvoice);
 invoiceRouter.post("/:id(*)/send-link", requireAuth, requirePermission("invoices", "write"), sendInvoiceLink);
 invoiceRouter.post("/:id(*)/mark-paid", requireAuth, requirePermission("invoices", "write"), markInvoicePaidManual);

@@ -952,8 +952,9 @@ export const ReportsPage = () => {
                       <button type="button"
                         onClick={async () => {
                           try {
-                            await apiJson(`/invoices/from-submission/${encodeURIComponent(art.id)}`, { method: "POST" });
-                            toast.success("Invoice created");
+                            const inv = await apiJson<{ id: string }>(`/invoices/from-submission/${encodeURIComponent(art.id)}`, { method: "POST" });
+                            const invoiceId = inv?.id ?? art.id;
+                            window.open(`/api/invoices/${encodeURIComponent(invoiceId)}/pdf`, "_blank");
                           } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
                         }}
                         className="inline-flex items-center gap-1 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs text-green-700 hover:bg-green-100">

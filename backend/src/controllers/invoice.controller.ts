@@ -8,6 +8,7 @@ import { apcAmountForCurrency, loadApcRates } from "../services/apcSettings.serv
 import { ensureDraftInvoiceForSubmission } from "../services/invoiceDraft.service.js";
 import { writeAuditLog } from "../utils/auditLog.js";
 import type { AuthRequest } from "../middlewares/auth.middleware.js";
+import { generateInvoicePdf } from "../services/invoicePdf.service.js";
 
 export const createInvoice = async (req: Request, res: Response): Promise<void> => {
   const body = req.body as {
@@ -265,4 +266,52 @@ export const markInvoicePaidManual = async (req: Request, res: Response): Promis
   }
 
   res.json({ success: true, message: "Marked as paid — submission moved to Ready for Preparation", invoiceId: finalInvoiceId });
+};
+
+export const downloadInvoicePdf = async (req: Request, res: Response): Promise<void> => {
+  const id = String(req.params.id);
+  let invoice = await prisma.invoice.findUnique({
+    where: { id },
+    include: { submission: { include: { journal: true } } }
+  });
+  if (!invoice) {
+    invoice = await prisma.invoice.findFirst({
+      where: { submissionId: id },
+      orderBy: { createdAt: "desc" },
+      include: { submission: { include: { journal: true } } }
+    });
+  }
+  if (!invoice) {
+    res.status(404).json({ message: "Invoice not found" });
+    return;
+  }
+
+  const items = Array.isArray(invoice.items)
+    ? (invoice.items as { description: string; amount: number }[])
+    : [];
+
+  const pdfBuffer = await generateInvoicePdf({
+    invoiceId: invoice.id,
+    submissionId: invoice.submissionId,
+    customerName: invoice.customerName,
+    customerEmail: invoice.customerEmail,
+    items,
+    subtotal: invoice.subtotal,
+    tax: invoice.tax,
+    total: invoice.total,
+    currency: invoice.currency,
+    status: invoice.status,
+    createdAt: invoice.createdAt,
+    paidAt: invoice.paidAt,
+    method: invoice.method,
+    journalName: invoice.submission?.journal?.name,
+    issn: invoice.submission?.journal?.issn,
+    eIssn: invoice.submission?.journal?.eIssn,
+    paperTitle: invoice.submission?.title
+  });
+
+  const safeId = invoice.id.replace(/\//g, "-");
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="invoice-${safeId}.pdf"`);
+  res.send(pdfBuffer);
 };
