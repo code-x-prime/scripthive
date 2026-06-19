@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — puppeteer installed on server, not in local dev
 import puppeteer from "puppeteer";
+import { SIGN_B64, JYOTI_B64, LOGO_B64 } from "../assets/certImages.js";
 
 interface CertificateData {
   authorName: string;
@@ -44,7 +45,7 @@ body{margin:0;padding:0;background:#ffffff;font-family:"Georgia","Times New Roma
 .signature-line{border-top:1.5px solid #102a56;width:68%;margin:0 auto 6px;height:1px;}
 .signature-title{font-size:13px;font-weight:bold;color:#102a56;}
 .signature-subtitle{font-size:12px;color:#6b7280;margin-top:2px;}
-.seal{width:96px;height:96px;border-radius:50%;border:3px double #c89b3c;display:flex;align-items:center;justify-content:center;margin:0 auto;color:#102a56;font-family:Arial,sans-serif;font-size:11px;font-weight:bold;text-align:center;text-transform:uppercase;background:radial-gradient(circle,#fff9ea 0%,#ffffff 70%);}
+.seal{width:96px;height:96px;border-radius:50%;border:3px double #c89b3c;display:flex;align-items:center;justify-content:center;margin:0 auto;background:radial-gradient(circle,#fff9ea 0%,#ffffff 70%);overflow:hidden;}
 .website{position:absolute;bottom:9mm;left:0;right:0;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#6b7280;z-index:4;}
 .certificate-wrapper::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:0.08;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='90'%3E%3Ctext x='5' y='55' transform='rotate(-35 70 45)' fill='black' font-size='18' font-family='Arial' font-weight='bold'%3EScriptHive Publication%3C/text%3E%3C/svg%3E");background-repeat:repeat;background-size:140px 90px;}
 `;
@@ -83,12 +84,16 @@ function buildCertBlock(d: CertificateData): string {
     </div>
     <div class="footer">
       <div class="signature-block">
+        <img src="${SIGN_B64}" style="height:48px;max-width:140px;object-fit:contain;display:block;margin:0 auto 4px;" />
         <div class="signature-line"></div>
         <div class="signature-title">Editor-in-Chief</div>
         <div class="signature-subtitle">ScriptHive Publication</div>
       </div>
-      <div class="seal">Official<br/>Publication<br/>Certificate</div>
+      <div class="seal">
+        <img src="${LOGO_B64}" style="width:72px;height:72px;object-fit:contain;border-radius:50%;" />
+      </div>
       <div class="signature-block">
+        <img src="${JYOTI_B64}" style="height:48px;max-width:140px;object-fit:contain;display:block;margin:0 auto 4px;" />
         <div class="signature-line"></div>
         <div class="signature-title">Publisher</div>
         <div class="signature-subtitle">ScriptHive Publication</div>
