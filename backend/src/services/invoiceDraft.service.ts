@@ -1,7 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../config/prisma.js";
 import { apcAmountForCurrency, loadApcRates } from "./apcSettings.service.js";
-import { generateInvoiceId, getFinancialYear } from "../utils/generateId.js";
 import { sendPaymentLinkEmail } from "./email.service.js";
 import { env } from "../config/env.js";
 
@@ -40,15 +39,9 @@ export async function createAdvanceInvoice(submissionId: string): Promise<{ invo
     ...addonItems
   ] as unknown as Prisma.InputJsonValue;
 
-  const now = new Date();
-  const fy = getFinancialYear(now);
-  const fyCount = await prisma.invoice.count({
-    where: { createdAt: { gte: fy.start, lte: fy.end }, id: { startsWith: "SH/" } }
-  });
-
   const invoice = await prisma.invoice.create({
     data: {
-      id: generateInvoiceId(now, fyCount + 1),
+      id: `DRAFT-${sub.id}-${Date.now()}`,
       submissionId: sub.id,
       customerName: sub.authorName,
       customerEmail: sub.authorEmail,
@@ -102,18 +95,9 @@ export async function ensureDraftInvoiceForSubmission(submissionId: string): Pro
     ...addonItems
   ] as unknown as Prisma.InputJsonValue;
 
-  const now = new Date();
-  const fy = getFinancialYear(now);
-  const fyCount = await prisma.invoice.count({
-    where: {
-      createdAt: { gte: fy.start, lte: fy.end },
-      id: { startsWith: "SH/" }
-    }
-  });
-
   await prisma.invoice.create({
     data: {
-      id: generateInvoiceId(now, fyCount + 1),
+      id: `DRAFT-${sub.id}-${Date.now()}`,
       submissionId: sub.id,
       customerName: sub.authorName,
       customerEmail: sub.authorEmail,
