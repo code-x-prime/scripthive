@@ -17,8 +17,12 @@ export const generateCertificateForSubmission = async (req: Request, res: Respon
     ? new Date(sub.pubDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
     : new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 
+  const allAuthors = sub.coAuthors
+    ? `${sub.authorName}, ${sub.coAuthors}`
+    : sub.authorName;
+
   const pdf = await generateCertificatePdf({
-    authorName: sub.authorName,
+    authorName: allAuthors,
     paperTitle: sub.title,
     journalName: sub.journal?.name ?? sub.journalId,
     volume: vol && iss ? `Vol. ${vol.number}, Issue ${iss.number}` : "—",
