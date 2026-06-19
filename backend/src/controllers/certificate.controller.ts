@@ -35,7 +35,7 @@ export const generateCertificateForSubmission = async (req: Request, res: Respon
   const certDataList = authors.map((name, i) => ({
     ...commonFields,
     authorName: name,
-    certId: i === 0 ? baseCertId : `${baseCertId}-${i + 1}`,
+    certId: i === 0 ? baseCertId : `${baseCertId}-${i}`,
   }));
 
   const pdf = await generateCertificatePdf(certDataList);
