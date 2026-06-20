@@ -389,7 +389,7 @@ export const PaymentsPage = () => {
                         {inv.total} <span className="text-xs font-semibold text-gray-500">{inv.currency}</span>
                       </span>
                     )}
-                    {!editingAmount[inv.id] && Array.isArray(inv.items) && (inv.items as {description:string;amount:number}[]).length > 1 && (
+                    {!editingAmount[inv.id] && Array.isArray(inv.items) && (inv.items as {description:string;amount:number}[]).length > 0 && (
                       <div className="mt-0.5 space-y-0.5">
                         {(inv.items as {description:string;amount:number}[]).map((item, i) => (
                           <p key={i} className="text-xs text-gray-400 whitespace-nowrap">{item.description}: {inv.currency === "INR" ? "₹" : "$"}{item.amount}</p>
