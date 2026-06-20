@@ -20,8 +20,16 @@ export const authLoginLimiter = rateLimit({
 
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 500,
+  max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
   handler: jsonRateLimitHandler("Too many requests. Please wait a moment and try again.")
+});
+
+export const submissionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: jsonRateLimitHandler("Too many submissions from this IP. Please try again after 15 minutes.")
 });
