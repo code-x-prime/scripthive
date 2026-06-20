@@ -1,5 +1,6 @@
 import { fmtDateTime } from "@/utils/formatDate";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import JoditEditor from "jodit-react";
 import toast from "react-hot-toast";
 import {
   Bar, BarChart, CartesianGrid, Cell, Legend,
@@ -544,6 +545,7 @@ export const ReportsPage = () => {
   const [publishedLoading, setPublishedLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{ title: string; authorName: string; coAuthors: string; abstract: string; keywords: string; pdfPublicPath: string; country: string; affiliations: string; pageStart: string; pageEnd: string; slug: string; }>({ title: "", authorName: "", coAuthors: "", abstract: "", keywords: "", pdfPublicPath: "", country: "", affiliations: "", pageStart: "", pageEnd: "", slug: "" });
+  const joditConfig = useMemo(() => ({ height: 220, toolbarAdaptive: false, buttons: "bold,italic,underline,|,ul,ol,|,link,|,source", statusbar: false, showCharsCounter: false, showWordsCounter: false, showXPathInStatusbar: false }), []);
   const [saving, setSaving] = useState(false);
   const [pdfUploading, setPdfUploading] = useState(false);
 
@@ -997,10 +999,15 @@ export const ReportsPage = () => {
                       <input value={editForm.affiliations} onChange={(e) => setEditForm((p) => ({ ...p, affiliations: e.target.value }))}
                         className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
                     </label>
-                    <label className="block text-xs font-medium text-slate-600">Abstract
-                      <textarea value={editForm.abstract} onChange={(e) => setEditForm((p) => ({ ...p, abstract: e.target.value }))}
-                        rows={4} className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-                    </label>
+                    <div className="block text-xs font-medium text-slate-600">Abstract
+                      <div className="mt-1">
+                        <JoditEditor
+                          value={editForm.abstract}
+                          config={joditConfig}
+                          onBlur={(val) => setEditForm((p) => ({ ...p, abstract: val }))}
+                        />
+                      </div>
+                    </div>
                     <label className="block text-xs font-medium text-slate-600">Keywords
                       <input value={editForm.keywords} onChange={(e) => setEditForm((p) => ({ ...p, keywords: e.target.value }))}
                         className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
