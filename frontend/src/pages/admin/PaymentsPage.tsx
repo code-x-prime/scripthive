@@ -113,7 +113,7 @@ export const PaymentsPage = () => {
       .filter((i) => filterCurrency === "ALL" || i.currency === filterCurrency)
       .filter((i) => filterMethod === "ALL" || i.method === filterMethod)
       .filter((i) => {
-        const ts = new Date(i.paidAt ?? i.createdAt).getTime();
+        const ts = new Date(i.paidAt ?? i.createdAt ?? 0).getTime();
         if (fromTs && ts < fromTs) return false;
         if (toTs && ts > toTs) return false;
         return true;
@@ -133,8 +133,8 @@ export const PaymentsPage = () => {
         case "amount": return dir * (a.total - b.total);
         case "date":
         default: {
-          const da = new Date(a.paidAt ?? a.createdAt).getTime();
-          const db = new Date(b.paidAt ?? b.createdAt).getTime();
+          const da = new Date(a.paidAt ?? a.createdAt ?? 0).getTime();
+          const db = new Date(b.paidAt ?? b.createdAt ?? 0).getTime();
           return dir * (da - db);
         }
       }
