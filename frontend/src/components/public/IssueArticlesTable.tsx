@@ -2,6 +2,13 @@ import { Link } from "react-router-dom";
 import type { ArchiveArticleSummary } from "@/services/archive.service";
 import { articleArchivePath } from "@/utils/archiveUrls";
 
+async function trackAndDownload(articleId: string, pdfUrl: string) {
+  try {
+    await fetch(`/api/archive/download/${articleId}`, { method: "POST" });
+  } catch { /* non-blocking */ }
+  window.open(pdfUrl, "_blank");
+}
+
 function formatFileSize(kb: number | null | undefined): string {
   if (kb == null) return "";
   if (kb >= 1024) return `${(kb / 1024).toFixed(1)} MB`;
@@ -89,15 +96,13 @@ export function IssueArticlesTable({ journalId, volume, issue, articles }: Issue
                       </Link>
                     ) : null}
                     {article.pdfUrl ? (
-                      <a
-                        href={article.pdfUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-medium text-blue-700 underline hover:text-blue-900"
+                      <button
+                        onClick={() => trackAndDownload(article.id, article.pdfUrl!)}
+                        className="font-medium text-blue-700 underline hover:text-blue-900 cursor-pointer bg-transparent border-none p-0"
                       >
                         Download
                         {sizeLabel ? <span className="font-normal text-gray-600"> ({sizeLabel})</span> : null}
-                      </a>
+                      </button>
                     ) : (
                       <span className="text-gray-400">PDF not available</span>
                     )}
