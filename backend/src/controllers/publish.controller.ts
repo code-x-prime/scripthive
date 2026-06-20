@@ -3,7 +3,7 @@ import path from "node:path";
 import fs from "node:fs";
 import { prisma } from "../config/prisma.js";
 import { logger } from "../utils/logger.js";
-import { sendArticlePublishedEmail } from "../services/email.service.js";
+import { sendArticlePublishedEmailToAllAuthors } from "../services/email.service.js";
 import { generateUniqueArticleSlug } from "../utils/uniqueArticleSlug.js";
 import { writeAuditLog } from "../utils/auditLog.js";
 import type { AuthRequest } from "../middlewares/auth.middleware.js";
@@ -259,7 +259,6 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
 
     try {
       const siteUrl = process.env.CLIENT_URL ?? "https://scripthive.org";
-      const journalAbbr = ((submission.journal as unknown as {abbr?: string})?.abbr ?? submission.journalId).toLowerCase();
       const articlePageUrl = articleSlug
         ? `${siteUrl}/article/${encodeURIComponent(articleSlug)}`
         : undefined;
@@ -267,9 +266,18 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
         ? `${_month} ${year}`
         : new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
       const journalIssn = (submission.journal as unknown as { issn?: string | null })?.issn ?? "";
-      await sendArticlePublishedEmail(
-        submission.authorEmail,
-        authorName || submission.authorName,
+      const baseCertId = `SH-${year}-${(_refNo ?? submissionId).slice(-4).toUpperCase()}`;
+
+      const coAuthorList = submission.coAuthors
+        ? (submission.coAuthors as string).split(/[,;]/).map((s: string) => s.trim()).filter(Boolean)
+        : [];
+      const authors = [
+        { name: authorName || submission.authorName, email: submission.authorEmail },
+        ...coAuthorList.map((n: string) => ({ name: n, email: "" }))
+      ];
+
+      await sendArticlePublishedEmailToAllAuthors(
+        authors,
         title || submission.title,
         assignDoi ? (finalDoiLink ?? "") : "",
         submission.journal?.name ?? "",
@@ -279,7 +287,7 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
           issue,
           pubDate: pubDateStr,
           issn: journalIssn,
-          certId: `SH-${year}-${_refNo ?? submissionId.slice(-3)}`
+          baseCertId
         }
       );
     } catch (err) {

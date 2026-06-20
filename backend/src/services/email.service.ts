@@ -443,7 +443,6 @@ export const sendArticlePublishedEmail = async (
         certId: certData.certId
       });
     } catch (e) {
-      // Non-blocking — send email without certificate if PDF fails
       console.warn("[Certificate] PDF generation failed:", e instanceof Error ? e.message : e);
     }
   }
@@ -454,4 +453,76 @@ export const sendArticlePublishedEmail = async (
     html: baseTemplate("Article Published", `Your article "${title}" is now published.`, body),
     ...(certPdf ? { attachments: [{ filename: "Publication_Certificate.pdf", content: certPdf, contentType: "application/pdf" }] } : {})
   });
+};
+
+/* ── Article published — send to ALL authors, each gets own certificate ─────── */
+export const sendArticlePublishedEmailToAllAuthors = async (
+  authors: { name: string; email: string }[],
+  title: string,
+  doiLink: string,
+  journalName: string,
+  articlePageUrl?: string,
+  certBase?: {
+    volume: string;
+    issue: string;
+    pubDate: string;
+    issn: string;
+    baseCertId: string;
+  }
+): Promise<void> => {
+  const viewUrl = articlePageUrl || doiLink;
+
+  for (let i = 0; i < authors.length; i++) {
+    const author = authors[i]!;
+    if (!author.email) continue;
+
+    const certId = certBase
+      ? (i === 0 ? certBase.baseCertId : `${certBase.baseCertId}-${i}`)
+      : undefined;
+
+    const body = `
+      ${greeting(author.name)}
+      <div style="text-align:center;margin:0 0 24px;">${badge("🌟 Now Published", "#2563eb", "#eff6ff")}</div>
+      <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
+        Congratulations! Your manuscript has been <strong>officially published</strong>${journalName ? ` in <strong>${journalName}</strong>` : ""} and is now available online for the global research community.
+      </p>
+      ${infoCard([
+        ["Manuscript", title],
+        ["Journal", journalName || "ScriptHive Journal"],
+        ["Status", "Published"],
+        ...(doiLink ? [["DOI", `<a href="${doiLink}" style="color:#2563eb;">${doiLink}</a>`] as [string, string]] : []),
+      ])}
+      ${viewUrl ? ctaButton("📖 View Published Article", viewUrl) : ""}
+      ${divider()}
+      <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">
+        Share your published article with your network. Thank you for contributing to open-access research with ScriptHive.
+      </p>
+    `;
+
+    let certPdf: Buffer | null = null;
+    if (certBase && certId) {
+      try {
+        const { generateCertificatePdf } = await import("./certificate.service.js");
+        certPdf = await generateCertificatePdf({
+          authorName: author.name,
+          paperTitle: title,
+          journalName,
+          volume: certBase.volume,
+          issue: certBase.issue,
+          pubDate: certBase.pubDate,
+          issn: certBase.issn,
+          certId
+        });
+      } catch (e) {
+        console.warn("[Certificate] PDF generation failed for", author.name, ":", e instanceof Error ? e.message : e);
+      }
+    }
+
+    await sendMail({
+      to: author.email,
+      subject: `🌟 Your Article is Published — ${title}`,
+      html: baseTemplate("Article Published", `Your article "${title}" is now published.`, body),
+      ...(certPdf ? { attachments: [{ filename: `Publication_Certificate_${author.name.replace(/\s+/g, "_")}.pdf`, content: certPdf, contentType: "application/pdf" }] } : {})
+    });
+  }
 };
