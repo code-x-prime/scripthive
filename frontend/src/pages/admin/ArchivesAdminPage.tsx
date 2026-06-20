@@ -1,7 +1,7 @@
 import { fmtDate } from "@/utils/formatDate";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { ChevronDown, ChevronRight, Download, ExternalLink, FileText, Globe } from "lucide-react";
+import { ChevronDown, ChevronRight, Download, ExternalLink, FileText, Globe, Upload } from "lucide-react";
 import { Link } from "react-router-dom";
 import { apiJson } from "@/services/api";
 import type { Submission } from "@/types";
@@ -185,7 +185,7 @@ export const ArchivesAdminPage = () => {
 
                         <div className="space-y-5">
                           {g.articles.map((a, idx) => (
-                            <ArticleCard key={a.id} article={a} sno={idx + 1} journalAbbr={j.journalId} group={g} />
+                            <ArticleCard key={a.id} article={a} sno={idx + 1} journalAbbr={j.journalId} group={g} onReload={load} />
                           ))}
                         </div>
                       </div>
@@ -199,7 +199,7 @@ export const ArchivesAdminPage = () => {
                         </div>
                         <div className="space-y-5">
                           {j.ungrouped.map((a, idx) => (
-                            <ArticleCard key={a.id} article={a} sno={idx + 1} journalAbbr={j.journalId} group={null} />
+                            <ArticleCard key={a.id} article={a} sno={idx + 1} journalAbbr={j.journalId} group={null} onReload={load} />
                           ))}
                         </div>
                       </div>
@@ -219,14 +219,36 @@ function ArticleCard({
   article: a,
   sno,
   journalAbbr,
-  group
+  group,
+  onReload
 }: {
   article: Submission;
   sno: number;
   journalAbbr: string;
   group: VolumeIssueGroup | null;
+  onReload: () => void;
 }) {
   const authors = submissionAuthorsDisplay(a);
+  const [replacing, setReplacing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleReplacePdf(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setReplacing(true);
+    try {
+      const fd = new FormData();
+      fd.append("pdf", file);
+      const res = await fetch(`/api/submissions/${a.id}/replace-pdf`, { method: "POST", body: fd });
+      if (!res.ok) throw new Error((await res.json()).message ?? "Upload failed");
+      toast.success("PDF replaced successfully");
+      onReload();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setReplacing(false);
+    }
+  }
 
   const citation = group
     ? `${journalAbbr}., ${group.volYear}; ${group.volNum}(${group.issueNum}): ${padPage(a.pageStart)}-${padPage(a.pageEnd)}`
@@ -313,6 +335,12 @@ function ArticleCard({
                 PDF
               </a>
             ) : null}
+
+            <label className={`inline-flex cursor-pointer items-center gap-1 font-medium text-orange-600 hover:text-orange-800 ${replacing ? "opacity-50 pointer-events-none" : ""}`}>
+              <Upload className="h-3.5 w-3.5" />
+              {replacing ? "Uploading…" : "Replace PDF"}
+              <input ref={fileInputRef} type="file" accept=".pdf" className="hidden" onChange={handleReplacePdf} />
+            </label>
 
             {publicArticleUrl ? (
               <Link

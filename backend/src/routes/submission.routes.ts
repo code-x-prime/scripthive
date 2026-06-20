@@ -10,6 +10,7 @@ import {
   getSubmission,
   listPublishedArticles,
   listSubmissions,
+  replacePdf,
   trackSubmission,
   updatePriority,
   updateProductionStatus,
@@ -81,3 +82,4 @@ submissionRouter.put("/:id/status", requireAuth, requirePermission("submissions"
 submissionRouter.put("/:id/review-notes", requireAuth, requirePermission("submissions", "write"), updateReviewNotes);
 submissionRouter.delete("/:id", requireAuth, requirePermission("submissions", "delete"), deleteSubmission);
 submissionRouter.put("/:id/priority", requireAuth, requirePermission("submissions", "write"), updatePriority);
+submissionRouter.post("/:id/replace-pdf", requireAuth, requirePermission("submissions", "write"), upload.single("pdf"), replacePdf);

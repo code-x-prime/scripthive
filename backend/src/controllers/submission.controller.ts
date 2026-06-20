@@ -460,6 +460,28 @@ export const downloadProductionFile = async (req: Request, res: Response): Promi
   res.download(abs, path.basename(abs));
 };
 
+export const replacePdf = async (req: Request, res: Response): Promise<void> => {
+  const id = String(req.params.id);
+  if (!req.file) { res.status(400).json({ message: "No file uploaded" }); return; }
+  const r2Key = `articles/${id}.pdf`;
+  let stored: string;
+  try {
+    stored = await uploadToR2(req.file.path, r2Key, "application/pdf");
+  } catch {
+    stored = req.file.path.replace(/\\/g, "/");
+  }
+  await prisma.submission.update({ where: { id }, data: { pdfPublicPath: stored } });
+  void writeAuditLog({
+    adminId: (req as AuthRequest).admin?.adminId,
+    action: "replace_pdf",
+    resource: "submission",
+    resourceId: id,
+    details: { stored },
+    ipAddress: req.ip
+  });
+  res.json({ success: true, pdfPublicPath: stored });
+};
+
 // Sample journal template download — serves uploads/samples/<journalId>.docx (or .pdf)
 export const downloadSample = async (req: Request, res: Response): Promise<void> => {
   const id = String(req.params.id);
