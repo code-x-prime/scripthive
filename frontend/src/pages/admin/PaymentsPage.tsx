@@ -2,7 +2,7 @@ import { fmtDate } from "@/utils/formatDate";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Download, FileText, Mail, Plus, Search, Send, Star, X } from "lucide-react";
+import { ArrowDownUp, Download, FileText, Mail, Plus, Search, Send, Star, X } from "lucide-react";
 import { apiJson } from "@/services/api";
 import { paymentService } from "@/services/payment.service";
 import { apcAmountForCurrency } from "@/utils/apcAmounts";
@@ -58,6 +58,19 @@ export const PaymentsPage = () => {
   // inline amount editing state: invoiceId -> draft value
   const [editingAmount, setEditingAmount] = useState<Record<string, string>>({});
 
+  // filter & sort state
+  const [filterCurrency, setFilterCurrency] = useState<"ALL" | "INR" | "USD">("ALL");
+  const [filterMethod, setFilterMethod] = useState("ALL");
+  const [filterDateFrom, setFilterDateFrom] = useState("");
+  const [filterDateTo, setFilterDateTo] = useState("");
+  const [sortField, setSortField] = useState<"date" | "amount" | "id" | "name">("date");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
+  const toggleSort = (field: typeof sortField) => {
+    if (sortField === field) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortField(field); setSortDir("desc"); }
+  };
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -83,16 +96,52 @@ export const PaymentsPage = () => {
 
   const tableRows = useMemo(() => {
     const q = search.trim().toLowerCase();
+    const fromTs = filterDateFrom ? new Date(filterDateFrom).getTime() : null;
+    const toTs = filterDateTo ? new Date(filterDateTo + "T23:59:59").getTime() : null;
+
     const filtered = invoices
       .filter((i) => isCompleted ? i.status === "Paid" : (i.status === "Draft" || i.status === "Pending"))
       .filter((i) => !q || (
+        i.id?.toLowerCase().includes(q) ||
         i.submissionId?.toLowerCase().includes(q) ||
         i.submission?.title?.toLowerCase().includes(q) ||
         i.customerName?.toLowerCase().includes(q) ||
-        i.customerEmail?.toLowerCase().includes(q)
-      ));
-    return [...filtered].sort((a, b) => (b.submission?.priority ? 1 : 0) - (a.submission?.priority ? 1 : 0));
-  }, [invoices, isCompleted, search]);
+        i.customerEmail?.toLowerCase().includes(q) ||
+        i.gatewayPayId?.toLowerCase().includes(q) ||
+        i.method?.toLowerCase().includes(q)
+      ))
+      .filter((i) => filterCurrency === "ALL" || i.currency === filterCurrency)
+      .filter((i) => filterMethod === "ALL" || i.method === filterMethod)
+      .filter((i) => {
+        const ts = new Date(i.paidAt ?? i.createdAt).getTime();
+        if (fromTs && ts < fromTs) return false;
+        if (toTs && ts > toTs) return false;
+        return true;
+      });
+
+    const dir = sortDir === "asc" ? 1 : -1;
+    filtered.sort((a, b) => {
+      // priority always top for pending
+      if (!isCompleted) {
+        const pa = b.submission?.priority ? 1 : 0;
+        const pb = a.submission?.priority ? 1 : 0;
+        if (pa !== pb) return pa - pb;
+      }
+      switch (sortField) {
+        case "id": return dir * a.id.localeCompare(b.id);
+        case "name": return dir * (a.customerName ?? "").localeCompare(b.customerName ?? "");
+        case "amount": return dir * (a.total - b.total);
+        case "date":
+        default: {
+          const da = new Date(a.paidAt ?? a.createdAt).getTime();
+          const db = new Date(b.paidAt ?? b.createdAt).getTime();
+          return dir * (da - db);
+        }
+      }
+    });
+
+    return filtered;
+  }, [invoices, isCompleted, search, filterCurrency, filterMethod, filterDateFrom, filterDateTo, sortField, sortDir]);
 
   const onPriorityToggle = async (submissionId: string, current: boolean) => {
     try {
@@ -308,16 +357,107 @@ export const PaymentsPage = () => {
         </div>
       )}
 
-      {/* Search bar */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search by ID, title, author..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
+      {/* Search + filter bar */}
+      <div className="flex flex-wrap gap-2 items-end">
+        {/* search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search ID, title, author, UTR..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-60 rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+
+        {/* currency filter */}
+        <select
+          value={filterCurrency}
+          onChange={(e) => setFilterCurrency(e.target.value as "ALL" | "INR" | "USD")}
+          className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <option value="ALL">All currencies</option>
+          <option value="INR">INR</option>
+          <option value="USD">USD</option>
+        </select>
+
+        {/* method filter */}
+        <select
+          value={filterMethod}
+          onChange={(e) => setFilterMethod(e.target.value)}
+          className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          <option value="ALL">All methods</option>
+          <option value="UPI">UPI</option>
+          <option value="Cash">Cash</option>
+          <option value="NEFT/RTGS">NEFT/RTGS</option>
+          <option value="Cheque/DD">Cheque/DD</option>
+          <option value="Razorpay">Razorpay</option>
+          <option value="PayPal">PayPal</option>
+          <option value="SMEPay">SMEPay</option>
+          <option value="Other">Other</option>
+        </select>
+
+        {/* date from */}
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[10px] font-semibold uppercase text-gray-400 pl-1">From</span>
+          <input
+            type="date"
+            value={filterDateFrom}
+            onChange={(e) => setFilterDateFrom(e.target.value)}
+            className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+
+        {/* date to */}
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[10px] font-semibold uppercase text-gray-400 pl-1">To</span>
+          <input
+            type="date"
+            value={filterDateTo}
+            onChange={(e) => setFilterDateTo(e.target.value)}
+            className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+
+        {/* sort */}
+        <div className="flex items-center gap-1 ml-1">
+          <ArrowDownUp className="h-3.5 w-3.5 text-gray-400" />
+          <select
+            value={sortField}
+            onChange={(e) => setSortField(e.target.value as typeof sortField)}
+            className="h-9 rounded-lg border border-gray-200 bg-white px-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            <option value="date">Date</option>
+            <option value="amount">Amount</option>
+            <option value="id">Invoice ID</option>
+            <option value="name">Author name</option>
+          </select>
+          <button
+            type="button"
+            onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+            className="h-9 w-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:bg-gray-50"
+            title={sortDir === "asc" ? "Ascending — click for descending" : "Descending — click for ascending"}
+          >
+            {sortDir === "asc" ? "↑" : "↓"}
+          </button>
+        </div>
+
+        {/* clear filters */}
+        {(search || filterCurrency !== "ALL" || filterMethod !== "ALL" || filterDateFrom || filterDateTo) && (
+          <button
+            type="button"
+            onClick={() => { setSearch(""); setFilterCurrency("ALL"); setFilterMethod("ALL"); setFilterDateFrom(""); setFilterDateTo(""); }}
+            className="h-9 rounded-lg border border-red-200 bg-red-50 px-3 text-xs font-medium text-red-700 hover:bg-red-100"
+          >
+            <X className="inline h-3.5 w-3.5 mr-1" />
+            Clear filters
+          </button>
+        )}
+
+        {/* result count */}
+        <span className="ml-auto text-xs text-gray-400 self-center">{tableRows.length} result{tableRows.length !== 1 ? "s" : ""}</span>
       </div>
 
       {loading ? (
@@ -336,13 +476,31 @@ export const PaymentsPage = () => {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <th className="px-3 py-3"></th>
-                {isCompleted && <th className="px-3 py-3">Invoice No.</th>}
+                {isCompleted && (
+                  <th className="px-3 py-3">
+                    <button type="button" onClick={() => toggleSort("id")} className="flex items-center gap-1 hover:text-gray-800">
+                      Invoice No. {sortField === "id" ? (sortDir === "asc" ? "↑" : "↓") : <ArrowDownUp className="h-3 w-3 opacity-40" />}
+                    </button>
+                  </th>
+                )}
                 <th className="px-3 py-3">Submission ID</th>
-                <th className="px-3 py-3">Customer</th>
-                <th className="px-3 py-3">Amount</th>
+                <th className="px-3 py-3">
+                  <button type="button" onClick={() => toggleSort("name")} className="flex items-center gap-1 hover:text-gray-800">
+                    Customer {sortField === "name" ? (sortDir === "asc" ? "↑" : "↓") : <ArrowDownUp className="h-3 w-3 opacity-40" />}
+                  </button>
+                </th>
+                <th className="px-3 py-3">
+                  <button type="button" onClick={() => toggleSort("amount")} className="flex items-center gap-1 hover:text-gray-800">
+                    Amount {sortField === "amount" ? (sortDir === "asc" ? "↑" : "↓") : <ArrowDownUp className="h-3 w-3 opacity-40" />}
+                  </button>
+                </th>
                 {isCompleted && <th className="px-3 py-3">Payment Method</th>}
                 {isCompleted && <th className="px-3 py-3">UTR / Ref</th>}
-                <th className="px-3 py-3">Date</th>
+                <th className="px-3 py-3">
+                  <button type="button" onClick={() => toggleSort("date")} className="flex items-center gap-1 hover:text-gray-800">
+                    Date {sortField === "date" ? (sortDir === "asc" ? "↑" : "↓") : <ArrowDownUp className="h-3 w-3 opacity-40" />}
+                  </button>
+                </th>
                 <th className="px-3 py-3">Status</th>
                 <th className="px-3 py-3 text-right">Actions</th>
               </tr>
@@ -389,7 +547,7 @@ export const PaymentsPage = () => {
                         {inv.total} <span className="text-xs font-semibold text-gray-500">{inv.currency}</span>
                       </span>
                     )}
-                    {!editingAmount[inv.id] && Array.isArray(inv.items) && (inv.items as {description:string;amount:number}[]).length > 0 && (
+                    {Array.isArray(inv.items) && (inv.items as {description:string;amount:number}[]).length > 0 && (
                       <div className="mt-0.5 space-y-0.5">
                         {(inv.items as {description:string;amount:number}[]).map((item, i) => (
                           <p key={i} className="text-xs text-gray-400 whitespace-nowrap">{item.description}: {inv.currency === "INR" ? "₹" : "$"}{item.amount}</p>
