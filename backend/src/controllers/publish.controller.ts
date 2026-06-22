@@ -245,6 +245,11 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
     const updated = await prisma.submission.update({
       where: { id: submissionId },
       data: {
+        title: title || submission.title,
+        authorName: authorName || submission.authorName,
+        abstract: _abstract || submission.abstract,
+        keywords: _keywords || submission.keywords,
+        country: _country || submission.country,
         status: "Published",
         partId: partRecord.id,
         volumeId: volumeRecord.id,
