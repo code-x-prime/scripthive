@@ -39,14 +39,14 @@ body{margin:0;padding:0;background:#ffffff;font-family:"Georgia","Times New Roma
 .detail-box{border:1px solid #d6c08b;padding:8px 6px;background:rgba(248,246,239,0.75);border-radius:6px;}
 .detail-label{font-size:10px;text-transform:uppercase;color:#6b7280;letter-spacing:0.7px;margin-bottom:4px;}
 .detail-value{font-size:13px;font-weight:bold;color:#17233c;}
-.verification-text{width:82%;margin:12px auto 0;font-size:14px;line-height:1.45;color:#4b5563;}
-.footer{display:grid;grid-template-columns:1fr 120px 1fr;align-items:end;gap:20px;margin-top:10px;}
+.verification-text{width:82%;margin:8px auto 0;font-size:13px;line-height:1.4;color:#4b5563;}
+.footer{display:grid;grid-template-columns:1fr 100px 1fr;align-items:end;gap:12px;margin-top:8px;}
 .signature-block{text-align:center;font-family:Arial,sans-serif;}
-.signature-line{border-top:1.5px solid #102a56;width:68%;margin:0 auto 6px;height:1px;}
-.signature-title{font-size:13px;font-weight:bold;color:#102a56;}
-.signature-subtitle{font-size:12px;color:#6b7280;margin-top:2px;}
-.seal{width:110px;height:110px;display:flex;align-items:center;justify-content:center;margin:0 auto;}
-.website{position:absolute;bottom:9mm;left:0;right:0;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#6b7280;z-index:4;}
+.signature-line{border-top:1.5px solid #102a56;width:68%;margin:0 auto 4px;height:1px;}
+.signature-title{font-size:12px;font-weight:bold;color:#102a56;}
+.signature-subtitle{font-size:11px;color:#6b7280;margin-top:2px;}
+.seal{width:90px;height:90px;display:flex;align-items:center;justify-content:center;margin:0 auto;}
+.website{text-align:center;font-family:Arial,sans-serif;font-size:11px;color:#6b7280;margin-top:4px;}
 .certificate-wrapper::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:0.08;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='90'%3E%3Ctext x='5' y='55' transform='rotate(-35 70 45)' fill='black' font-size='18' font-family='Arial' font-weight='bold'%3EScriptHive Publication%3C/text%3E%3C/svg%3E");background-repeat:repeat;background-size:140px 90px;}
 `;
 
@@ -84,23 +84,23 @@ function buildCertBlock(d: CertificateData): string {
     </div>
     <div class="footer">
       <div class="signature-block">
-        <img src="${SIGN_B64}" style="height:62px;max-width:160px;object-fit:contain;display:block;margin:0 auto 4px;filter:brightness(0.1) saturate(2);" />
+        <img src="${SIGN_B64}" style="height:48px;max-width:130px;object-fit:contain;display:block;margin:0 auto 4px;filter:brightness(0.1) saturate(2);" />
         <div class="signature-line"></div>
         <div class="signature-title">Editor-in-Chief</div>
         <div class="signature-subtitle">ScriptHive Publication</div>
       </div>
       <div class="seal">
-        <img src="${LOGO_B64}" style="width:110px;height:110px;object-fit:contain;" />
+        <img src="${LOGO_B64}" style="width:90px;height:90px;object-fit:contain;" />
       </div>
       <div class="signature-block">
-        <img src="${JYOTI_B64}" style="height:62px;max-width:160px;object-fit:contain;display:block;margin:0 auto 4px;filter:brightness(0.1) saturate(2);" />
+        <img src="${JYOTI_B64}" style="height:48px;max-width:130px;object-fit:contain;display:block;margin:0 auto 4px;filter:brightness(0.1) saturate(2);" />
         <div class="signature-line"></div>
         <div class="signature-title">Publisher</div>
         <div class="signature-subtitle">ScriptHive Publication</div>
       </div>
     </div>
+    <div class="website">www.scripthive.org | Certificate issued for academic publication record</div>
   </div>
-  <div class="website">www.scripthive.org | Certificate issued for academic publication record</div>
 </div>`;
 }
 

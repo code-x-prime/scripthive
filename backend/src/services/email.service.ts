@@ -456,6 +456,13 @@ export const sendArticlePublishedEmail = async (
 };
 
 /* ── Article published — send to ALL authors, each gets own certificate ─────── */
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, "").replace(/&[a-z]+;/gi, (m) => {
+    const map: Record<string, string> = { "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'" };
+    return map[m] ?? m;
+  }).trim();
+}
+
 export const sendArticlePublishedEmailToAllAuthors = async (
   authors: { name: string; email: string }[],
   title: string,
@@ -470,6 +477,7 @@ export const sendArticlePublishedEmailToAllAuthors = async (
     baseCertId: string;
   }
 ): Promise<void> => {
+  const plainTitle = stripHtml(title);
   const viewUrl = articlePageUrl || doiLink;
 
   for (let i = 0; i < authors.length; i++) {
@@ -505,7 +513,7 @@ export const sendArticlePublishedEmailToAllAuthors = async (
         const { generateCertificatePdf } = await import("./certificate.service.js");
         certPdf = await generateCertificatePdf({
           authorName: author.name,
-          paperTitle: title,
+          paperTitle: plainTitle,
           journalName,
           volume: certBase.volume,
           issue: certBase.issue,
@@ -520,8 +528,8 @@ export const sendArticlePublishedEmailToAllAuthors = async (
 
     await sendMail({
       to: author.email,
-      subject: `🌟 Your Article is Published — ${title}`,
-      html: baseTemplate("Article Published", `Your article "${title}" is now published.`, body),
+      subject: `🌟 Your Article is Published — ${plainTitle}`,
+      html: baseTemplate("Article Published", `Your article "${plainTitle}" is now published.`, body),
       ...(certPdf ? { attachments: [{ filename: `Publication_Certificate_${author.name.replace(/\s+/g, "_")}.pdf`, content: certPdf, contentType: "application/pdf" }] } : {})
     });
   }
