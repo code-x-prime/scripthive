@@ -60,7 +60,7 @@ export const PublishArticlePage = () => {
   const inlineEditorConfig = useMemo(() => ({
     readonly: false, height: 80,
     toolbarButtonSize: "small" as const,
-    buttons: ["bold","italic","underline","superscript","subscript","|","undo","redo"],
+    buttons: ["bold","italic","underline","fontsize","brush","align","superscript","subscript","|","undo","redo"],
     removeButtons: ["file","video","image","speechRecognize","spellcheck","source"],
     showXPathInStatusbar: false, showCharsCounter: false, showWordsCounter: false,
     askBeforePasteHTML: false, askBeforePasteFromWord: false,
@@ -72,7 +72,7 @@ export const PublishArticlePage = () => {
     readonly: false, height: 300,
     placeholder: "Enter article abstract here...",
     toolbarButtonSize: "small" as const,
-    buttons: ["bold","italic","underline","strikethrough","|","ul","ol","|","outdent","indent","|","superscript","subscript","|","link","|","undo","redo","|","eraser","copyformat"],
+    buttons: ["bold","italic","underline","strikethrough","|","fontsize","brush","align","|","ul","ol","|","outdent","indent","|","superscript","subscript","|","table","link","|","undo","redo","|","eraser","copyformat"],
     removeButtons: ["file","video","image","speechRecognize","spellcheck"],
     showXPathInStatusbar: false, showCharsCounter: false, showWordsCounter: false,
     askBeforePasteHTML: false, askBeforePasteFromWord: false,
@@ -201,9 +201,15 @@ export const PublishArticlePage = () => {
 
   const onPublish = async () => {
     if (!submissionId) { toast.error("Select an approved submission first"); return; }
-    if (!form.title)   { toast.error("Article title is required"); return; }
-    if (!form.authorName) { toast.error("Author name is required"); return; }
-    if (!form.abstract || form.abstract.replace(/<[^>]*>/g, "").trim().length === 0) { toast.error("Abstract is required"); return; }
+    
+    // Read directly from Jodit refs to guarantee we capture the latest input even if onBlur hasn't fired yet
+    const latestTitle = (titleEditorRef.current as any)?.value || form.title;
+    const latestAuthor = (authorEditorRef.current as any)?.value || form.authorName;
+    const latestAbstract = (editorRef.current as any)?.value || form.abstract;
+
+    if (!latestTitle)   { toast.error("Article title is required"); return; }
+    if (!latestAuthor) { toast.error("Author name is required"); return; }
+    if (!latestAbstract || latestAbstract.replace(/<[^>]*>/g, "").trim().length === 0) { toast.error("Abstract is required"); return; }
     if (!form.volumeId) { toast.error("Volume is required"); return; }
     if (!form.issueId)  { toast.error("Issue is required"); return; }
     if (!form.partId)   { toast.error("Part is required"); return; }
@@ -222,9 +228,9 @@ export const PublishArticlePage = () => {
     try {
       const fd = new window.FormData();
       fd.append("submissionId", submissionId);
-      fd.append("title",        form.title);
-      fd.append("authorName",   form.authorName);
-      fd.append("abstract",     form.abstract);
+      fd.append("title",        latestTitle);
+      fd.append("authorName",   latestAuthor);
+      fd.append("abstract",     latestAbstract);
       fd.append("keywords",     form.keywords);
       fd.append("subject",      form.subject);
       fd.append("country",      form.country);
