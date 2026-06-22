@@ -54,8 +54,6 @@ export const PublishArticlePage = () => {
   const [publishing, setPublishing]   = useState(false);
 
   const editorRef = useRef(null);
-  const titleEditorRef = useRef(null);
-  const authorEditorRef = useRef(null);
 
   const inlineEditorConfig = useMemo(() => ({
     readonly: false, height: 80,
@@ -202,9 +200,8 @@ export const PublishArticlePage = () => {
   const onPublish = async () => {
     if (!submissionId) { toast.error("Select an approved submission first"); return; }
     
-    // Read directly from Jodit refs to guarantee we capture the latest input even if onBlur hasn't fired yet
-    const latestTitle = (titleEditorRef.current as any)?.value || form.title;
-    const latestAuthor = (authorEditorRef.current as any)?.value || form.authorName;
+    const latestTitle = form.title;
+    const latestAuthor = form.authorName;
     const latestAbstract = (editorRef.current as any)?.value || form.abstract;
 
     if (!latestTitle)   { toast.error("Article title is required"); return; }
@@ -341,18 +338,24 @@ export const PublishArticlePage = () => {
         <div className="space-y-5 p-6">
           <div>
             <label className={labelClass}>Article Title <span className="text-red-400">*</span></label>
-            <div className="overflow-hidden rounded-lg border border-slate-200">
-              <JoditEditor ref={titleEditorRef} value={form.title} config={{...inlineEditorConfig, placeholder: "Enter full article title"}}
-                onBlur={(c: string) => setField("title", c)} />
-            </div>
+            <textarea
+              value={form.title}
+              onChange={(e) => setField("title", e.target.value)}
+              placeholder="Enter full article title"
+              rows={2}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 resize-none"
+            />
           </div>
 
           <div>
             <label className={labelClass}>Author Name <span className="text-red-400">*</span></label>
-            <div className="overflow-hidden rounded-lg border border-slate-200">
-              <JoditEditor ref={authorEditorRef} value={form.authorName} config={{...inlineEditorConfig, placeholder: "Author names separated by comma"}}
-                onBlur={(c: string) => setField("authorName", c)} />
-            </div>
+            <input
+              type="text"
+              value={form.authorName}
+              onChange={(e) => setField("authorName", e.target.value)}
+              placeholder="Author names separated by comma"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            />
           </div>
 
           <div>

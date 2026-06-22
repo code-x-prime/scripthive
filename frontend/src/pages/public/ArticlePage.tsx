@@ -62,8 +62,8 @@ export const ArticlePage = () => {
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-green-700">{vi.label}</p>
             ) : null}
 
-            <h1 className="font-display text-2xl font-bold leading-snug text-gray-900">{data.article.title}</h1>
-            <p className="mt-3 text-gray-700">{data.article.authorName}</p>
+            <h1 className="font-display text-2xl font-bold leading-snug text-gray-900" dangerouslySetInnerHTML={{ __html: data.article.title }} />
+            <p className="mt-3 text-gray-700" dangerouslySetInnerHTML={{ __html: data.article.authorName }} />
 
             <dl className="mt-6 grid gap-3 border-t border-gray-100 pt-6 text-sm sm:grid-cols-2">
               {data.article.pages ? (
