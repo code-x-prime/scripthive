@@ -55,17 +55,6 @@ export const PublishArticlePage = () => {
 
   const editorRef = useRef(null);
 
-  const inlineEditorConfig = useMemo(() => ({
-    readonly: false, height: 80,
-    toolbarButtonSize: "small" as const,
-    buttons: ["bold","italic","underline","fontsize","brush","align","superscript","subscript","|","undo","redo"],
-    removeButtons: ["file","video","image","speechRecognize","spellcheck","source"],
-    showXPathInStatusbar: false, showCharsCounter: false, showWordsCounter: false,
-    askBeforePasteHTML: false, askBeforePasteFromWord: false,
-    defaultActionOnPaste: "insert_clear_html" as const,
-    style: { background: "#ffffff", color: "#0f172a", fontSize: "14px", fontFamily: "Poppins, sans-serif" }
-  }), []);
-
   const joditConfig = useMemo(() => ({
     readonly: false, height: 300,
     placeholder: "Enter article abstract here...",
