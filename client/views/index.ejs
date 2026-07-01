@@ -1,1709 +1,1461 @@
 <%- include('partials/header') %>
 
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
-<style>
-  :root {
-    --primary: #2563eb;
-    --primary-dark: #1e40af;
-    --navy: #0f172a;
-    --gold: #fbbf24;
-    --gold-light: #fef08a;
-    --bg-light: #f8fafc;
-    --text-dark: #1e293b;
-    --text-muted: #64748b;
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-  }
-
-  body {
-    background-color: var(--bg-light);
-    font-family: "Inter", sans-serif;
-    overflow-x: hidden;
-  }
-
-  /* Utility Classes */
-  .section-padding {
-    padding: 100px 20px;
-  }
-
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 2;
-  }
-
-  .section-title {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--text-dark);
-    margin-bottom: 20px;
-    text-align: center;
-    line-height: 1.2;
-  }
-
-  .section-title.light {
-    color: white;
-  }
-
-  .section-subtitle {
-    font-size: 1.2rem;
-    color: var(--text-muted);
-    line-height: 1.6;
-    max-width: 800px;
-    margin: 0 auto 50px;
-    text-align: center;
-  }
-
-  .section-subtitle.light {
-    color: #cbd5e1;
-  }
-
-  .glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    box-shadow: var(--glass-shadow);
-    padding: 40px;
-    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .glass-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    border-color: rgba(37, 99, 235, 0.3);
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 15px 30px;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    text-decoration: none;
-    transition: 0.3s;
-    cursor: pointer;
-    border: none;
-  }
-
-  .btn-primary {
-    background: linear-gradient(
-      135deg,
-      var(--primary) 0%,
-      var(--primary-dark) 100%
-    );
-    color: white;
-    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4);
-    color: white;
-  }
-
-  .btn-white {
-    background: white;
-    color: var(--primary);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  }
-
-  .btn-white:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-  }
-
-  .btn-outline-white {
-    border: 2px solid white;
-    color: white;
-    background: transparent;
-  }
-
-  .btn-outline-white:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    transform: translateY(-3px);
-  }
-
-  /* Hero Section */
-  .hero-section {
-    position: relative;
-    background: var(--navy);
-    color: white;
-    padding: 180px 20px 150px;
-    overflow: hidden;
-    min-height: 90vh;
-    display: flex;
-    align-items: center;
-  }
-
-  .hero-mesh {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background:
-      radial-gradient(
-        circle at 20% 40%,
-        rgba(37, 99, 235, 0.3) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        circle at 80% 70%,
-        rgba(251, 191, 36, 0.15) 0%,
-        transparent 50%
-      );
-    animation: meshPulse 10s infinite alternate ease-in-out;
-  }
-
-  @keyframes meshPulse {
-    0% {
-      transform: scale(1);
-      opacity: 0.8;
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --navy: #0f172a;
+      --gold: #fbbf24;
+      --gold-light: #fef08a;
+      --bg-light: #f8fafc;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.5);
+      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
     }
 
-    100% {
-      transform: scale(1.1);
-      opacity: 1;
-    }
-  }
-
-  .hero-particles {
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(
-      rgba(255, 255, 255, 0.1) 1px,
-      transparent 1px
-    );
-    background-size: 30px 30px;
-    opacity: 0.3;
-  }
-
-  .hero-grid {
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 60px;
-    align-items: center;
-  }
-
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 8px 16px;
-    border-radius: 30px;
-    font-size: 0.9rem;
-    margin-bottom: 25px;
-    backdrop-filter: blur(10px);
-    color: var(--gold-light);
-    font-weight: 600;
-  }
-
-  .hero-title {
-    font-size: 4.5rem;
-    font-weight: 900;
-    line-height: 1.1;
-    margin-bottom: 25px;
-    background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .hero-title em {
-    font-style: normal;
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .hero-subtitle {
-    font-size: 1.25rem;
-    color: #94a3b8;
-    line-height: 1.6;
-    margin-bottom: 40px;
-    font-weight: 400;
-    max-width: 600px;
-  }
-
-  .hero-buttons {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-
-  /* Hero Visual 3D */
-  .hero-visual {
-    position: relative;
-    height: 500px;
-    perspective: 1000px;
-  }
-
-  .hero-floating-card {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
-  }
-
-  .hc-main {
-    width: 320px;
-    top: 50px;
-    left: 50px;
-    z-index: 2;
-    animation: floatObj 6s infinite alternate ease-in-out;
-    border-top: 4px solid var(--primary);
-  }
-
-  .hc-small-1 {
-    width: 200px;
-    top: -10px;
-    right: 20px;
-    z-index: 1;
-    animation: floatObj 5s infinite alternate-reverse ease-in-out;
-    background: rgba(37, 99, 235, 0.1);
-    border-color: rgba(37, 99, 235, 0.3);
-  }
-
-  .hc-small-2 {
-    width: 220px;
-    bottom: 40px;
-    right: 40px;
-    z-index: 3;
-    animation: floatObj 7s infinite alternate ease-in-out;
-    border-left: 4px solid var(--gold);
-  }
-
-  .mock-graph {
-    height: 80px;
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    margin-top: 20px;
-  }
-
-  .mock-bar {
-    background: var(--primary);
-    width: 100%;
-    border-radius: 4px;
-    animation: barGrow 2s ease-out forwards;
-  }
-
-  .mock-bar:nth-child(1) {
-    height: 40%;
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  .mock-bar:nth-child(2) {
-    height: 60%;
-    background: rgba(255, 255, 255, 0.4);
-  }
-
-  .mock-bar:nth-child(3) {
-    height: 100%;
-    background: var(--gold);
-  }
-
-  @keyframes floatObj {
-    0% {
-      transform: translateY(0) rotateX(5deg) rotateY(-5deg);
+    body {
+      background-color: var(--bg-light);
+      font-family: "Inter", sans-serif;
+      overflow-x: hidden;
     }
 
-    100% {
-      transform: translateY(-20px) rotateX(0deg) rotateY(0deg);
-    }
-  }
-
-  @keyframes barGrow {
-    0% {
-      transform: scaleY(0);
-      transform-origin: bottom;
+    /* Utility Classes */
+    .section-padding {
+      padding: 100px 20px;
     }
 
-    100% {
-      transform: scaleY(1);
-      transform-origin: bottom;
-    }
-  }
-
-  /* Stats Section */
-  .stats-section {
-    margin-top: -60px;
-    position: relative;
-    z-index: 10;
-    padding: 0 20px;
-  }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
-    background: white;
-    padding: 30px;
-    border-radius: 24px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--glass-border);
-  }
-
-  .stat-item {
-    text-align: center;
-    padding: 20px;
-    border-right: 1px solid #e2e8f0;
-    transition: 0.3s;
-  }
-
-  .stat-item:last-child {
-    border-right: none;
-  }
-
-  .stat-item:hover {
-    transform: translateY(-5px);
-  }
-
-  .stat-icon {
-    font-size: 2rem;
-    color: var(--primary);
-    margin-bottom: 15px;
-  }
-
-  .stat-title {
-    font-weight: 800;
-    font-size: 1.1rem;
-    color: var(--text-dark);
-    margin-bottom: 5px;
-  }
-
-  .stat-desc {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-  }
-
-  /* About Section */
-  .about-split {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
-  }
-
-  .about-content h2 {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--text-dark);
-    margin-bottom: 25px;
-    line-height: 1.2;
-  }
-
-  .about-content p {
-    font-size: 1.15rem;
-    color: var(--text-muted);
-    line-height: 1.7;
-    margin-bottom: 20px;
-  }
-
-  .feature-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin: 30px 0;
-  }
-
-  .feature-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    color: var(--text-dark);
-  }
-
-  .feature-item i {
-    color: #10b981;
-    font-size: 1.2rem;
-    background: rgba(16, 185, 129, 0.1);
-    padding: 8px;
-    border-radius: 50%;
-  }
-
-  .about-visual {
-    position: relative;
-    height: 500px;
-  }
-
-  .av-main {
-    width: 100%;
-    height: 100%;
-    border-radius: 30px;
-    object-fit: cover;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
-  }
-
-  .av-card {
-    position: absolute;
-    bottom: 40px;
-    left: -40px;
-    background: white;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    animation: floatCard 4s infinite alternate;
-    border: 1px solid var(--glass-border);
-  }
-
-  .av-card-icon {
-    width: 60px;
-    height: 60px;
-    background: var(--primary);
-    color: white;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-  }
-
-  @keyframes floatCard {
-    0% {
-      transform: translateY(0);
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
     }
 
-    100% {
-      transform: translateY(-15px);
-    }
-  }
-
-  /* Mission & Vision */
-  .mv-section {
-    background: var(--navy);
-    color: white;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .mv-mesh {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      circle at 50% 50%,
-      rgba(37, 99, 235, 0.2) 0%,
-      transparent 70%
-    );
-  }
-
-  .mv-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-  }
-
-  .mv-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 50px;
-    border-radius: 24px;
-    position: relative;
-    overflow: hidden;
-    transition: 0.4s;
-  }
-
-  .mv-card:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-10px);
-    border-color: rgba(251, 191, 36, 0.3);
-  }
-
-  .mv-icon {
-    font-size: 3rem;
-    color: var(--gold);
-    margin-bottom: 25px;
-  }
-
-  .mv-card h3 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    margin-bottom: 20px;
-  }
-
-  .mv-card p {
-    font-size: 1.15rem;
-    color: #cbd5e1;
-    line-height: 1.7;
-  }
-
-  /* Journals Showcase */
-  .journals-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 30px;
-  }
-
-  .journal-card {
-    background: white;
-    border-radius: 24px;
-    overflow: hidden;
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-    transition: 0.4s;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .journal-card:hover {
-    transform: translateY(-15px);
-    box-shadow: 0 30px 60px rgba(37, 99, 235, 0.1);
-    border-color: var(--primary);
-  }
-
-  .jc-header {
-    padding: 30px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-bottom: 1px solid #e2e8f0;
-    position: relative;
-  }
-
-  .jc-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--navy);
-    line-height: 1.4;
-    margin-bottom: 5px;
-    word-wrap: break-word;
-  }
-
-  .jc-acronym {
-    font-size: 1.05rem;
-    font-weight: 600;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--gold) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    margin-left: 4px;
-  }
-
-  .jc-body {
-    padding: 30px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .jc-desc {
-    color: var(--text-muted);
-    line-height: 1.6;
-    margin-bottom: 20px;
-    flex-grow: 1;
-  }
-
-  .jc-meta {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
-  }
-
-  .meta-tag {
-    background: #f1f5f9;
-    color: var(--text-dark);
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .meta-tag.oa {
-    background: rgba(16, 185, 129, 0.1);
-    color: #059669;
-  }
-
-  .jc-link {
-    color: var(--primary);
-    font-weight: 700;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: 0.3s;
-  }
-
-  .journal-card:hover .jc-link {
-    gap: 10px;
-  }
-
-  /* Services Section */
-  .services-section {
-    background: var(--navy);
-    color: white;
-    position: relative;
-  }
-
-  .srv-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-  }
-
-  .srv-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 35px;
-    transition: 0.4s;
-    backdrop-filter: blur(10px);
-  }
-
-  .srv-card:hover {
-    transform: translateY(-10px);
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary);
-  }
-
-  .srv-icon {
-    width: 60px;
-    height: 60px;
-    background: rgba(37, 99, 235, 0.2);
-    color: var(--primary);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    transition: 0.3s;
-  }
-
-  .srv-card:hover .srv-icon {
-    background: var(--primary);
-    color: white;
-    transform: scale(1.1) rotate(5deg);
-  }
-
-  .srv-card h3 {
-    font-size: 1.4rem;
-    font-weight: 800;
-    margin-bottom: 15px;
-    color: white;
-  }
-
-  .srv-card p {
-    color: #cbd5e1;
-    line-height: 1.6;
-  }
-
-  /* CTA Section (Call for Papers) */
-  .cta-section {
-    padding: 120px 20px;
-    background: linear-gradient(
-      135deg,
-      var(--primary) 0%,
-      var(--primary-dark) 100%
-    );
-    color: white;
-    position: relative;
-    overflow: hidden;
-    text-align: center;
-  }
-
-  .cta-content {
-    max-width: 800px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 2;
-  }
-
-  .cta-content h2 {
-    font-size: 3.5rem;
-    font-weight: 900;
-    margin-bottom: 25px;
-  }
-
-  .cta-content p {
-    font-size: 1.25rem;
-    margin-bottom: 40px;
-    opacity: 0.9;
-  }
-
-  .cta-checklist {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 50px;
-  }
-
-  .cta-check-item {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  .cta-check-item i {
-    color: var(--gold);
-  }
-
-  .cta-mesh {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      circle at 80% 20%,
-      rgba(251, 191, 36, 0.3) 0%,
-      transparent 60%
-    );
-    animation: meshPulse 8s infinite alternate;
-  }
-
-  /* Guidelines */
-  .guide-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 40px;
-  }
-
-  .guide-card {
-    background: white;
-    padding: 30px 20px;
-    border-radius: 16px;
-    text-align: center;
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.02);
-    transition: 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .guide-card:hover {
-    transform: translateY(-8px);
-    border-color: var(--primary);
-    box-shadow: 0 15px 30px rgba(37, 99, 235, 0.1);
-  }
-
-  .guide-num {
-    font-size: 4rem;
-    font-weight: 900;
-    color: rgba(37, 99, 235, 0.05);
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    line-height: 1;
-    transition: 0.3s;
-  }
-
-  .guide-card:hover .guide-num {
-    color: rgba(37, 99, 235, 0.1);
-    transform: scale(1.1);
-  }
-
-  .guide-icon {
-    font-size: 2rem;
-    color: var(--primary);
-    margin-bottom: 15px;
-    position: relative;
-    z-index: 2;
-  }
-
-  .guide-title {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--text-dark);
-    position: relative;
-    z-index: 2;
-  }
-
-  .guide-featured {
-    background: var(--bg-light);
-    border: 1px solid var(--primary);
-    border-radius: 24px;
-    padding: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 40px;
-    flex-wrap: wrap;
-  }
-
-  .gf-content h3 {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--navy);
-    margin-bottom: 15px;
-  }
-
-  .gf-content p {
-    color: var(--text-muted);
-    font-size: 1.1rem;
-    max-width: 600px;
-  }
-
-  /* Contact & Trust Grid */
-  .ct-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-  }
-
-  .contact-box {
-    background: white;
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--glass-border);
-  }
-
-  .cb-item {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 25px;
-    padding-bottom: 25px;
-    border-bottom: 1px solid #f1f5f9;
-  }
-
-  .cb-item:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-  }
-
-  .cb-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-  }
-
-  .cb-item.whatsapp .cb-icon {
-    background: rgba(37, 211, 102, 0.1);
-    color: #25d366;
-  }
-
-  .cb-text h4 {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 5px;
-  }
-
-  .cb-text p {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin: 0;
-  }
-
-  .trust-box {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-  }
-
-  .trust-item {
-    background: white;
-    padding: 20px;
-    border-radius: 16px;
-    border: 1px solid var(--glass-border);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-weight: 600;
-    color: var(--text-dark);
-    transition: 0.3s;
-  }
-
-  .trust-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-    border-color: #10b981;
-  }
-
-  .trust-item i {
-    color: #10b981;
-    font-size: 1.2rem;
-  }
-
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .hero-grid,
-    .about-split,
-    .mv-grid,
-    .ct-grid {
-      grid-template-columns: 1fr;
+    .section-title {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 20px;
+      text-align: center;
+      line-height: 1.2;
     }
 
-    .hero-title {
-      font-size: 3.5rem;
+    .section-title.light {
+      color: white;
     }
 
-    .stats-grid {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-    }
-
-    .stats-section {
-      margin-top: 40px;
-    }
-
-    .hero-visual {
-      display: none;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .stats-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .guide-featured {
-      flex-direction: column;
+    .section-subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto 50px;
       text-align: center;
     }
 
-    .trust-box {
-      grid-template-columns: 1fr;
+    .section-subtitle.light {
+      color: #cbd5e1;
     }
-  }
 
-  @media (max-width: 480px) {
-    .stats-grid {
-      grid-template-columns: 1fr;
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      box-shadow: var(--glass-shadow);
+      padding: 40px;
+      transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border-color: rgba(37, 99, 235, 0.3);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px 30px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-decoration: none;
+      transition: 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg,
+          var(--primary) 0%,
+          var(--primary-dark) 100%);
+      color: white;
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4);
+      color: white;
+    }
+
+    .btn-white {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-white:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-outline-white {
+      border: 2px solid white;
+      color: white;
+      background: transparent;
+    }
+
+    .btn-outline-white:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateY(-3px);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      position: relative;
+      background: var(--navy);
+      color: white;
+      padding: 180px 20px 150px;
+      overflow: hidden;
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-mesh {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 20% 40%,
+          rgba(37, 99, 235, 0.3) 0%,
+          transparent 50%),
+        radial-gradient(circle at 80% 70%,
+          rgba(251, 191, 36, 0.15) 0%,
+          transparent 50%);
+      animation: meshPulse 10s infinite alternate ease-in-out;
+    }
+
+    @keyframes meshPulse {
+      0% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+    }
+
+    .hero-particles {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px,
+          transparent 1px);
+      background-size: 30px 30px;
+      opacity: 0.3;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+      backdrop-filter: blur(10px);
+      color: var(--gold-light);
+      font-weight: 600;
     }
 
     .hero-title {
-      font-size: 2.5rem;
+      font-size: 4.5rem;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 25px;
+      background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-  }
-</style>
 
-<!-- HERO SECTION -->
-<section class="hero-section" id="home">
-  <div class="hero-mesh"></div>
-  <div class="hero-particles"></div>
-  <div class="container">
-    <div class="hero-grid">
-      <div class="hero-content gs-reveal">
-        <div class="hero-badge">
-          <i class="fa-solid fa-globe"></i> International Academic Publisher
-        </div>
-        <h1 class="hero-title">ScriptHive<br /><em>Publication</em></h1>
-        <p class="hero-subtitle">
-          Advancing Knowledge Through Quality Research — ISSN-supported,
-          peer-reviewed journals across six disciplines, committed to open
-          access and global visibility.
-        </p>
-        <div class="hero-buttons">
-          <a href="/submit" class="btn btn-primary"
-            ><i class="fa-solid fa-file-arrow-up"></i> Submit Paper</a
-          >
-          <a href="/journals" class="btn btn-white"
-            ><i class="fa-solid fa-book-journal-whills"></i> View Journals</a
-          >
-        </div>
-      </div>
+    .hero-title em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-      <div class="hero-visual gs-reveal">
-        <div class="hero-floating-card hc-main">
-          <div
-            style="
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 40px;
+      font-weight: 400;
+      max-width: 600px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* Hero Visual 3D */
+    .hero-visual {
+      position: relative;
+      height: 500px;
+      perspective: 1000px;
+    }
+
+    .hero-floating-card {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .hc-main {
+      width: 320px;
+      top: 50px;
+      left: 50px;
+      z-index: 2;
+      animation: floatObj 6s infinite alternate ease-in-out;
+      border-top: 4px solid var(--primary);
+    }
+
+    .hc-small-1 {
+      width: 200px;
+      top: -10px;
+      right: 20px;
+      z-index: 1;
+      animation: floatObj 5s infinite alternate-reverse ease-in-out;
+      background: rgba(37, 99, 235, 0.1);
+      border-color: rgba(37, 99, 235, 0.3);
+    }
+
+    .hc-small-2 {
+      width: 220px;
+      bottom: 40px;
+      right: 40px;
+      z-index: 3;
+      animation: floatObj 7s infinite alternate ease-in-out;
+      border-left: 4px solid var(--gold);
+    }
+
+    .mock-graph {
+      height: 80px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .mock-bar {
+      background: var(--primary);
+      width: 100%;
+      border-radius: 4px;
+      animation: barGrow 2s ease-out forwards;
+    }
+
+    .mock-bar:nth-child(1) {
+      height: 40%;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .mock-bar:nth-child(2) {
+      height: 60%;
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .mock-bar:nth-child(3) {
+      height: 100%;
+      background: var(--gold);
+    }
+
+    @keyframes floatObj {
+      0% {
+        transform: translateY(0) rotateX(5deg) rotateY(-5deg);
+      }
+
+      100% {
+        transform: translateY(-20px) rotateX(0deg) rotateY(0deg);
+      }
+    }
+
+    @keyframes barGrow {
+      0% {
+        transform: scaleY(0);
+        transform-origin: bottom;
+      }
+
+      100% {
+        transform: scaleY(1);
+        transform-origin: bottom;
+      }
+    }
+
+    /* Stats Section */
+    .stats-section {
+      margin-top: -60px;
+      position: relative;
+      z-index: 10;
+      padding: 0 20px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+      background: white;
+      padding: 30px;
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--glass-border);
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 20px;
+      border-right: 1px solid #e2e8f0;
+      transition: 0.3s;
+    }
+
+    .stat-item:last-child {
+      border-right: none;
+    }
+
+    .stat-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+
+    .stat-title {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--text-dark);
+      margin-bottom: 5px;
+    }
+
+    .stat-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* About Section */
+    .about-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .about-content h2 {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 25px;
+      line-height: 1.2;
+    }
+
+    .about-content p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .feature-item i {
+      color: #10b981;
+      font-size: 1.2rem;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 8px;
+      border-radius: 50%;
+    }
+
+    .about-visual {
+      position: relative;
+      height: 500px;
+    }
+
+    .av-main {
+      width: 100%;
+      height: 100%;
+      border-radius: 30px;
+      object-fit: cover;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+    }
+
+    .av-card {
+      position: absolute;
+      bottom: 40px;
+      left: -40px;
+      background: white;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      animation: floatCard 4s infinite alternate;
+      border: 1px solid var(--glass-border);
+    }
+
+    .av-card-icon {
+      width: 60px;
+      height: 60px;
+      background: var(--primary);
+      color: white;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    @keyframes floatCard {
+      0% {
+        transform: translateY(0);
+      }
+
+      100% {
+        transform: translateY(-15px);
+      }
+    }
+
+    /* Mission & Vision */
+    .mv-section {
+      background: var(--navy);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mv-mesh {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%,
+          rgba(37, 99, 235, 0.2) 0%,
+          transparent 70%);
+    }
+
+    .mv-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .mv-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 50px;
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: 0.4s;
+    }
+
+    .mv-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-10px);
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    .mv-icon {
+      font-size: 3rem;
+      color: var(--gold);
+      margin-bottom: 25px;
+    }
+
+    .mv-card h3 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .mv-card p {
+      font-size: 1.15rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+
+    /* Journals Showcase */
+    .journals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+    }
+
+    .journal-card {
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+      transition: 0.4s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .journal-card:hover {
+      transform: translateY(-15px);
+      box-shadow: 0 30px 60px rgba(37, 99, 235, 0.1);
+      border-color: var(--primary);
+    }
+
+    .jc-header {
+      padding: 30px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-bottom: 1px solid #e2e8f0;
+      position: relative;
+    }
+
+    .jc-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.4;
+      margin-bottom: 5px;
+      word-wrap: break-word;
+    }
+
+    .jc-acronym {
+      font-size: 1.05rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      margin-left: 4px;
+    }
+
+    .jc-body {
+      padding: 30px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .jc-desc {
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .jc-meta {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      background: #f1f5f9;
+      color: var(--text-dark);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .meta-tag.oa {
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+    }
+
+    .jc-link {
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: 0.3s;
+    }
+
+    .journal-card:hover .jc-link {
+      gap: 10px;
+    }
+
+    /* Services Section */
+    .services-section {
+      background: var(--navy);
+      color: white;
+      position: relative;
+    }
+
+    .srv-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
+
+    .srv-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 35px;
+      transition: 0.4s;
+      backdrop-filter: blur(10px);
+    }
+
+    .srv-card:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--primary);
+    }
+
+    .srv-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(37, 99, 235, 0.2);
+      color: var(--primary);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      transition: 0.3s;
+    }
+
+    .srv-card:hover .srv-icon {
+      background: var(--primary);
+      color: white;
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .srv-card h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 15px;
+      color: white;
+    }
+
+    .srv-card p {
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    /* CTA Section (Call for Papers) */
+    .cta-section {
+      padding: 120px 20px;
+      background: linear-gradient(135deg,
+          var(--primary) 0%,
+          var(--primary-dark) 100%);
+      color: white;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .cta-content {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .cta-content h2 {
+      font-size: 3.5rem;
+      font-weight: 900;
+      margin-bottom: 25px;
+    }
+
+    .cta-content p {
+      font-size: 1.25rem;
+      margin-bottom: 40px;
+      opacity: 0.9;
+    }
+
+    .cta-checklist {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 50px;
+    }
+
+    .cta-check-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .cta-check-item i {
+      color: var(--gold);
+    }
+
+    .cta-mesh {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 80% 20%,
+          rgba(251, 191, 36, 0.3) 0%,
+          transparent 60%);
+      animation: meshPulse 8s infinite alternate;
+    }
+
+    /* Guidelines */
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .guide-card {
+      background: white;
+      padding: 30px 20px;
+      border-radius: 16px;
+      text-align: center;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.02);
+      transition: 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .guide-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--primary);
+      box-shadow: 0 15px 30px rgba(37, 99, 235, 0.1);
+    }
+
+    .guide-num {
+      font-size: 4rem;
+      font-weight: 900;
+      color: rgba(37, 99, 235, 0.05);
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      line-height: 1;
+      transition: 0.3s;
+    }
+
+    .guide-card:hover .guide-num {
+      color: rgba(37, 99, 235, 0.1);
+      transform: scale(1.1);
+    }
+
+    .guide-icon {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .guide-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-dark);
+      position: relative;
+      z-index: 2;
+    }
+
+    .guide-featured {
+      background: var(--bg-light);
+      border: 1px solid var(--primary);
+      border-radius: 24px;
+      padding: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .gf-content h3 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 15px;
+    }
+
+    .gf-content p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+    }
+
+    /* Contact & Trust Grid */
+    .ct-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .contact-box {
+      background: white;
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--glass-border);
+    }
+
+    .cb-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 25px;
+      padding-bottom: 25px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .cb-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .cb-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .cb-item.whatsapp .cb-icon {
+      background: rgba(37, 211, 102, 0.1);
+      color: #25d366;
+    }
+
+    .cb-text h4 {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+
+    .cb-text p {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    .trust-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .trust-item {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-weight: 600;
+      color: var(--text-dark);
+      transition: 0.3s;
+    }
+
+    .trust-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+      border-color: #10b981;
+    }
+
+    .trust-item i {
+      color: #10b981;
+      font-size: 1.2rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+
+      .hero-grid,
+      .about-split,
+      .mv-grid,
+      .ct-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-title {
+        font-size: 3.5rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+      }
+
+      .stats-section {
+        margin-top: 40px;
+      }
+
+      .hero-visual {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .guide-featured {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .trust-box {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+
+  <!-- HERO SECTION -->
+  <section class="hero-section" id="home">
+    <div class="hero-mesh"></div>
+    <div class="hero-particles"></div>
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content gs-reveal">
+          <div class="hero-badge">
+            <i class="fa-solid fa-globe"></i> International Academic Publisher
+          </div>
+          <h1 class="hero-title">ScriptHive<br /><em>Publication</em></h1>
+          <p class="hero-subtitle">
+            Advancing Knowledge Through Quality Research — ISSN-supported,
+            peer-reviewed journals across six disciplines, committed to open
+            access and global visibility.
+          </p>
+          <div class="hero-buttons">
+            <a href="/submit" class="btn btn-primary"><i class="fa-solid fa-file-arrow-up"></i> Submit Paper</a>
+            <a href="/journals" class="btn btn-white"><i class="fa-solid fa-book-journal-whills"></i> View Journals</a>
+          </div>
+        </div>
+
+        <div class="hero-visual gs-reveal">
+          <div class="hero-floating-card hc-main">
+            <div style="
               display: flex;
               justify-content: space-between;
               align-items: center;
               margin-bottom: 15px;
-            "
-          >
-            <div style="font-weight: 800; font-size: 1.2rem; color: white">
-              Publication Metrics
-            </div>
-            <i
-              class="fa-solid fa-chart-line"
-              style="color: var(--primary); font-size: 1.5rem"
-            ></i>
-          </div>
-          <div style="color: #cbd5e1; font-size: 0.9rem">
-            Global Reach & Citations
-          </div>
-          <div class="mock-graph">
-            <div class="mock-bar"></div>
-            <div class="mock-bar"></div>
-            <div class="mock-bar"></div>
-            <div class="mock-bar"></div>
-            <div class="mock-bar"></div>
-            <div class="mock-bar"></div>
-          </div>
-        </div>
-
-        <div class="hero-floating-card hc-small-1">
-          <div style="display: flex; align-items: center; gap: 10px">
-            <i
-              class="fa-solid fa-check-circle"
-              style="color: #10b981; font-size: 1.5rem"
-            ></i>
-            <div>
-              <div style="font-weight: 700; color: white; font-size: 0.9rem">
-                100% Peer Reviewed
+            ">
+              <div style="font-weight: 800; font-size: 1.2rem; color: white">
+                Publication Metrics
               </div>
-              <div style="color: #94a3b8; font-size: 0.8rem">
-                Rigorous process
+              <i class="fa-solid fa-chart-line" style="color: var(--primary); font-size: 1.5rem"></i>
+            </div>
+            <div style="color: #cbd5e1; font-size: 0.9rem">
+              Global Reach & Citations
+            </div>
+            <div class="mock-graph">
+              <div class="mock-bar"></div>
+              <div class="mock-bar"></div>
+              <div class="mock-bar"></div>
+              <div class="mock-bar"></div>
+              <div class="mock-bar"></div>
+              <div class="mock-bar"></div>
+            </div>
+          </div>
+
+          <div class="hero-floating-card hc-small-1">
+            <div style="display: flex; align-items: center; gap: 10px">
+              <i class="fa-solid fa-check-circle" style="color: #10b981; font-size: 1.5rem"></i>
+              <div>
+                <div style="font-weight: 700; color: white; font-size: 0.9rem">
+                  100% Peer Reviewed
+                </div>
+                <div style="color: #94a3b8; font-size: 0.8rem">
+                  Rigorous process
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="hero-floating-card hc-small-2">
-          <div style="display: flex; align-items: center; gap: 10px">
-            <i
-              class="fa-solid fa-barcode"
-              style="color: var(--gold); font-size: 1.5rem"
-            ></i>
-            <div>
-              <div style="font-weight: 700; color: white; font-size: 0.9rem">
-                ISSN Certified
-              </div>
-              <div style="color: #94a3b8; font-size: 0.8rem">
-                International Standard
+          <div class="hero-floating-card hc-small-2">
+            <div style="display: flex; align-items: center; gap: 10px">
+              <i class="fa-solid fa-barcode" style="color: var(--gold); font-size: 1.5rem"></i>
+              <div>
+                <div style="font-weight: 700; color: white; font-size: 0.9rem">
+                  ISSN Certified
+                </div>
+                <div style="color: #94a3b8; font-size: 0.8rem">
+                  International Standard
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- TRUST & STATS -->
-<section class="stats-section">
-  <div class="container">
-    <div class="stats-grid gs-reveal-up">
-      <div class="stat-item">
-        <i class="fa-solid fa-barcode stat-icon"></i>
-        <div class="stat-title">ISSN Certified</div>
-        <div class="stat-desc">International Standard</div>
-      </div>
-      <div class="stat-item">
-        <i class="fa-solid fa-bolt stat-icon"></i>
-        <div class="stat-title">7–15 Days</div>
-        <div class="stat-desc">Fast Review Time</div>
-      </div>
-      <div class="stat-item">
-        <i class="fa-solid fa-user-check stat-icon"></i>
-        <div class="stat-title">100% Reviewed</div>
-        <div class="stat-desc">Double-Blind Peer Review</div>
-      </div>
-      <div class="stat-item">
-        <i class="fa-solid fa-lock-open stat-icon"></i>
-        <div class="stat-title">Open Access</div>
-        <div class="stat-desc">Global Visibility</div>
-      </div>
-      <div class="stat-item">
-        <i class="fa-solid fa-award stat-icon"></i>
-        <div class="stat-title">ISO Verified</div>
-        <div class="stat-desc">Quality Standards</div>
+  <!-- TRUST & STATS -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid gs-reveal-up">
+        <div class="stat-item">
+          <i class="fa-solid fa-barcode stat-icon"></i>
+          <div class="stat-title">ISSN Certified</div>
+          <div class="stat-desc">International Standard</div>
+        </div>
+        <div class="stat-item">
+          <i class="fa-solid fa-bolt stat-icon"></i>
+          <div class="stat-title">7–15 Days</div>
+          <div class="stat-desc">Fast Review Time</div>
+        </div>
+        <div class="stat-item">
+          <i class="fa-solid fa-user-check stat-icon"></i>
+          <div class="stat-title">100% Reviewed</div>
+          <div class="stat-desc">Double-Blind Peer Review</div>
+        </div>
+        <div class="stat-item">
+          <i class="fa-solid fa-lock-open stat-icon"></i>
+          <div class="stat-title">Open Access</div>
+          <div class="stat-desc">Global Visibility</div>
+        </div>
+        <div class="stat-item">
+          <i class="fa-solid fa-award stat-icon"></i>
+          <div class="stat-title">ISO Verified</div>
+          <div class="stat-desc">Quality Standards</div>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ABOUT SECTION -->
-<section class="section-padding" id="about">
-  <div class="container">
-    <div class="about-split">
-      <div class="about-content gs-reveal">
-        <div
-          style="
+  <!-- ABOUT SECTION -->
+  <section class="section-padding" id="about">
+    <div class="container">
+      <div class="about-split">
+        <div class="about-content gs-reveal">
+          <div style="
             color: var(--primary);
             font-weight: 700;
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
-          "
-        >
-          About Us
+          ">
+            About Us
+          </div>
+          <h2>A Premier Platform for Global Research</h2>
+          <p>
+            ScriptHive Publication is a dedicated academic publishing platform
+            committed to disseminating high-quality, peer-reviewed research across
+            diverse disciplines.
+          </p>
+          <p>
+            Our ISSN-supported journals span Vedic studies, engineering, health
+            sciences, social sciences, and multidisciplinary research — helping
+            scholars share their work globally with unmatched credibility and
+            speed.
+          </p>
+
+          <div class="feature-list">
+            <div class="feature-item">
+              <i class="fa-solid fa-check"></i> Rigorous Peer Review
+            </div>
+            <div class="feature-item">
+              <i class="fa-solid fa-check"></i> Open Access Policy
+            </div>
+            <div class="feature-item">
+              <i class="fa-solid fa-check"></i> ISSN Certified
+            </div>
+            <div class="feature-item">
+              <i class="fa-solid fa-check"></i> Fast Processing
+            </div>
+          </div>
+
+          <a href="/about" class="btn btn-primary" style="margin-top: 10px">Learn More About Us <i
+              class="fa-solid fa-arrow-right"></i></a>
         </div>
-        <h2>A Premier Platform for Global Research</h2>
-        <p>
-          ScriptHive Publication is a dedicated academic publishing platform
-          committed to disseminating high-quality, peer-reviewed research across
-          diverse disciplines.
-        </p>
-        <p>
-          Our ISSN-supported journals span Vedic studies, engineering, health
-          sciences, social sciences, and multidisciplinary research — helping
-          scholars share their work globally with unmatched credibility and
-          speed.
-        </p>
 
-        <div class="feature-list">
-          <div class="feature-item">
-            <i class="fa-solid fa-check"></i> Rigorous Peer Review
-          </div>
-          <div class="feature-item">
-            <i class="fa-solid fa-check"></i> Open Access Policy
-          </div>
-          <div class="feature-item">
-            <i class="fa-solid fa-check"></i> ISSN Certified
-          </div>
-          <div class="feature-item">
-            <i class="fa-solid fa-check"></i> Fast Processing
-          </div>
-        </div>
-
-        <a href="/about" class="btn btn-primary" style="margin-top: 10px"
-          >Learn More About Us <i class="fa-solid fa-arrow-right"></i
-        ></a>
-      </div>
-
-      <div class="about-visual gs-reveal" style="transition-delay: 0.2s">
-        <img
-          src="https://images.unsplash.com/photo-1456324504439-367cee3b3c32?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-          alt="Research Papers"
-          class="av-main"
-        />
-        <div class="av-card">
-          <div class="av-card-icon">
-            <i class="fa-solid fa-file-shield"></i>
-          </div>
-          <div>
-            <div
-              style="
+        <div class="about-visual gs-reveal" style="transition-delay: 0.2s">
+          <img
+            src="https://images.unsplash.com/photo-1456324504439-367cee3b3c32?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            alt="Research Papers" class="av-main" />
+          <div class="av-card">
+            <div class="av-card-icon">
+              <i class="fa-solid fa-file-shield"></i>
+            </div>
+            <div>
+              <div style="
                 font-weight: 800;
                 font-size: 1.1rem;
                 color: var(--text-dark);
-              "
-            >
-              DOI Activation
+              ">
+                DOI Activation
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.9rem">
+                Permanent Digital Object Identifier assigned to all published
+                articles.
+              </div>
             </div>
-            <div style="color: var(--text-muted); font-size: 0.9rem">
-              Permanent Digital Object Identifier assigned to all published
-              articles.
-            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- MISSION & VISION -->
-<section class="section-padding mv-section" id="mission-vision">
-  <div class="mv-mesh"></div>
-  <div class="container">
-    <div class="mv-grid">
-      <div class="mv-card gs-reveal">
-        <i class="fa-solid fa-bullseye mv-icon"></i>
-        <h3>Our Mission</h3>
-        <p>
-          To provide a credible, accessible, and globally recognised platform
-          for researchers to publish and share knowledge that drives academic
-          progress and societal benefit. We strive to maintain the highest
-          ethical standards in scientific publishing.
-        </p>
-      </div>
-      <div class="mv-card gs-reveal" style="transition-delay: 0.2s">
-        <i class="fa-solid fa-lightbulb mv-icon" style="color: #10b981"></i>
-        <h3>Our Vision</h3>
-        <p>
-          To become a premier international Publication bridging knowledge
-          creation and global academic discourse. We envision a future where
-          high-quality research is freely accessible to everyone, fostering
-          global innovation.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- JOURNALS SHOWCASE -->
-<section class="section-padding" id="journals" style="background: white">
-  <div class="container">
-    <h2 class="section-title">Our Journals</h2>
-    <p class="section-subtitle">
-      Peer-reviewed, open-access journals across multiple disciplines.
-    </p>
-
-    <div class="journals-grid">
-      <!-- Journal 1 -->
-      <div class="journal-card gs-reveal-up">
-        <div class="jc-header">
-          <div class="jc-title">
-            ScriptHive Global Journal of Vedic and Sanskrit Research
-            <span class="jc-acronym">(SGJVSR)</span>
-          </div>
-        </div>
-        <div class="jc-body">
-          <div class="jc-meta">
-            <span class="meta-tag oa"
-              ><i class="fa-solid fa-lock-open"></i> Open Access</span
-            >
-            <span class="meta-tag"
-              ><i class="fa-solid fa-users"></i> Peer Reviewed</span
-            >
-          </div>
-          <p class="jc-desc">
-            Dedicated to Vedic studies, Sanskrit literature, ancient philosophy,
-            and classical linguistics.
+  <!-- MISSION & VISION -->
+  <section class="section-padding mv-section" id="mission-vision">
+    <div class="mv-mesh"></div>
+    <div class="container">
+      <div class="mv-grid">
+        <div class="mv-card gs-reveal">
+          <i class="fa-solid fa-bullseye mv-icon"></i>
+          <h3>Our Mission</h3>
+          <p>
+            To provide a credible, accessible, and globally recognised platform
+            for researchers to publish and share knowledge that drives academic
+            progress and societal benefit. We strive to maintain the highest
+            ethical standards in scientific publishing.
           </p>
-          <a href="/SGJVSR" class="jc-link"
-            >Read More <i class="fa-solid fa-arrow-right"></i
-          ></a>
         </div>
-      </div>
-
-      <!-- Journal 2 -->
-      <div class="journal-card gs-reveal-up" style="transition-delay: 0.1s">
-        <div class="jc-header">
-          <div class="jc-title">
-            ScriptHive Global Multidisciplinary Research Journal
-            <span class="jc-acronym">(SGMRJ)</span>
-          </div>
-        </div>
-        <div class="jc-body">
-          <div class="jc-meta">
-            <span class="meta-tag oa"
-              ><i class="fa-solid fa-lock-open"></i> Open Access</span
-            >
-            <span class="meta-tag"
-              ><i class="fa-solid fa-users"></i> Peer Reviewed</span
-            >
-          </div>
-          <p class="jc-desc">
-            Interdisciplinary journal covering all academic domains for
-            comprehensive global research sharing.
+        <div class="mv-card gs-reveal" style="transition-delay: 0.2s">
+          <i class="fa-solid fa-lightbulb mv-icon" style="color: #10b981"></i>
+          <h3>Our Vision</h3>
+          <p>
+            To become a premier international Publication bridging knowledge
+            creation and global academic discourse. We envision a future where
+            high-quality research is freely accessible to everyone, fostering
+            global innovation.
           </p>
-          <a href="/SGMRJ" class="jc-link"
-            >Read More <i class="fa-solid fa-arrow-right"></i
-          ></a>
-        </div>
-      </div>
-
-      <!-- Journal 3 -->
-      <div class="journal-card gs-reveal-up" style="transition-delay: 0.2s">
-        <div class="jc-header">
-          <div class="jc-title">
-            ScriptHive Global Journal of Physical and Life Sciences
-            <span class="jc-acronym">(SGJPLS)</span>
-          </div>
-        </div>
-        <div class="jc-body">
-          <div class="jc-meta">
-            <span class="meta-tag oa"
-              ><i class="fa-solid fa-lock-open"></i> Open Access</span
-            >
-            <span class="meta-tag"
-              ><i class="fa-solid fa-users"></i> Peer Reviewed</span
-            >
-          </div>
-          <p class="jc-desc">
-            Research in physics, chemistry, biology, environmental science, and
-            related scientific fields.
-          </p>
-          <a href="/SGJPLS" class="jc-link"
-            >Read More <i class="fa-solid fa-arrow-right"></i
-          ></a>
-        </div>
-      </div>
-
-      <!-- Journal 4 -->
-      <div class="journal-card gs-reveal-up" style="transition-delay: 0.3s">
-        <div class="jc-header">
-          <div class="jc-title">
-            ScriptHive Global Journal of Engineering and Technology Research
-            <span class="jc-acronym">(SGJETR)</span>
-          </div>
-        </div>
-        <div class="jc-body">
-          <div class="jc-meta">
-            <span class="meta-tag oa"
-              ><i class="fa-solid fa-lock-open"></i> Open Access</span
-            >
-            <span class="meta-tag"
-              ><i class="fa-solid fa-users"></i> Peer Reviewed</span
-            >
-          </div>
-          <p class="jc-desc">
-            Engineering, IT, electronics, artificial intelligence, and emerging
-            technological advancements.
-          </p>
-          <a href="/SGJETR" class="jc-link"
-            >Read More <i class="fa-solid fa-arrow-right"></i
-          ></a>
-        </div>
-      </div>
-
-      <!-- Journal 5 -->
-      <div class="journal-card gs-reveal-up" style="transition-delay: 0.4s">
-        <div class="jc-header">
-          <div class="jc-title">
-            ScriptHive Global Journal of Social Sciences and Humanities
-            <span class="jc-acronym">(SGJSSH)</span>
-          </div>
-        </div>
-        <div class="jc-body">
-          <div class="jc-meta">
-            <span class="meta-tag oa"
-              ><i class="fa-solid fa-lock-open"></i> Open Access</span
-            >
-            <span class="meta-tag"
-              ><i class="fa-solid fa-users"></i> Peer Reviewed</span
-            >
-          </div>
-          <p class="jc-desc">
-            Sociology, history, economics, literature, anthropology, and diverse
-            cultural studies.
-          </p>
-          <a href="/SGJSSH" class="jc-link"
-            >Read More <i class="fa-solid fa-arrow-right"></i
-          ></a>
-        </div>
-      </div>
-
-      <!-- Journal 6 -->
-      <div class="journal-card gs-reveal-up" style="transition-delay: 0.5s">
-        <div class="jc-header">
-          <div class="jc-title">
-            ScriptHive Global Journal of Applied Science and Health
-            <span class="jc-acronym">(SGJASH)</span>
-          </div>
-        </div>
-        <div class="jc-body">
-          <div class="jc-meta">
-            <span class="meta-tag oa"
-              ><i class="fa-solid fa-lock-open"></i> Open Access</span
-            >
-            <span class="meta-tag"
-              ><i class="fa-solid fa-users"></i> Peer Reviewed</span
-            >
-          </div>
-          <p class="jc-desc">
-            Applied sciences, nursing, pharmacy, nutrition, and advanced
-            healthcare research.
-          </p>
-          <a href="/SGJASH" class="jc-link"
-            >Read More <i class="fa-solid fa-arrow-right"></i
-          ></a>
         </div>
       </div>
     </div>
+  </section>
 
-    <div style="text-align: center; margin-top: 50px">
-      <a href="/journals" class="btn btn-primary btn-lg"
-        >View All Journals <i class="fa-solid fa-arrow-right"></i
-      ></a>
-    </div>
-  </div>
-</section>
 
-<!-- SERVICES SECTION -->
-<section class="section-padding services-section" id="services">
-  <div class="container">
-    <h2 class="section-title light">Our Services</h2>
-    <p class="section-subtitle light">
-      Comprehensive publishing support for researchers, institutions, and
-      academic organisations.
-    </p>
-
-    <div class="srv-grid">
-      <div class="srv-card gs-reveal-up">
-        <div class="srv-icon"><i class="fa-solid fa-newspaper"></i></div>
-        <h3>Journal Publishing</h3>
-        <p>
-          End-to-end peer-reviewed journal publication across multiple
-          disciplines with DOI assignment and global indexing.
-        </p>
-      </div>
-      <div class="srv-card gs-reveal-up" style="transition-delay: 0.1s">
-        <div class="srv-icon"><i class="fa-solid fa-book"></i></div>
-        <h3>Book Publishing</h3>
-        <p>
-          Professional academic book and thesis publishing with ISBN allotment,
-          premium cover design, and distribution.
-        </p>
-      </div>
-      <div class="srv-card gs-reveal-up" style="transition-delay: 0.2s">
-        <div class="srv-icon"><i class="fa-solid fa-bell"></i></div>
-        <h3>Subscription Services</h3>
-        <p>
-          Institutional and individual subscription plans providing unlimited
-          access to our vast repository of journals.
-        </p>
-      </div>
-      <div class="srv-card gs-reveal-up" style="transition-delay: 0.3s">
-        <div class="srv-icon"><i class="fa-solid fa-barcode"></i></div>
-        <h3>ISSN Support</h3>
-        <p>
-          Complete guidance and support for obtaining ISSN for new academic
-          journals and institutional publications.
-        </p>
-      </div>
-      <div class="srv-card gs-reveal-up" style="transition-delay: 0.4s">
-        <div class="srv-icon"><i class="fa-solid fa-pen-nib"></i></div>
-        <h3>Editing Services</h3>
-        <p>
-          Expert proofreading, formatting, and language editing to ensure your
-          manuscript meets global academic standards.
-        </p>
-      </div>
-    </div>
-
-    <div style="text-align: center; margin-top: 50px">
-      <a href="/services" class="btn btn-outline-white"
-        >Explore All Services <i class="fa-solid fa-arrow-right"></i
-      ></a>
-    </div>
-  </div>
-</section>
-
-<!-- CALL FOR PAPERS (CTA) -->
-<section class="cta-section" id="call-for-papers">
-  <div class="cta-mesh"></div>
-  <div class="container">
-    <div class="cta-content gs-reveal">
-      <h2>Submit Your Research Manuscript</h2>
-      <p>
-        We invite original research articles, review papers, case studies, and
-        short communications from researchers worldwide. Fast track your
-        academic success with ScriptHive.
+  <!-- SERVICES SECTION -->
+  <section class="section-padding services-section" id="services">
+    <div class="container">
+      <h2 class="section-title light">Our Services</h2>
+      <p class="section-subtitle light">
+        Comprehensive publishing support for researchers, institutions, and
+        academic organisations.
       </p>
 
-      <div class="cta-checklist">
-        <div class="cta-check-item">
-          <i class="fa-solid fa-check-circle"></i> Fast Review (7–15 Days)
+      <div class="srv-grid">
+        <div class="srv-card gs-reveal-up">
+          <div class="srv-icon"><i class="fa-solid fa-newspaper"></i></div>
+          <h3>Journal Publishing</h3>
+          <p>
+            End-to-end peer-reviewed journal publication across multiple
+            disciplines with DOI assignment and global indexing.
+          </p>
         </div>
-        <div class="cta-check-item">
-          <i class="fa-solid fa-check-circle"></i> ISSN-Supported Journals
+        <div class="srv-card gs-reveal-up" style="transition-delay: 0.1s">
+          <div class="srv-icon"><i class="fa-solid fa-book"></i></div>
+          <h3>Book Publishing</h3>
+          <p>
+            Professional academic book and thesis publishing with ISBN allotment,
+            premium cover design, and distribution.
+          </p>
         </div>
-        <div class="cta-check-item">
-          <i class="fa-solid fa-check-circle"></i> Open Access Publishing
+        <div class="srv-card gs-reveal-up" style="transition-delay: 0.2s">
+          <div class="srv-icon"><i class="fa-solid fa-bell"></i></div>
+          <h3>Subscription Services</h3>
+          <p>
+            Institutional and individual subscription plans providing unlimited
+            access to our vast repository of journals.
+          </p>
         </div>
-        <div class="cta-check-item">
-          <i class="fa-solid fa-check-circle"></i> Plagiarism Checked
+        <div class="srv-card gs-reveal-up" style="transition-delay: 0.3s">
+          <div class="srv-icon"><i class="fa-solid fa-barcode"></i></div>
+          <h3>ISSN Support</h3>
+          <p>
+            Complete guidance and support for obtaining ISSN for new academic
+            journals and institutional publications.
+          </p>
         </div>
-        <div class="cta-check-item">
-          <i class="fa-solid fa-check-circle"></i> Global Visibility
+        <div class="srv-card gs-reveal-up" style="transition-delay: 0.4s">
+          <div class="srv-icon"><i class="fa-solid fa-pen-nib"></i></div>
+          <h3>Editing Services</h3>
+          <p>
+            Expert proofreading, formatting, and language editing to ensure your
+            manuscript meets global academic standards.
+          </p>
         </div>
       </div>
 
-      <a
-        href="/submit"
-        class="btn btn-white"
-        style="font-size: 1.2rem; padding: 18px 40px"
-      >
-        <i class="fa-solid fa-file-arrow-up"></i> Submit Your Paper Now
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- GUIDELINES SECTION -->
-<section class="section-padding" id="guidelines">
-  <div class="container">
-    <h2 class="section-title">Publication Guidelines</h2>
-    <p class="section-subtitle">
-      Ensure your manuscript meets our standards for a smooth and rapid
-      peer-review process.
-    </p>
-
-    <div class="guide-grid">
-      <div class="guide-card gs-reveal-up">
-        <div class="guide-num">1</div>
-        <i class="fa-solid fa-file-word guide-icon"></i>
-        <div class="guide-title">Manuscript Format</div>
-      </div>
-      <div class="guide-card gs-reveal-up" style="transition-delay: 0.1s">
-        <div class="guide-num">2</div>
-        <i class="fa-solid fa-magnifying-glass guide-icon"></i>
-        <div class="guide-title">Abstract & Keywords</div>
-      </div>
-      <div class="guide-card gs-reveal-up" style="transition-delay: 0.2s">
-        <div class="guide-num">3</div>
-        <i class="fa-solid fa-fingerprint guide-icon"></i>
-        <div class="guide-title">Originality</div>
-      </div>
-      <div class="guide-card gs-reveal-up" style="transition-delay: 0.3s">
-        <div class="guide-num">4</div>
-        <i class="fa-solid fa-link guide-icon"></i>
-        <div class="guide-title">References</div>
-      </div>
-      <div class="guide-card gs-reveal-up" style="transition-delay: 0.4s">
-        <div class="guide-num">5</div>
-        <i class="fa-solid fa-shield-halved guide-icon"></i>
-        <div class="guide-title">Plagiarism Policy</div>
+      <div style="text-align: center; margin-top: 50px">
+        <a href="/services" class="btn btn-outline-white">Explore All Services <i
+            class="fa-solid fa-arrow-right"></i></a>
       </div>
     </div>
+  </section>
 
-    <div class="guide-featured gs-reveal">
-      <div class="gf-content">
-        <h3>Complete Author Guidelines</h3>
+  <!-- CALL FOR PAPERS (CTA) -->
+  <section class="cta-section" id="call-for-papers">
+    <div class="cta-mesh"></div>
+    <div class="container">
+      <div class="cta-content gs-reveal">
+        <h2>Submit Your Research Manuscript</h2>
         <p>
-          Read comprehensive author guidelines covering manuscript structure,
-          peer review, ethical standards, citation formats, and submission
-          procedures.
+          We invite original research articles, review papers, case studies, and
+          short communications from researchers worldwide. Fast track your
+          academic success with ScriptHive.
         </p>
-      </div>
-      <div style="display: flex; gap: 15px; flex-wrap: wrap">
-        <a href="/guidelines" class="btn btn-primary"
-          ><i class="fa-solid fa-book-open"></i> Read Full Guidelines</a
-        >
-        <a href="/issn" class="btn btn-white"
-          ><i class="fa-solid fa-barcode"></i> ISSN Compliance</a
-        >
+
+        <div class="cta-checklist">
+          <div class="cta-check-item">
+            <i class="fa-solid fa-check-circle"></i> Fast Review (7–15 Days)
+          </div>
+          <div class="cta-check-item">
+            <i class="fa-solid fa-check-circle"></i> ISSN-Supported Journals
+          </div>
+          <div class="cta-check-item">
+            <i class="fa-solid fa-check-circle"></i> Open Access Publishing
+          </div>
+          <div class="cta-check-item">
+            <i class="fa-solid fa-check-circle"></i> Plagiarism Checked
+          </div>
+          <div class="cta-check-item">
+            <i class="fa-solid fa-check-circle"></i> Global Visibility
+          </div>
+        </div>
+
+        <a href="/submit" class="btn btn-white" style="font-size: 1.2rem; padding: 18px 40px">
+          <i class="fa-solid fa-file-arrow-up"></i> Submit Your Paper Now
+        </a>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- CONTACT & TRUST -->
-<section
-  class="section-padding"
-  id="contact"
-  style="background: var(--bg-light)"
->
-  <div class="container">
-    <div class="ct-grid">
-      <!-- Contact Info -->
-      <div class="gs-reveal">
-        <h2
-          style="
+  <!-- GUIDELINES SECTION -->
+  <section class="section-padding" id="guidelines">
+    <div class="container">
+      <h2 class="section-title">Publication Guidelines</h2>
+      <p class="section-subtitle">
+        Ensure your manuscript meets our standards for a smooth and rapid
+        peer-review process.
+      </p>
+
+      <div class="guide-grid">
+        <div class="guide-card gs-reveal-up">
+          <div class="guide-num">1</div>
+          <i class="fa-solid fa-file-word guide-icon"></i>
+          <div class="guide-title">Manuscript Format</div>
+        </div>
+        <div class="guide-card gs-reveal-up" style="transition-delay: 0.1s">
+          <div class="guide-num">2</div>
+          <i class="fa-solid fa-magnifying-glass guide-icon"></i>
+          <div class="guide-title">Abstract & Keywords</div>
+        </div>
+        <div class="guide-card gs-reveal-up" style="transition-delay: 0.2s">
+          <div class="guide-num">3</div>
+          <i class="fa-solid fa-fingerprint guide-icon"></i>
+          <div class="guide-title">Originality</div>
+        </div>
+        <div class="guide-card gs-reveal-up" style="transition-delay: 0.3s">
+          <div class="guide-num">4</div>
+          <i class="fa-solid fa-link guide-icon"></i>
+          <div class="guide-title">References</div>
+        </div>
+        <div class="guide-card gs-reveal-up" style="transition-delay: 0.4s">
+          <div class="guide-num">5</div>
+          <i class="fa-solid fa-shield-halved guide-icon"></i>
+          <div class="guide-title">Plagiarism Policy</div>
+        </div>
+      </div>
+
+      <div class="guide-featured gs-reveal">
+        <div class="gf-content">
+          <h3>Complete Author Guidelines</h3>
+          <p>
+            Read comprehensive author guidelines covering manuscript structure,
+            peer review, ethical standards, citation formats, and submission
+            procedures.
+          </p>
+        </div>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap">
+          <a href="/guidelines" class="btn btn-primary"><i class="fa-solid fa-book-open"></i> Read Full Guidelines</a>
+          <a href="/issn" class="btn btn-white"><i class="fa-solid fa-barcode"></i> ISSN Compliance</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT & TRUST -->
+  <section class="section-padding" id="contact" style="background: var(--bg-light)">
+    <div class="container">
+      <div class="ct-grid">
+        <!-- Contact Info -->
+        <div class="gs-reveal">
+          <h2 style="
             font-size: 2.5rem;
             font-weight: 800;
             color: var(--navy);
             margin-bottom: 15px;
-          "
-        >
-          Get in Touch
-        </h2>
-        <p
-          style="
+          ">
+            Get in Touch
+          </h2>
+          <p style="
             color: var(--text-muted);
             font-size: 1.1rem;
             margin-bottom: 30px;
-          "
-        >
-          Have questions about submissions, publishing services, or
-          collaboration? We’re here to help.
-        </p>
+          ">
+            Have questions about submissions, publishing services, or
+            collaboration? We’re here to help.
+          </p>
 
-        <div class="contact-box">
-          <div class="cb-item">
-            <div class="cb-icon"><i class="fa-solid fa-envelope"></i></div>
-            <div class="cb-text">
-              <h4>Email Support</h4>
-              <p>info@scripthive.org</p>
+          <div class="contact-box">
+            <div class="cb-item">
+              <div class="cb-icon"><i class="fa-solid fa-envelope"></i></div>
+              <div class="cb-text">
+                <h4>Email Support</h4>
+                <p>info@scripthive.org</p>
+              </div>
+            </div>
+            <div class="cb-item whatsapp">
+              <div class="cb-icon"><i class="fa-brands fa-whatsapp"></i></div>
+              <div class="cb-text">
+                <h4>WhatsApp Chat</h4>
+                <p>+91 9899916683</p>
+              </div>
+            </div>
+            <div class="cb-item">
+              <div class="cb-icon" style="background: rgba(251, 191, 36, 0.1); color: var(--gold)">
+                <i class="fa-solid fa-location-dot"></i>
+              </div>
+              <div class="cb-text">
+                <h4>Location</h4>
+                <p>Begumpur, New Delhi - 110086, India</p>
+              </div>
             </div>
           </div>
-          <div class="cb-item whatsapp">
-            <div class="cb-icon"><i class="fa-brands fa-whatsapp"></i></div>
-            <div class="cb-text">
-              <h4>WhatsApp Chat</h4>
-              <p>+91 9899916683</p>
-            </div>
-          </div>
-          <div class="cb-item">
-            <div
-              class="cb-icon"
-              style="background: rgba(251, 191, 36, 0.1); color: var(--gold)"
-            >
-              <i class="fa-solid fa-location-dot"></i>
-            </div>
-            <div class="cb-text">
-              <h4>Location</h4>
-              <p>Begumpur, New Delhi - 110086, India</p>
-            </div>
+
+          <div style="margin-top: 30px; display: flex; gap: 15px">
+            <a href="https://wa.me/919899916683" target="_blank" class="btn"
+              style="background: #25d366; color: white"><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp</a>
+            <a href="/contact" class="btn btn-white"><i class="fa-solid fa-paper-plane"></i> Contact Us</a>
           </div>
         </div>
 
-        <div style="margin-top: 30px; display: flex; gap: 15px">
-          <a
-            href="https://wa.me/919899916683"
-            target="_blank"
-            class="btn"
-            style="background: #25d366; color: white"
-            ><i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp</a
-          >
-          <a href="/contact" class="btn btn-white"
-            ><i class="fa-solid fa-paper-plane"></i> Contact Us</a
-          >
-        </div>
-      </div>
-
-      <!-- Trust Info -->
-      <div class="gs-reveal" style="transition-delay: 0.2s">
-        <h2
-          style="
+        <!-- Trust Info -->
+        <div class="gs-reveal" style="transition-delay: 0.2s">
+          <h2 style="
             font-size: 2.5rem;
             font-weight: 800;
             color: var(--navy);
             margin-bottom: 30px;
-          "
-        >
-          Why Researchers Trust ScriptHive
-        </h2>
+          ">
+            Why Researchers Trust ScriptHive
+          </h2>
 
-        <div class="trust-box">
-          <div class="trust-item">
-            <i class="fa-solid fa-circle-check"></i> Ethical standards
-          </div>
-          <div class="trust-item">
-            <i class="fa-solid fa-circle-check"></i> Global visibility
-          </div>
-          <div class="trust-item">
-            <i class="fa-solid fa-circle-check"></i> Fast communication
-          </div>
-          <div class="trust-item">
-            <i class="fa-solid fa-circle-check"></i> Open access
-          </div>
-          <div class="trust-item">
-            <i class="fa-solid fa-circle-check"></i> Dedicated support
-          </div>
-          <div class="trust-item">
-            <i class="fa-solid fa-circle-check"></i> Pro peer review
-          </div>
-          <div class="trust-item">
-            <i class="fa-solid fa-circle-check"></i> DOI assignment
-          </div>
-          <div class="trust-item">
-            <i class="fa-solid fa-circle-check"></i> CrossRef Indexing
+          <div class="trust-box">
+            <div class="trust-item">
+              <i class="fa-solid fa-circle-check"></i> Ethical standards
+            </div>
+            <div class="trust-item">
+              <i class="fa-solid fa-circle-check"></i> Global visibility
+            </div>
+            <div class="trust-item">
+              <i class="fa-solid fa-circle-check"></i> Fast communication
+            </div>
+            <div class="trust-item">
+              <i class="fa-solid fa-circle-check"></i> Open access
+            </div>
+            <div class="trust-item">
+              <i class="fa-solid fa-circle-check"></i> Dedicated support
+            </div>
+            <div class="trust-item">
+              <i class="fa-solid fa-circle-check"></i> Pro peer review
+            </div>
+            <div class="trust-item">
+              <i class="fa-solid fa-circle-check"></i> DOI assignment
+            </div>
+            <div class="trust-item">
+              <i class="fa-solid fa-circle-check"></i> CrossRef Indexing
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- FINAL CTA -->
-<section class="section-padding" style="background: white">
-  <div class="container">
-    <div
-      class="glass-card gs-reveal"
-      style="
+  <!-- FINAL CTA -->
+  <section class="section-padding" style="background: white">
+    <div class="container">
+      <div class="glass-card gs-reveal" style="
         background: linear-gradient(
           135deg,
           var(--navy) 0%,
@@ -1715,77 +1467,64 @@
         border: none;
         overflow: hidden;
         position: relative;
-      "
-    >
-      <div class="cta-mesh" style="opacity: 0.5"></div>
-      <div style="position: relative; z-index: 2">
-        <h2 style="font-size: 3.5rem; font-weight: 900; margin-bottom: 20px">
-          Ready to Publish Your Research?
-        </h2>
-        <p
-          style="
+      ">
+        <div class="cta-mesh" style="opacity: 0.5"></div>
+        <div style="position: relative; z-index: 2">
+          <h2 style="font-size: 3.5rem; font-weight: 900; margin-bottom: 20px">
+            Ready to Publish Your Research?
+          </h2>
+          <p style="
             font-size: 1.25rem;
             color: #cbd5e1;
             margin-bottom: 40px;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
-          "
-        >
-          Join thousands of researchers publishing with ScriptHive journals
-          worldwide and amplify your academic impact.
-        </p>
-        <div
-          style="
+          ">
+            Join thousands of researchers publishing with ScriptHive journals
+            worldwide and amplify your academic impact.
+          </p>
+          <div style="
             display: flex;
             justify-content: center;
             gap: 20px;
             flex-wrap: wrap;
-          "
-        >
-          <a
-            href="/submit"
-            class="btn btn-white"
-            style="font-size: 1.1rem; padding: 15px 35px"
-            ><i class="fa-solid fa-file-arrow-up"></i> Submit Paper</a
-          >
-          <a
-            href="/journals"
-            class="btn btn-outline-white"
-            style="font-size: 1.1rem; padding: 15px 35px"
-            ><i class="fa-solid fa-book-journal-whills"></i> Explore Journals</a
-          >
+          ">
+            <a href="/submit" class="btn btn-white" style="font-size: 1.1rem; padding: 15px 35px"><i
+                class="fa-solid fa-file-arrow-up"></i> Submit Paper</a>
+            <a href="/journals" class="btn btn-outline-white" style="font-size: 1.1rem; padding: 15px 35px"><i
+                class="fa-solid fa-book-journal-whills"></i> Explore Journals</a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    gsap.registerPlugin(ScrollTrigger);
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      gsap.registerPlugin(ScrollTrigger);
 
-    // Reveal animations
-    gsap.utils.toArray(".gs-reveal").forEach(function (elem) {
-      gsap.from(elem, {
-        scrollTrigger: { trigger: elem, start: "top 85%" },
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        ease: "power3.out",
+      // Reveal animations
+      gsap.utils.toArray(".gs-reveal").forEach(function (elem) {
+        gsap.from(elem, {
+          scrollTrigger: { trigger: elem, start: "top 85%" },
+          y: 50,
+          opacity: 0,
+          duration: 1,
+          ease: "power3.out",
+        });
+      });
+
+      gsap.utils.toArray(".gs-reveal-up").forEach(function (elem) {
+        gsap.from(elem, {
+          scrollTrigger: { trigger: elem, start: "top 85%" },
+          y: 30,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power2.out",
+        });
       });
     });
+  </script>
 
-    gsap.utils.toArray(".gs-reveal-up").forEach(function (elem) {
-      gsap.from(elem, {
-        scrollTrigger: { trigger: elem, start: "top 85%" },
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power2.out",
-      });
-    });
-  });
-</script>
-
-<%- include('partials/footer') %>
+  <%- include('partials/footer') %>
