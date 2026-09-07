@@ -763,10 +763,12 @@
       setTimeout(function(){ journalSel.closest('.sub-form-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 400);
     }
 
+    // APC rates — script-level so the success/payment handler can read it too
+    var _apcRates = <%- JSON.stringify(typeof apcRates !== 'undefined' ? apcRates : {inr:0,usd:0}) %>;
+
     // Add-on services — injected server-side, no CORS issues
     (function initAddons() {
       const addons = <%- JSON.stringify(typeof addonServices !== 'undefined' ? addonServices : []) %>;
-      const _apcRates = <%- JSON.stringify(typeof apcRates !== 'undefined' ? apcRates : {inr:0,usd:0}) %>;
       if (!addons || !addons.length) return;
 
       const section  = document.getElementById('addon-section');
