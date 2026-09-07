@@ -222,9 +222,9 @@ async function fetchEditorialBoard(journalId) {
 // Invoice Route
 app.get('/invoice', (req, res) => res.render('invoice'));
 
-// Public article page
-app.get('/article/:slug', async (req, res) => {
-    const slug = req.params.slug;
+// Public article page — wildcard so DOI slugs containing "/" (e.g. 10.55662/SGMRJ...) still match
+app.get('/article/*', async (req, res) => {
+    const slug = decodeURIComponent(req.params[0] || '');
     try {
         const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
         const resp = await fetch(`${apiUrl}/api/archive/article/${encodeURIComponent(slug)}`);

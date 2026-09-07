@@ -346,8 +346,11 @@
                 var pageRange = (ps && pe) ? (String(ps).padStart(2,'0') + '-' + String(pe).padStart(2,'0')) : null;
                 var partSuffix = iss.part.name !== 'A' ? iss.part.name.toLowerCase() : '';
                 var citation = journal.abbr + '; ' + iss.vol.year + '; ' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + (pageRange || '');
-                // Use DOI if available, else fallback to id
-                var articleSlug = (art.doiRecord && art.doiRecord.doi) ? art.doiRecord.doi : art.id;
+                // Prefer the URL-safe title slug (no "/"), then DOI, then id.
+                // A DOI contains "/" which Apache rejects as an encoded slash (%2F) -> 404.
+                var articleSlug = art.slug
+                  ? art.slug
+                  : ((art.doiRecord && art.doiRecord.doi) ? art.doiRecord.doi : art.id);
                 var pdfUrl = art.pdfPublicPath ? (art.pdfPublicPath.startsWith('http') ? art.pdfPublicPath : '/api-files/' + art.pdfPublicPath) : null;
               %>
               <tr class="art-row"
