@@ -1004,6 +1004,11 @@
     <div class="form-card">
       <h3>Send Us a Message</h3>
       <form id="contactForm" novalidate>
+        <!-- anti-spam: honeypot (hidden from humans) + render timestamp -->
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden;">
+          <label>Company <input type="text" name="company_website" tabindex="-1" autocomplete="off" /></label>
+        </div>
+        <input type="hidden" name="form_loaded_at" id="form_loaded_at" value="" />
         <div class="form-grid">
           <div class="form-group">
             <input
@@ -1378,6 +1383,12 @@
       .addEventListener("click", () => errorOverlay.classList.remove("active"));
 
     let currentQueryDetails = null;
+
+    // anti-spam: stamp the time the form became interactive
+    (function () {
+      var stamp = document.getElementById("form_loaded_at");
+      if (stamp) stamp.value = String(Date.now());
+    })();
 
     document
       .getElementById("contactForm")

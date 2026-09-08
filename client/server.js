@@ -492,11 +492,65 @@ app.post('/submit-paper', submissionLimiter, (req, res) => {
 
 // POST Routes
 
-app.post('/contact', upload.single('attachment'), async (req, res) => {
+// Rate limit for the public contact form — real users submit once, bots hammer it
+const contactLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    max: 4,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { status: 'error', message: 'Too many messages from this network. Please try again later.' }
+});
+
+// The only subject values the real form can produce
+const ALLOWED_CONTACT_SUBJECTS = new Set([
+    'Manuscript Submission Query',
+    'Publication Guidelines',
+    'ISSN Guidance',
+    'Editing Services',
+    'Editorial Collaboration',
+    'General Inquiry'
+]);
+
+// Returns a reason string if the payload looks like spam, else null.
+function detectContactSpam({ name, subject, message, company_website, form_loaded_at }) {
+    // 1. Honeypot — humans never see or fill this field
+    if (company_website && String(company_website).trim() !== '') return 'honeypot';
+
+    // 2. Subject must be one of the real form options (bots send "Option1".."Option5", "General Inquiry" typos, etc.)
+    if (!ALLOWED_CONTACT_SUBJECTS.has(String(subject).trim())) return 'bad-subject';
+
+    // 3. Submitted implausibly fast after page load (< 2.5s) or with no timestamp at all
+    const loadedAt = Number(form_loaded_at);
+    if (!Number.isFinite(loadedAt) || Date.now() - loadedAt < 2500) return 'too-fast';
+
+    // 4. Links in the name field — never legitimate
+    if (/https?:\/\/|www\.|\.(com|net|ru|xyz|top|online)\b/i.test(String(name))) return 'url-in-name';
+
+    // 5. Gibberish name: 8+ letters, all lowercase, no vowels or vowel-starved (random keyboard mashing)
+    const n = String(name).trim();
+    if (/^[a-z]{8,}$/.test(n)) {
+        const vowels = (n.match(/[aeiou]/g) || []).length;
+        if (vowels / n.length < 0.2) return 'gibberish-name';
+    }
+
+    // 6. Message with links but almost no real text
+    if (/https?:\/\//i.test(String(message)) && String(message).replace(/\s+/g, '').length < 40) return 'link-only-message';
+
+    return null;
+}
+
+app.post('/contact', contactLimiter, upload.single('attachment'), async (req, res) => {
     try {
-        const { name, email, phone, subject, message } = req.body;
+        const { name, email, phone, subject, message, company_website, form_loaded_at } = req.body;
         if (!name || !email || !subject || !message) {
             return res.status(400).json({ status: 'error', message: 'All required fields must be filled.' });
+        }
+
+        const spamReason = detectContactSpam({ name, subject, message, company_website, form_loaded_at });
+        if (spamReason) {
+            console.warn('[Contact spam blocked]', spamReason, '-', String(email).slice(0, 60));
+            // Respond 200 so bots get no useful signal to adapt against
+            return res.json({ status: 'success', query_id: 'QRY-00000', timestamp: new Date().toLocaleString() });
         }
 
         const apiUrl = process.env.SCRIPTHIVE_API_URL || 'http://localhost:3001';
