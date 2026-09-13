@@ -556,8 +556,8 @@ export const ReportsPage = () => {
       fd.append("file", file);
       const res = await apiFetch(`/submissions/${encodeURIComponent(id)}/upload-production`, { method: "POST", body: fd });
       if (!res.ok) throw new Error("Upload failed");
-      const data = await res.json() as { pdfPublicPath?: string; url?: string };
-      const url = data.pdfPublicPath ?? data.url ?? "";
+      const data = await res.json() as { pdfPublicPath?: string; url?: string; filePath?: string };
+      const url = data.pdfPublicPath ?? data.url ?? data.filePath ?? "";
       setEditForm((p) => ({ ...p, pdfPublicPath: url }));
       toast.success("PDF uploaded — save to confirm");
     } catch (e) { toast.error(e instanceof Error ? e.message : "Upload failed"); }

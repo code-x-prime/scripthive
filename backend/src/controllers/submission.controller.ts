@@ -40,7 +40,10 @@ export const updatePublishedArticle = async (req: Request, res: Response): Promi
   if (coAuthors !== undefined) data.coAuthors = coAuthors || null;
   if (abstract !== undefined) data.abstract = abstract;
   if (keywords !== undefined) data.keywords = keywords;
-  if (pdfPublicPath !== undefined) data.pdfPublicPath = pdfPublicPath || null;
+  // Only touch pdfPublicPath when a real value is sent — an empty string here almost
+  // always means the client failed to pick up the just-uploaded file's URL, so treat
+  // it as "unchanged" rather than wiping out the existing PDF link.
+  if (pdfPublicPath) data.pdfPublicPath = pdfPublicPath;
   if (country !== undefined) data.country = country || null;
   if (affiliations !== undefined) data.affiliations = affiliations || null;
   if (pageStart !== undefined) data.pageStart = pageStart;
