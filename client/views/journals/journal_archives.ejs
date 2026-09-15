@@ -71,6 +71,14 @@
   /* Empty state */
   .no-articles { text-align: center; padding: 60px 20px; color: #94a3b8; font-size: 1rem; }
 
+  /* Pagination */
+  .arch-pagination { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0; }
+  .pg-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; height: 38px; padding: 0 12px; border-radius: 8px; border: 1.5px solid #e2e8f0; background: #fff; color: #374151; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: 0.15s; }
+  .pg-btn:hover:not(.disabled):not(.active) { border-color: #2563eb; color: #2563eb; }
+  .pg-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+  .pg-btn.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+  .pg-ellipsis { color: #94a3b8; padding: 0 4px; font-size: 0.85rem; }
+
   .arch-filter-select { width:100%; height:38px; border:1.5px solid #e2e8f0; border-radius:8px; padding:0 10px; font-size:0.85rem; color:#374151; background:#fff; cursor:pointer; outline:none; transition:0.15s; }
   .arch-filter-select:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.1); }
   .arch-filter-col { display: none; } /* moved to right col */
@@ -391,6 +399,11 @@
         <% }); %>
         <div id="archNoResults" class="arch-no-results">No articles match your search.</div>
 
+        <!-- Pagination — one issue/part per page -->
+        <% if (issues.length > 1) { %>
+        <div id="archPagination" class="arch-pagination"></div>
+        <% } %>
+
       <% } %>
     </main>
 
@@ -429,17 +442,7 @@
           user-select:none; transition:background 0.2s;
         }
         .tree-iss-hdr:hover { background:#f8fafc; }
-        .tree-iss-hdr.active { background:#eff6ff; color:#2563eb; }
-        .tree-iss-hdr .ti-arrow { font-size:0.65rem; color:#cbd5e1; transition:transform 0.2s; }
-        .tree-iss-hdr.open .ti-arrow { transform:rotate(180deg); }
-        .tree-part-list { display:none; padding:2px 0 2px 12px; }
-        .tree-part-list.open { display:block; }
-        .tree-part-item {
-          padding:5px 10px; font-size:0.82rem; font-weight:500; color:#475569;
-          border-radius:6px; cursor:pointer; transition:background 0.2s;
-        }
-        .tree-part-item:hover { background:#f1f5f9; }
-        .tree-part-item.active { background:#dbeafe; color:#1d4ed8; font-weight:700; }
+        .tree-iss-hdr.active { background:#dbeafe; color:#1d4ed8; }
       </style>
       <div class="filter-card">
         <div class="filter-card-title">
@@ -452,7 +455,6 @@
       (function(){
         var DATA = <%- issueDataJson %>;
 
-        function partLabel(p){ return (/^part\s/i.test(p)||/special\s*issue/i.test(p))?p:'Part '+p; }
         function getUniq(arr){ var s={}; arr.forEach(function(v){s[v]=true;}); return Object.keys(s).sort(function(a,b){return Number(b)-Number(a);}); }
 
         var selVol=null, selIss=null, selPart=null;
@@ -474,24 +476,13 @@
             issues.forEach(function(n){
               var issDiv = document.createElement('div'); issDiv.className='tree-iss';
               var issHdr = document.createElement('div');
-              var parts = getUniq(DATA.filter(function(d){return String(d.vol)===v&&String(d.iss)===n;}).map(function(d){return d.part;}));
-              issHdr.className='tree-iss-hdr'+(selVol===v&&selIss===n?' open':'');
-              issHdr.innerHTML='<span>Issue '+n+'</span><span class="ti-arrow">▼</span>';
+              issHdr.className='tree-iss-hdr'+(selVol===v&&selIss===n?' active':'');
+              issHdr.innerHTML='<span>Issue '+n+'</span>';
               issHdr.addEventListener('click', function(e){
                 e.stopPropagation();
                 selVol=v; selIss=(selIss===n?null:n); selPart=null; (window.applyFilters||function(){})(); buildTree();
               });
               issDiv.appendChild(issHdr);
-              var partList = document.createElement('div');
-              partList.className='tree-part-list'+(selVol===v&&selIss===n?' open':'');
-              parts.forEach(function(p){
-                var pi = document.createElement('div');
-                pi.className='tree-part-item'+(selVol===v&&selIss===n&&selPart===p?' active':'');
-                pi.textContent=partLabel(p);
-                pi.addEventListener('click', function(e){ e.stopPropagation(); selVol=v; selIss=n; selPart=p; (window.applyFilters||function(){})(); buildTree(); });
-                partList.appendChild(pi);
-              });
-              issDiv.appendChild(partList);
               issList.appendChild(issDiv);
             });
 
@@ -578,13 +569,65 @@
     return el ? el.value : '';
   }
 
-  window.applyFilters = function applyFilters() {
+  // ---- Pagination: one issue/part block per page when no search/filter is active ----
+  var pgCurrentPage = 1;
+
+  function renderPagination(blocks) {
+    var el = document.getElementById('archPagination');
+    if (!el) return;
+    var total = blocks.length;
+    if (total <= 1) { el.innerHTML = ''; return; }
+    if (pgCurrentPage > total) pgCurrentPage = total;
+    if (pgCurrentPage < 1) pgCurrentPage = 1;
+
+    function btn(label, page, opts) {
+      opts = opts || {};
+      var cls = 'pg-btn' + (opts.active ? ' active' : '') + (opts.disabled ? ' disabled' : '');
+      return '<button type="button" class="' + cls + '" data-page="' + page + '"' + (opts.disabled ? ' disabled' : '') + '>' + label + '</button>';
+    }
+
+    var html = '';
+    html += btn('&laquo;', pgCurrentPage - 1, { disabled: pgCurrentPage === 1 });
+
+    var pages = [];
+    for (var p = 1; p <= total; p++) {
+      if (p === 1 || p === total || Math.abs(p - pgCurrentPage) <= 1) pages.push(p);
+    }
+    var lastShown = 0;
+    pages.forEach(function(p) {
+      if (lastShown && p - lastShown > 1) html += '<span class="pg-ellipsis">&hellip;</span>';
+      html += btn(String(p), p, { active: p === pgCurrentPage });
+      lastShown = p;
+    });
+
+    html += btn('&raquo;', pgCurrentPage + 1, { disabled: pgCurrentPage === total });
+    el.innerHTML = html;
+
+    el.querySelectorAll('.pg-btn:not(.disabled)').forEach(function(b) {
+      b.addEventListener('click', function() {
+        pgCurrentPage = parseInt(b.getAttribute('data-page'), 10);
+        showPage(blocks);
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+  }
+
+  function showPage(blocks) {
+    blocks.forEach(function(block, i) {
+      block.style.display = (i === pgCurrentPage - 1) ? '' : 'none';
+    });
+    renderPagination(blocks);
+  }
+
+  window.applyFilters = function applyFilters(opts) {
+    opts = opts || {};
     var q = (document.getElementById('archSearch') ? document.getElementById('archSearch').value : '').toLowerCase().trim();
     var selYear = getDropVal('dropYear');
     var treeState = window._treeState ? window._treeState() : {vol:null,iss:null,part:null};
     var selVol  = treeState.vol  || getDropVal('dropVol');
     var selIss  = treeState.iss  || getDropVal('dropIss');
     var selPart = treeState.part || getDropVal('dropPart');
+    var hasActiveFilter = !!(q || selYear || selVol || selIss || selPart);
     var rows = document.querySelectorAll('.art-row');
     var visible = 0;
 
@@ -605,11 +648,32 @@
       if (show) visible++;
     });
 
-    // hide issue blocks with no visible rows
-    document.querySelectorAll('.issue-block').forEach(function(block) {
-      var hasVisible = Array.from(block.querySelectorAll('.art-row')).some(function(r){ return r.style.display !== 'none'; });
-      block.style.display = hasVisible ? '' : 'none';
-    });
+    var blocks = Array.from(document.querySelectorAll('.issue-block'));
+    var pagination = document.getElementById('archPagination');
+
+    if (hasActiveFilter) {
+      // Search/filter active — show every matching block, hide pagination
+      blocks.forEach(function(block) {
+        var hasVisible = Array.from(block.querySelectorAll('.art-row')).some(function(r){ return r.style.display !== 'none'; });
+        block.style.display = hasVisible ? '' : 'none';
+      });
+      if (pagination) pagination.innerHTML = '';
+    } else {
+      // No filter — paginate one issue/part per page
+      blocks.forEach(function(block) {
+        block.querySelectorAll('.art-row').forEach(function(r) { r.style.display = ''; });
+      });
+      if (opts.resetPage) pgCurrentPage = 1;
+      if (treeState.vol) {
+        var targetIdx = blocks.findIndex(function(b) {
+          var matchesVol = b.getAttribute('data-vol') === String(treeState.vol);
+          var matchesIss = !treeState.iss || b.getAttribute('data-iss') === String(treeState.iss);
+          return matchesVol && matchesIss;
+        });
+        if (targetIdx >= 0) pgCurrentPage = targetIdx + 1;
+      }
+      showPage(blocks);
+    }
 
     // renumber per block
     document.querySelectorAll('.issue-block').forEach(function(block) {
@@ -628,11 +692,11 @@
 
   document.addEventListener('DOMContentLoaded', function() {
     var s = document.getElementById('archSearch');
-    if (s) s.addEventListener('input', applyFilters);
+    if (s) s.addEventListener('input', function(){ applyFilters({ resetPage: true }); });
 
     ['dropYear','dropVol','dropIss','dropPart'].forEach(function(id) {
       var el = document.getElementById(id);
-      if (el) el.addEventListener('change', applyFilters);
+      if (el) el.addEventListener('change', function(){ applyFilters({ resetPage: true }); });
     });
 
     // Tree filter handles clear + auto-select — just run applyFilters on load
