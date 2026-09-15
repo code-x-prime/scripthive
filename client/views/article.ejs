@@ -76,6 +76,16 @@
   const partName = art.part?.name || 'A';
   const partLetter = partName.toLowerCase();
   const citation = vol && iss ? (jid + '; ' + vol.year + '; ' + vol.number + '(' + iss.number + partLetter + ')' + (art.pageStart ? (':' + String(art.pageStart).padStart(2,'0') + (art.pageEnd ? '-' + String(art.pageEnd).padStart(2,'0') : '')) : '')) : '';
+  // Vancouver-style journal abbreviation used in the "How to Cite" reference
+  const JOURNAL_VANCOUVER_ABBR = {
+    SGMRJ: 'ScriptHive Glob Multidiscip Res J',
+    SGJVSR: 'ScriptHive Glob J Vedic Sanskrit Res',
+    SGJPLS: 'ScriptHive Glob J Phys Life Sci',
+    SGJETR: 'ScriptHive Glob J Eng Technol Res',
+    SGJSSH: 'ScriptHive Glob J Soc Sci Humanit',
+    SGJASH: 'ScriptHive Glob J Appl Sci Health'
+  };
+  const journalAbbrName = JOURNAL_VANCOUVER_ABBR[jid] || art.journal?.name || jid;
   const issueLabel = vol && iss ? ('Vol. ' + vol.number + ', Issue ' + iss.number + (partName !== 'A' ? ' Part ' + partName : '') + ' (' + vol.year + ')') : '';
   const journalUrl = '/' + jid + '/archives';
 %>
@@ -147,7 +157,7 @@
       <div class="art-card">
         <div class="art-section-label">How to Cite</div>
         <div class="art-cite-box">
-          <%= art.authorName %><%= art.coAuthors ? ', ' + art.coAuthors : '' %>. "<%= art.title %>." <%= art.journal?.name || jid %> <%= citation %>.<% if (doiUrl) { %> <%= doiUrl %><% } %>
+          <%= art.authorName %><%= art.coAuthors ? ', ' + art.coAuthors : '' %>. "<%= art.title %>." <%= journalAbbrName %>. <%= citation %>.<% if (doiUrl) { %> <%= doiUrl %><% } %>
         </div>
       </div>
       <% } %>
