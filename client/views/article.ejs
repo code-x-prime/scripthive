@@ -86,8 +86,12 @@
     SGJASH: 'ScriptHive Glob J Appl Sci Health'
   };
   const journalAbbrName = JOURNAL_VANCOUVER_ABBR[jid] || art.journal?.name || jid;
-  const partDisplay = /^part\s/i.test(partName) || /special\s*issue/i.test(partName) ? partName : ('Part ' + partName);
-  const issueLabel = vol && iss ? ('Vol. ' + vol.number + ', Issue ' + iss.number + (partName !== 'A' ? ' ' + partDisplay : '') + ' (' + vol.year + ')') : '';
+  // Strip a leading "Part" word/separator so stored names like "Part - A" just show as "A".
+  // Special Issue names are left untouched.
+  const partDisplay = /special\s*issue/i.test(partName)
+    ? partName
+    : partName.replace(/^part\b\s*[-:]?\s*/i, '').trim();
+  const issueLabel = vol && iss ? ('Vol. ' + vol.number + ', Issue ' + iss.number + (partDisplay && partDisplay !== 'A' ? ' Part ' + partDisplay : '') + ' (' + vol.year + ')') : '';
   const journalUrl = '/' + jid + '/archives';
 %>
 
