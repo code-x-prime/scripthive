@@ -86,7 +86,8 @@
     SGJASH: 'ScriptHive Glob J Appl Sci Health'
   };
   const journalAbbrName = JOURNAL_VANCOUVER_ABBR[jid] || art.journal?.name || jid;
-  const issueLabel = vol && iss ? ('Vol. ' + vol.number + ', Issue ' + iss.number + (partName !== 'A' ? ' Part ' + partName : '') + ' (' + vol.year + ')') : '';
+  const partDisplay = /^part\s/i.test(partName) || /special\s*issue/i.test(partName) ? partName : ('Part ' + partName);
+  const issueLabel = vol && iss ? ('Vol. ' + vol.number + ', Issue ' + iss.number + (partName !== 'A' ? ' ' + partDisplay : '') + ' (' + vol.year + ')') : '';
   const journalUrl = '/' + jid + '/archives';
 %>
 
@@ -107,7 +108,6 @@
         <% if (issueLabel) { %><span class="art-chip"><i class="fa-solid fa-book-open"></i> <%= issueLabel %></span><% } %>
         <% if (art.country) { %><span class="art-chip"><i class="fa-solid fa-location-dot"></i> <%= art.country %></span><% } %>
         <% if (art.pageStart && art.pageEnd) { %><span class="art-chip"><i class="fa-solid fa-file-lines"></i> Pages <%= art.pageStart %>–<%= art.pageEnd %></span><% } %>
-        <% if (art.pubDate) { %><span class="art-chip"><i class="fa-solid fa-calendar"></i> <%= new Date(art.pubDate).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'}) %></span><% } %>
       </div>
     </div>
   </div>
