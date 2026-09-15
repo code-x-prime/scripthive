@@ -291,6 +291,8 @@ function ActivityTab({ activityData }: { activityData: ActivityPayload }) {
   const { dailyActivity, userSummary, recentLogs } = activityData;
   const [drillUser, setDrillUser] = useState<UserActivitySummary | null>(null);
   const [feedFilter, setFeedFilter] = useState("");
+  const [feedDateFrom, setFeedDateFrom] = useState("");
+  const [feedDateTo, setFeedDateTo] = useState("");
   const [_expandedUsers, _setExpandedUsers] = useState<Record<string, boolean>>({});
 
   const totalActions = recentLogs.length;
@@ -301,13 +303,28 @@ function ActivityTab({ activityData }: { activityData: ActivityPayload }) {
     }, acc), {} as Record<string,number>);
   const topActionLabel = Object.entries(topAction).sort((a,b)=>b[1]-a[1])[0];
 
-  const filteredLogs = feedFilter
-    ? recentLogs.filter(l =>
-        (l.admin?.name ?? "").toLowerCase().includes(feedFilter.toLowerCase()) ||
-        l.action.toLowerCase().includes(feedFilter.toLowerCase()) ||
-        (l.resourceId ?? "").toLowerCase().includes(feedFilter.toLowerCase())
-      )
-    : recentLogs;
+  const fromTs = feedDateFrom ? new Date(feedDateFrom + "T00:00:00").getTime() : null;
+  const toTs = feedDateTo ? new Date(feedDateTo + "T23:59:59.999").getTime() : null;
+
+  const filteredLogs = recentLogs.filter((l) => {
+    if (feedFilter) {
+      const q = feedFilter.toLowerCase();
+      const matches =
+        (l.admin?.name ?? "").toLowerCase().includes(q) ||
+        l.action.toLowerCase().includes(q) ||
+        (l.resourceId ?? "").toLowerCase().includes(q);
+      if (!matches) return false;
+    }
+    if (fromTs != null || toTs != null) {
+      const ts = new Date(l.createdAt).getTime();
+      if (fromTs != null && ts < fromTs) return false;
+      if (toTs != null && ts > toTs) return false;
+    }
+    return true;
+  });
+
+  const hasFeedFilters = feedFilter !== "" || feedDateFrom !== "" || feedDateTo !== "";
+  const clearFeedFilters = () => { setFeedFilter(""); setFeedDateFrom(""); setFeedDateTo(""); };
 
   function exportAllCSV() {
     const esc = (v: string) => /[",\n\r]/.test(v) ? `"${v.replaceAll('"','""')}"` : v;
@@ -479,17 +496,40 @@ function ActivityTab({ activityData }: { activityData: ActivityPayload }) {
 
       {/* Activity feed with filter */}
       <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="border-b border-slate-100 px-5 py-3 flex items-center gap-3 flex-wrap">
+        <div className="border-b border-slate-100 px-5 py-3 flex items-center gap-2 flex-wrap">
           <Activity className="h-4 w-4 text-slate-500 shrink-0" />
           <h3 className="font-semibold text-slate-800">Activity feed</h3>
-          <input
-            type="text"
-            placeholder="Filter by user, action, ID…"
-            value={feedFilter}
-            onChange={(e) => setFeedFilter(e.target.value)}
-            className="ml-auto h-8 rounded-lg border border-slate-200 px-3 text-xs focus:outline-none focus:ring-2 focus:ring-green-500 w-52"
-          />
-          <span className="text-xs text-slate-400 shrink-0">{filteredLogs.length} entries</span>
+          <div className="ml-auto flex items-center gap-2 flex-wrap">
+            <input
+              type="text"
+              placeholder="Filter by user, action, ID…"
+              value={feedFilter}
+              onChange={(e) => setFeedFilter(e.target.value)}
+              className="h-8 rounded-lg border border-slate-200 px-3 text-xs focus:outline-none focus:ring-2 focus:ring-green-500 w-52"
+            />
+            <input
+              type="date"
+              value={feedDateFrom}
+              onChange={(e) => setFeedDateFrom(e.target.value)}
+              title="From date"
+              className="h-8 rounded-lg border border-slate-200 px-2 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <span className="text-xs text-slate-400">to</span>
+            <input
+              type="date"
+              value={feedDateTo}
+              onChange={(e) => setFeedDateTo(e.target.value)}
+              title="To date"
+              className="h-8 rounded-lg border border-slate-200 px-2 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            {hasFeedFilters && (
+              <button type="button" onClick={clearFeedFilters}
+                className="h-8 rounded-lg border border-slate-200 px-2.5 text-xs font-medium text-slate-500 hover:bg-slate-50">
+                Clear
+              </button>
+            )}
+          </div>
+          <span className="text-xs text-slate-400 shrink-0 basis-full text-right sm:basis-auto">{filteredLogs.length} entries</span>
         </div>
         <div className="divide-y divide-slate-50 max-h-[600px] overflow-y-auto">
           {filteredLogs.length === 0 && (
@@ -543,6 +583,9 @@ export const ReportsPage = () => {
   const [activityDays, setActivityDays] = useState(30);
   const [publishedArticles, setPublishedArticles] = useState<Submission[]>([]);
   const [publishedLoading, setPublishedLoading] = useState(false);
+  const [publishedSearch, setPublishedSearch] = useState("");
+  const [publishedDateFrom, setPublishedDateFrom] = useState("");
+  const [publishedDateTo, setPublishedDateTo] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{ title: string; authorName: string; coAuthors: string; abstract: string; keywords: string; pdfPublicPath: string; country: string; affiliations: string; pageStart: string; pageEnd: string; slug: string; }>({ title: "", authorName: "", coAuthors: "", abstract: "", keywords: "", pdfPublicPath: "", country: "", affiliations: "", pageStart: "", pageEnd: "", slug: "" });
   const joditConfig = useMemo(() => ({ height: 220, toolbarAdaptive: false, buttons: "bold,italic,underline,|,ul,ol,|,link,|,source", statusbar: false, showCharsCounter: false, showWordsCounter: false, showXPathInStatusbar: false }), []);
@@ -617,6 +660,34 @@ export const ReportsPage = () => {
     window.print();
     document.body.classList.remove("printing-report");
   };
+
+  const pubFromTs = publishedDateFrom ? new Date(publishedDateFrom + "T00:00:00").getTime() : null;
+  const pubToTs = publishedDateTo ? new Date(publishedDateTo + "T23:59:59.999").getTime() : null;
+
+  const filteredPublishedArticles = publishedArticles.filter((art: Submission) => {
+    if (publishedSearch) {
+      const q = publishedSearch.toLowerCase();
+      const matches =
+        art.title.toLowerCase().includes(q) ||
+        art.authorName.toLowerCase().includes(q) ||
+        (art.coAuthors ?? "").toLowerCase().includes(q) ||
+        art.id.toLowerCase().includes(q) ||
+        art.journalId.toLowerCase().includes(q) ||
+        (art.country ?? "").toLowerCase().includes(q);
+      if (!matches) return false;
+    }
+    if (pubFromTs != null || pubToTs != null) {
+      const dateSource = art.pubDate ?? art.createdAt;
+      if (!dateSource) return false;
+      const ts = new Date(dateSource).getTime();
+      if (pubFromTs != null && ts < pubFromTs) return false;
+      if (pubToTs != null && ts > pubToTs) return false;
+    }
+    return true;
+  });
+
+  const hasPublishedFilters = publishedSearch !== "" || publishedDateFrom !== "" || publishedDateTo !== "";
+  const clearPublishedFilters = () => { setPublishedSearch(""); setPublishedDateFrom(""); setPublishedDateTo(""); };
 
   if (loading) {
     return (
@@ -896,20 +967,58 @@ export const ReportsPage = () => {
 
       {activeTab === "published" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <h2 className="text-lg font-semibold text-slate-800">Published Articles</h2>
             <button type="button" onClick={() => void loadPublished()}
               className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
               Refresh
             </button>
           </div>
+
+          {/* Search + date range filter */}
+          <div className="flex items-center gap-2 flex-wrap rounded-xl border border-slate-200 bg-white p-3">
+            <input
+              type="text"
+              placeholder="Search by title, author, journal, ID…"
+              value={publishedSearch}
+              onChange={(e) => setPublishedSearch(e.target.value)}
+              className="h-9 flex-1 min-w-[220px] rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <input
+              type="date"
+              value={publishedDateFrom}
+              onChange={(e) => setPublishedDateFrom(e.target.value)}
+              title="Published from"
+              className="h-9 rounded-lg border border-slate-200 px-2 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <span className="text-xs text-slate-400">to</span>
+            <input
+              type="date"
+              value={publishedDateTo}
+              onChange={(e) => setPublishedDateTo(e.target.value)}
+              title="Published to"
+              className="h-9 rounded-lg border border-slate-200 px-2 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            {hasPublishedFilters && (
+              <button type="button" onClick={clearPublishedFilters}
+                className="h-9 rounded-lg border border-slate-200 px-3 text-sm font-medium text-slate-500 hover:bg-slate-50">
+                Clear
+              </button>
+            )}
+            <span className="text-xs text-slate-400 shrink-0 ml-auto">
+              {filteredPublishedArticles.length} of {publishedArticles.length} articles
+            </span>
+          </div>
+
           {publishedLoading ? (
             <div className="flex items-center gap-2 text-slate-500"><Loader2 className="h-5 w-5 animate-spin" /> Loading…</div>
           ) : publishedArticles.length === 0 ? (
             <p className="rounded-xl border border-dashed border-slate-200 bg-white py-12 text-center text-sm text-slate-400">No published articles yet.</p>
+          ) : filteredPublishedArticles.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-slate-200 bg-white py-12 text-center text-sm text-slate-400">No articles match your filters.</p>
           ) : (
             <div className="space-y-3">
-              {publishedArticles.map((art) => (
+              {filteredPublishedArticles.map((art: Submission) => (
                 <div key={art.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
