@@ -6,12 +6,27 @@
   <%
     const archiveData = typeof archive !== 'undefined' ? archive : [];
     const journalAbbr = typeof journalId !== 'undefined' ? journalId : 'SGJVSR';
+    // Vancouver-style journal abbreviation used in article citations
+    const JOURNAL_VANCOUVER_ABBR = {
+      SGMRJ: 'ScriptHive Glob Multidiscip Res J',
+      SGJVSR: 'ScriptHive Glob J Vedic Sanskrit Res',
+      SGJPLS: 'ScriptHive Glob J Phys Life Sci',
+      SGJETR: 'ScriptHive Glob J Eng Technol Res',
+      SGJSSH: 'ScriptHive Glob J Soc Sci Humanit',
+      SGJASH: 'ScriptHive Glob J Appl Sci Health'
+    };
+    const journalCiteName = JOURNAL_VANCOUVER_ABBR[journalAbbr] || journalAbbr;
     const issueList = [];
     archiveData.forEach(function(vol) {
       (vol.issues || []).forEach(function(iss) {
         (iss.parts || []).forEach(function(part) {
           if ((part.articles || []).length > 0) {
-            const pl = (part.name || 'A').toLowerCase();
+            // Stored part names look like "Part - A" — strip the prefix, and only
+            // emit a Vancouver issue-suffix letter for non-default parts, e.g. 1(1b).
+            const rawPart = part.name || 'A';
+            const isSpecial = /special\s*issue/i.test(rawPart);
+            const partBare = isSpecial ? rawPart : rawPart.replace(/^part\b\s*[-:]?\s*/i, '').trim();
+            const pl = (!isSpecial && partBare && partBare !== 'A') ? partBare.toLowerCase() : '';
             issueList.push({ vol, iss, part, pl, articles: part.articles });
           }
         });
@@ -35,8 +50,12 @@
   <% } else { %>
     <% issueList.forEach(function(item) { %>
       <%
+        const rawPartName = item.part.name || 'A';
+        const isSpecialPart = /special\s*issue/i.test(rawPartName);
+        const barePart = isSpecialPart ? rawPartName : rawPartName.replace(/^part\b\s*[-:]?\s*/i, '').trim();
+        const partText = isSpecialPart ? rawPartName : ('Part ' + barePart);
         const issLabel = 'Vol. ' + item.vol.number + ', Issue ' + item.iss.number +
-          (item.part.name !== 'A' ? ' Part ' + item.part.name : '') +
+          (barePart !== 'A' ? ' ' + partText : '') +
           ' (' + item.vol.year + ')' +
           (item.iss.period ? ' — ' + item.iss.period : '');
       %>
@@ -56,7 +75,7 @@
               <% item.articles.forEach(function(art, idx) {
                 const ps = art.pageStart, pe = art.pageEnd;
                 const pageRange = (ps && pe) ? (String(ps).padStart(2,'0') + '-' + String(pe).padStart(2,'0')) : '';
-                const citation = journalAbbr + '; ' + item.vol.year + '; ' + item.vol.number + '(' + item.iss.number + item.pl + '):' + pageRange;
+                const citation = journalCiteName + '. ' + item.vol.year + '; ' + item.vol.number + '(' + item.iss.number + item.pl + '):' + pageRange;
                 const pdfUrl = art.pdfPublicPath
                   ? (art.pdfPublicPath.startsWith('http') ? art.pdfPublicPath : (backendBase + '/' + art.pdfPublicPath.replace(/^uploads\//, 'uploads/')))
                   : null;

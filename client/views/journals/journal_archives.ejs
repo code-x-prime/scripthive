@@ -227,6 +227,17 @@
   </nav>
 
   <%
+    // Vancouver-style journal abbreviation used in article citations
+    var JOURNAL_VANCOUVER_ABBR = {
+      SGMRJ: 'ScriptHive Glob Multidiscip Res J',
+      SGJVSR: 'ScriptHive Glob J Vedic Sanskrit Res',
+      SGJPLS: 'ScriptHive Glob J Phys Life Sci',
+      SGJETR: 'ScriptHive Glob J Eng Technol Res',
+      SGJSSH: 'ScriptHive Glob J Soc Sci Humanit',
+      SGJASH: 'ScriptHive Glob J Appl Sci Health'
+    };
+    var journalCiteName = JOURNAL_VANCOUVER_ABBR[journal.abbr] || journal.name || journal.abbr;
+
     var issues = [];
     (archive || []).forEach(function(vol) {
       (vol.issues || []).forEach(function(iss) {
@@ -336,7 +347,13 @@
         <% issues.forEach(function(iss) {
           var sameParts = issues.filter(function(i){ return i.vol.number === iss.vol.number && i.iss.number === iss.iss.number; });
           var showPart = sameParts.length > 1;
-          var partLabel = iss.part.name ? (/^part\s/i.test(iss.part.name) || /special\s*issue/i.test(iss.part.name) ? iss.part.name : 'Part ' + iss.part.name) : '';
+          var rawPart = iss.part.name || 'A';
+          var isSpecial = /special\s*issue/i.test(rawPart);
+          // Stored part names look like "Part - A"; strip the prefix so we don't render "Part Part - A".
+          var partBare = isSpecial ? rawPart : rawPart.replace(/^part\b\s*[-:]?\s*/i, '').trim();
+          var partLabel = isSpecial ? rawPart : ('Part ' + partBare);
+          // Vancouver issue suffix — only non-default parts get a letter, e.g. 1(1b)
+          var partSuffix = (!isSpecial && partBare && partBare !== 'A') ? partBare.toLowerCase() : '';
           var issLabel = 'Vol. ' + iss.vol.number + ', Issue ' + iss.iss.number + (showPart ? ' — ' + partLabel : '') + ' (' + iss.vol.year + ')';
         %>
         <div class="issue-block" data-year="<%= iss.vol.year %>" data-vol="<%= iss.vol.number %>" data-iss="<%= iss.iss.number %>">
@@ -352,8 +369,7 @@
               <% iss.articles.forEach(function(art, idx) {
                 var ps = art.pageStart, pe = art.pageEnd;
                 var pageRange = (ps && pe) ? (String(ps).padStart(2,'0') + '-' + String(pe).padStart(2,'0')) : null;
-                var partSuffix = iss.part.name !== 'A' ? iss.part.name.toLowerCase() : '';
-                var citation = journal.abbr + '; ' + iss.vol.year + '; ' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + (pageRange || '');
+                var citation = journalCiteName + '. ' + iss.vol.year + '; ' + iss.vol.number + '(' + iss.iss.number + partSuffix + '):' + (pageRange || '');
                 // Prefer the URL-safe title slug (no "/"), then DOI, then id.
                 // A DOI contains "/" which Apache rejects as an encoded slash (%2F) -> 404.
                 var articleSlug = art.slug
