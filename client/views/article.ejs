@@ -74,8 +74,17 @@
     : null;
   const doiUrl = art.doiRecord?.doi ? ('https://www.doi.org/' + art.doiRecord.doi) : null;
   const partName = art.part?.name || 'A';
-  const partLetter = partName.toLowerCase();
-  const citation = vol && iss ? (jid + '; ' + vol.year + '; ' + vol.number + '(' + iss.number + partLetter + ')' + (art.pageStart ? (':' + String(art.pageStart).padStart(2,'0') + (art.pageEnd ? '-' + String(art.pageEnd).padStart(2,'0') : '')) : '')) : '';
+  // Strip a leading "Part" word/separator so stored names like "Part - A" just show as "A".
+  // Special Issue names are left untouched.
+  const partDisplay = /special\s*issue/i.test(partName)
+    ? partName
+    : partName.replace(/^part\b\s*[-:]?\s*/i, '').trim();
+  // Vancouver issue suffix: only non-default parts get a letter, e.g. 1(1b)
+  const partLetter = (!/special\s*issue/i.test(partName) && partDisplay && partDisplay !== 'A')
+    ? partDisplay.toLowerCase()
+    : '';
+  // Citation body without the journal name — the name is rendered separately
+  const citation = vol && iss ? (vol.year + '; ' + vol.number + '(' + iss.number + partLetter + ')' + (art.pageStart ? (':' + String(art.pageStart).padStart(2,'0') + (art.pageEnd ? '-' + String(art.pageEnd).padStart(2,'0') : '')) : '')) : '';
   // Vancouver-style journal abbreviation used in the "How to Cite" reference
   const JOURNAL_VANCOUVER_ABBR = {
     SGMRJ: 'ScriptHive Glob Multidiscip Res J',
@@ -86,11 +95,6 @@
     SGJASH: 'ScriptHive Glob J Appl Sci Health'
   };
   const journalAbbrName = JOURNAL_VANCOUVER_ABBR[jid] || art.journal?.name || jid;
-  // Strip a leading "Part" word/separator so stored names like "Part - A" just show as "A".
-  // Special Issue names are left untouched.
-  const partDisplay = /special\s*issue/i.test(partName)
-    ? partName
-    : partName.replace(/^part\b\s*[-:]?\s*/i, '').trim();
   const issueLabel = vol && iss ? ('Vol. ' + vol.number + ', Issue ' + iss.number + (partDisplay && partDisplay !== 'A' ? ' Part ' + partDisplay : '') + ' (' + vol.year + ')') : '';
   const journalUrl = '/' + jid + '/archives';
 %>
