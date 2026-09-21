@@ -251,6 +251,9 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
         keywords: _keywords || submission.keywords,
         country: _country || submission.country,
         status: "Published",
+        // Move it out of the production pipeline — otherwise it keeps showing
+        // up in the "Ready to published" queue after being published.
+        productionStatus: "Published",
         partId: partRecord.id,
         volumeId: volumeRecord.id,
         issueId: issueRecord.id,
