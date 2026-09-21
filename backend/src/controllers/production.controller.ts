@@ -1,9 +1,8 @@
 import type { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
+import type { ProductionStage } from "../utils/submissionStatus.js";
 
-const STAGES = ["ReadyForPreparation", "ReadyForUpload", "ReadyToPublished"] as const;
-
-export const listProductionStage = (stage: (typeof STAGES)[number]) => {
+export const listProductionStage = (stage: ProductionStage) => {
   return async (_req: Request, res: Response): Promise<void> => {
     const rows = await prisma.submission.findMany({
       // Already-published papers have left the production pipeline, so keep them

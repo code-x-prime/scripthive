@@ -8,6 +8,7 @@ import { generateUniqueArticleSlug } from "../utils/uniqueArticleSlug.js";
 import { writeAuditLog } from "../utils/auditLog.js";
 import type { AuthRequest } from "../middlewares/auth.middleware.js";
 import { uploadToR2 } from "../utils/r2Upload.js";
+import { statusChangeData } from "../utils/submissionStatus.js";
 
 export const listVolumesForJournal = async (req: Request, res: Response): Promise<void> => {
   const journalId = typeof req.query.journalId === "string" ? req.query.journalId : undefined;
@@ -250,10 +251,8 @@ export const publishArticle = async (req: Request, res: Response): Promise<void>
         abstract: _abstract || submission.abstract,
         keywords: _keywords || submission.keywords,
         country: _country || submission.country,
-        status: "Published",
-        // Move it out of the production pipeline — otherwise it keeps showing
-        // up in the "Ready to published" queue after being published.
-        productionStatus: "Published",
+        // Sets status **and** clears the pipeline stage — see submissionStatus.ts.
+        ...statusChangeData("Published", submission.status),
         partId: partRecord.id,
         volumeId: volumeRecord.id,
         issueId: issueRecord.id,

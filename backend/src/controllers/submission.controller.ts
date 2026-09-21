@@ -17,6 +17,7 @@ import { logger } from "../utils/logger.js";
 import { writeAuditLog } from "../utils/auditLog.js";
 import type { AuthRequest } from "../middlewares/auth.middleware.js";
 import { uploadToR2 } from "../utils/r2Upload.js";
+import { PRODUCTION_STAGES, statusChangeData } from "../utils/submissionStatus.js";
 
 export const listPublishedArticles = async (_req: Request, res: Response): Promise<void> => {
   const rows = await prisma.submission.findMany({
@@ -258,7 +259,10 @@ export const updateSubmissionStatus = async (req: Request, res: Response): Promi
     res.status(404).json({ message: "Submission not found" });
     return;
   }
-  const row = await prisma.submission.update({ where: { id }, data: { status } });
+  const row = await prisma.submission.update({
+    where: { id },
+    data: statusChangeData(status, prev.status)
+  });
   const adminId = (req as AuthRequest).admin?.adminId;
   void writeAuditLog({
     adminId,
@@ -335,12 +339,22 @@ export const uploadManuscript = async (req: Request, res: Response): Promise<voi
 
 export const updateProductionStatus = async (req: Request, res: Response): Promise<void> => {
   const { productionStatus } = req.body as { productionStatus: string | null };
-  const allowed = ["ReadyForPreparation", "ReadyForUpload", "ReadyToPublished"];
+  const allowed: string[] = [...PRODUCTION_STAGES];
   if (productionStatus !== null && productionStatus !== "" && !allowed.includes(productionStatus)) {
     res.status(400).json({ message: "Invalid production status" });
     return;
   }
   const id = String(req.params.id);
+  // A published paper has left the pipeline — putting it back into a stage would
+  // resurrect it in the production queues. Un-publish it first instead.
+  const current = await prisma.submission.findUnique({ where: { id }, select: { status: true } });
+  if (!current) { res.status(404).json({ message: "Submission not found" }); return; }
+  if (current.status === "Published" && productionStatus) {
+    res.status(409).json({
+      message: "This paper is already published. Change its status away from Published before moving it back into the production pipeline."
+    });
+    return;
+  }
   const row = await prisma.submission.update({
     where: { id },
     data: { productionStatus: productionStatus === null || productionStatus === "" ? null : productionStatus }
@@ -394,7 +408,21 @@ export const bulkUpdateStatus = async (req: Request, res: Response): Promise<voi
     return;
   }
   const submissions = await prisma.submission.findMany({ where: { id: { in: ids } } });
-  await prisma.submission.updateMany({ where: { id: { in: ids } }, data: { status } });
+  // productionStatus depends on each row's previous status, so group the ids by
+  // the patch they need instead of issuing one blanket updateMany.
+  const patchGroups = new Map<string, { data: { status: string; productionStatus?: string }; ids: string[] }>();
+  for (const sub of submissions) {
+    const data = statusChangeData(status, sub.status);
+    const key = JSON.stringify(data);
+    const group = patchGroups.get(key) ?? { data, ids: [] };
+    group.ids.push(sub.id);
+    patchGroups.set(key, group);
+  }
+  await prisma.$transaction(
+    [...patchGroups.values()].map((group) =>
+      prisma.submission.updateMany({ where: { id: { in: group.ids } }, data: group.data })
+    )
+  );
   const adminId = (req as AuthRequest).admin?.adminId;
   for (const sub of submissions) {
     void writeAuditLog({ adminId, action: "bulk_status_change", resource: "submission", resourceId: sub.id, details: { from: sub.status, to: status }, ipAddress: req.ip });
