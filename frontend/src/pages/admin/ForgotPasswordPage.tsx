@@ -103,7 +103,7 @@ export const ForgotPasswordPage = () => {
             </div>
             <span className="text-white font-heading text-xl font-semibold">ScriptHive</span>
           </div>
-          <p className="text-green-200 text-sm">LLP</p>
+          <p className="text-green-200 text-sm">Publication </p>
         </div>
         <div className="relative z-10">
           <h1 className="font-heading text-4xl text-white leading-tight mb-6">
@@ -130,7 +130,7 @@ export const ForgotPasswordPage = () => {
             ))}
           </div>
         </div>
-        <p className="relative z-10 text-green-400 text-xs">© {new Date().getFullYear()} ScriptHive LLP </p>
+        <p className="relative z-10 text-green-400 text-xs">© {new Date().getFullYear()} ScriptHive Publication </p>
       </div>
 
       {/* Right panel */}

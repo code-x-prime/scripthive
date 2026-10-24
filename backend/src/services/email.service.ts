@@ -42,7 +42,7 @@ function baseTemplate(title: string, preheader: string, body: string): string {
                   <img src="https://scripthive.org/images/only%20Logo.png" alt="ScriptHive" width="40" height="40" style="display:block;object-fit:contain;" />
                 </td>
                 <td style="vertical-align:middle;">
-                  <div style="font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;line-height:1.2;">ScriptHive LLP</div>
+                  <div style="font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;line-height:1.2;">ScriptHive Publication</div>
                   <div style="font-size:11px;color:#93c5fd;margin-top:5px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">International Research Journals</div>
                 </td>
               </tr>
@@ -74,7 +74,7 @@ function baseTemplate(title: string, preheader: string, body: string): string {
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td>
-            <div style="font-size:13px;font-weight:700;color:#0f172a;">ScriptHive LLP</div>
+            <div style="font-size:13px;font-weight:700;color:#0f172a;">ScriptHive Publication</div>
             <div style="font-size:12px;color:#64748b;margin-top:3px;">
               <a href="https://scripthive.org" style="color:#1d4ed8;text-decoration:none;">scripthive.org</a>
               &nbsp;·&nbsp;
@@ -164,7 +164,7 @@ export const sendSubmissionConfirmationEmail = async (
   const body = `
     ${greeting(authorName)}
     <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
-      Thank you for submitting your manuscript to <strong>ScriptHive LLP</strong>. We have successfully received your submission and it is now queued for editorial pre-screening.
+      Thank you for submitting your manuscript to <strong>ScriptHive Publication</strong>. We have successfully received your submission and it is now queued for editorial pre-screening.
     </p>
     ${infoCard(rows)}
     <p style="margin:0 0 8px;font-size:14px;color:#374151;line-height:1.6;">
@@ -284,7 +284,7 @@ export const sendAcceptedEmail = async (
       You will shortly receive instructions regarding the <strong>Article Processing Charge (APC)</strong> and the production process. Please complete the payment to proceed to publication.
     </p>
     ${divider()}
-    <p style="margin:0;font-size:13px;color:#64748b;">Thank you for choosing ScriptHive LLP for your research.</p>
+    <p style="margin:0;font-size:13px;color:#64748b;">Thank you for choosing ScriptHive Publication for your research.</p>
   `;
   await sendMail({
     to: authorEmail,
@@ -302,7 +302,7 @@ export const sendRejectedEmail = async (
   const body = `
     ${greeting(authorName)}
     <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
-      Thank you for submitting your manuscript to ScriptHive LLP. After careful evaluation by our editorial board and peer reviewers, we regret to inform you that we are <strong>unable to accept</strong> your manuscript for publication in its current form.
+      Thank you for submitting your manuscript to ScriptHive Publication. After careful evaluation by our editorial board and peer reviewers, we regret to inform you that we are <strong>unable to accept</strong> your manuscript for publication in its current form.
     </p>
     ${infoCard([
     ["Manuscript", title],

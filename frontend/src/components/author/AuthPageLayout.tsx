@@ -39,7 +39,7 @@ export function AuthPageLayout({ title, subtitle, children }: {
             ))}
           </div>
         </div>
-        <p className="text-xs" style={{ color: "#475569" }}>© 2026 ScriptHive LLP. All rights reserved.</p>
+        <p className="text-xs" style={{ color: "#475569" }}>© 2026 ScriptHive Publication. All rights reserved.</p>
       </div>
 
       {/* Right panel */}

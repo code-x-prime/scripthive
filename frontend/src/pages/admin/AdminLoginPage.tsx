@@ -64,7 +64,7 @@ export const AdminLoginPage = () => {
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-2">
             <img src="/logo.png" alt="ScriptHive" className="h-10 w-10 object-contain" />
-            <span className="text-white font-heading text-xl font-semibold">ScriptHive LLP</span>
+            <span className="text-white font-heading text-xl font-semibold">ScriptHive Publication</span>
           </div>
           <p className="text-green-200 text-sm">Admin Portal</p>
         </div>
@@ -97,7 +97,7 @@ export const AdminLoginPage = () => {
         </div>
 
         <p className="relative z-10 text-green-400 text-xs">
-          © {new Date().getFullYear()} ScriptHive LLP
+          © {new Date().getFullYear()} ScriptHive Publication
         </p>
       </div>
 
@@ -105,7 +105,7 @@ export const AdminLoginPage = () => {
         <div className="w-full max-w-md">
           <div className="flex items-center gap-2 mb-6 lg:hidden">
             <img src="/logo.png" alt="ScriptHive" className="h-8 w-8 object-contain" />
-            <span className="font-heading text-lg font-semibold text-slate-800">ScriptHive LLP</span>
+            <span className="font-heading text-lg font-semibold text-slate-800">ScriptHive Publication</span>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
