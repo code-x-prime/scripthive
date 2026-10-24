@@ -351,7 +351,7 @@ export const SettingsPage = () => {
               <input
                 value={siteName}
                 onChange={(e) => setSiteName(e.target.value)}
-                placeholder="ScriptHive Publication "
+                placeholder="ScriptHive LLP "
                 className="h-11 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </label>

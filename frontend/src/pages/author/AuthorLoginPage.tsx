@@ -77,7 +77,7 @@ export function AuthorLoginPage() {
           <div className="flex items-center gap-3 mb-16">
             <img src="/logo.png" alt="ScriptHive" className="h-10 w-10 object-contain" />
             <div>
-              <p className="text-white font-bold text-sm leading-tight">ScriptHive Publication</p>
+              <p className="text-white font-bold text-sm leading-tight">ScriptHive LLP</p>
               <p className="text-xs font-semibold" style={{color:"#93c5fd",letterSpacing:"0.08em"}}>AUTHOR PORTAL</p>
             </div>
           </div>
@@ -99,7 +99,7 @@ export function AuthorLoginPage() {
             ))}
           </div>
         </div>
-        <p className="text-xs" style={{color:"#475569"}}>© 2026 ScriptHive Publication. All rights reserved.</p>
+        <p className="text-xs" style={{color:"#475569"}}>© 2026 ScriptHive LLP. All rights reserved.</p>
       </div>
 
       {/* Right panel — form */}
@@ -109,7 +109,7 @@ export function AuthorLoginPage() {
           <div className="flex lg:hidden items-center gap-3 mb-8">
             <img src="/logo.png" alt="ScriptHive" className="h-10 w-10 object-contain" />
             <div>
-              <p className="font-bold text-slate-900 text-sm">ScriptHive Publication</p>
+              <p className="font-bold text-slate-900 text-sm">ScriptHive LLP</p>
               <p className="text-xs text-blue-600 font-semibold tracking-widest">AUTHOR PORTAL</p>
             </div>
           </div>

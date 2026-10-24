@@ -14,7 +14,7 @@ const Logo = () => (
   <div className="flex items-center gap-3">
     <img src="/logo.png" alt="ScriptHive" className="h-10 w-10 object-contain" />
     <div>
-      <div className="text-white font-bold text-lg tracking-tight leading-tight">ScriptHive Publication</div>
+      <div className="text-white font-bold text-lg tracking-tight leading-tight">ScriptHive LLP</div>
       <div className="text-[#93c5fd] text-xs font-semibold tracking-widest uppercase">Article Processing Charge</div>
     </div>
   </div>
@@ -284,7 +284,7 @@ export const PaymentPage = () => {
 
         {/* Footer */}
         <div className="bg-slate-100 border border-[#dde3ed] border-t-[3px] border-t-[#1d4ed8] px-8 py-5">
-          <div className="text-sm font-bold text-slate-800">ScriptHive Publication</div>
+          <div className="text-sm font-bold text-slate-800">ScriptHive LLP</div>
           <div className="text-xs text-slate-500 mt-1">
             scripthive.org · info@scripthive.org · +91 9899916683
           </div>

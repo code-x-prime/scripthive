@@ -72,7 +72,7 @@ body { font-family: Arial, Helvetica, sans-serif; background: #ffffff; color: #1
   <!-- Header -->
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;">
     <div>
-      <div style="font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-0.5px">ScriptHive Publication</div>
+      <div style="font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-0.5px">ScriptHive LLP</div>
       <div style="font-size:11px;color:#64748b;margin-top:3px;letter-spacing:0.5px">www.scripthive.org &nbsp;|&nbsp; info@scripthive.org</div>
       ${d.journalName ? `<div style="font-size:12px;color:#1d4ed8;margin-top:4px;font-weight:600">${d.journalName}</div>` : ""}
       ${d.issn ? `<div style="font-size:11px;color:#64748b">ISSN: ${d.issn}${d.eIssn ? ` &nbsp;|&nbsp; e-ISSN: ${d.eIssn}` : ""}</div>` : ""}
@@ -136,7 +136,7 @@ body { font-family: Arial, Helvetica, sans-serif; background: #ffffff; color: #1
   <!-- Footer -->
   <div style="position:absolute;bottom:10mm;left:14mm;right:14mm;border-top:1px solid #e2e8f0;padding-top:10px;">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="font-size:10px;color:#94a3b8">ScriptHive Publication &nbsp;|&nbsp; scripthive.org &nbsp;|&nbsp; +91 9899916683</div>
+      <div style="font-size:10px;color:#94a3b8">ScriptHive LLP &nbsp;|&nbsp; scripthive.org &nbsp;|&nbsp; +91 9899916683</div>
       <div style="font-size:10px;color:#94a3b8">This is a computer-generated invoice.</div>
     </div>
   </div>

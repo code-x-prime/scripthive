@@ -175,7 +175,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
   <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">If you did not request a password reset, please ignore this email. Your account remains secure.</p>
 </td></tr>
 <tr><td style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 14px 14px;padding:20px 40px;text-align:center;">
-  <p style="margin:0;font-size:11px;color:#94a3b8;">ScriptHive Publication &nbsp;|&nbsp; <a href="https://scripthive.org" style="color:#2563eb;text-decoration:none;">scripthive.org</a></p>
+  <p style="margin:0;font-size:11px;color:#94a3b8;">ScriptHive LLP &nbsp;|&nbsp; <a href="https://scripthive.org" style="color:#2563eb;text-decoration:none;">scripthive.org</a></p>
 </td></tr>
 </table></td></tr></table></body></html>`
   });

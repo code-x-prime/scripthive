@@ -1,5 +1,5 @@
 /* ============================================================
-   ScriptHive Publication — Global Stylesheet
+   ScriptHive LLP — Global Stylesheet
    Design System: Relax Mind Theme
    ============================================================ */
 
@@ -1179,7 +1179,7 @@ button {
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 48px;
   padding-bottom: 56px;
 }

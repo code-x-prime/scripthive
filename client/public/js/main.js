@@ -1,4 +1,4 @@
-// ScriptHive Publication — Main JS
+// ScriptHive LLP — Main JS
 /* 
    BACKEND CONFIGURATION:
    This website now uses a Python/Flask backend for automated emails.
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function () {
                   doc.setTextColor(255, 255, 255);
                   doc.setFont('helvetica', 'bold');
                   doc.setFontSize(22);
-                  doc.text('ScriptHive Publication', 105, 20, { align: 'center' });
+                  doc.text('ScriptHive LLP', 105, 20, { align: 'center' });
 
                   doc.setFontSize(12);
                   doc.setFont('helvetica', 'normal');

@@ -27,7 +27,7 @@ export function PublicNavbar() {
           </div>
           <div className="leading-tight">
             <p className="font-display text-sm font-semibold text-gray-900">ScriptHive</p>
-            <p className="-mt-0.5 text-[10px] text-gray-400">Publication </p>
+            <p className="-mt-0.5 text-[10px] text-gray-400">LLP</p>
           </div>
         </Link>
 

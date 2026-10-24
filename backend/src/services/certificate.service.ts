@@ -47,7 +47,7 @@ body{margin:0;padding:0;background:#ffffff;font-family:"Georgia","Times New Roma
 .signature-subtitle{font-size:11px;color:#6b7280;margin-top:2px;}
 .seal{width:90px;height:90px;display:flex;align-items:center;justify-content:center;margin:0 auto;}
 .website{text-align:center;font-family:Arial,sans-serif;font-size:11px;color:#6b7280;margin-top:4px;}
-.certificate-wrapper::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:0.08;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='90'%3E%3Ctext x='5' y='55' transform='rotate(-35 70 45)' fill='black' font-size='18' font-family='Arial' font-weight='bold'%3EScriptHive Publication%3C/text%3E%3C/svg%3E");background-repeat:repeat;background-size:140px 90px;}
+.certificate-wrapper::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:0.08;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='90'%3E%3Ctext x='5' y='55' transform='rotate(-35 70 45)' fill='black' font-size='18' font-family='Arial' font-weight='bold'%3EScriptHive LLP%3C/text%3E%3C/svg%3E");background-repeat:repeat;background-size:140px 90px;}
 `;
 
 function buildCertBlock(d: CertificateData): string {
@@ -58,7 +58,7 @@ function buildCertBlock(d: CertificateData): string {
   <div class="corner bottom-right"></div>
   <div class="content">
     <div class="top-header">
-      <div class="brand">ScriptHive Publication</div>
+      <div class="brand">ScriptHive LLP</div>
       <div class="brand-subtitle">Peer-Reviewed Academic Publishing Platform</div>
       <div class="certificate-title">Certificate of Publication</div>
       <div class="gold-line"></div>
@@ -79,7 +79,7 @@ function buildCertBlock(d: CertificateData): string {
       <div class="verification-text">
         The above-mentioned manuscript has been reviewed and accepted for publication through the journal's formal
         double-blind peer review process in accordance with the editorial policies and academic standards of
-        ScriptHive Publication.
+        ScriptHive LLP.
       </div>
     </div>
     <div class="footer">
@@ -87,7 +87,7 @@ function buildCertBlock(d: CertificateData): string {
         <img src="${SIGN_B64}" style="height:48px;max-width:130px;object-fit:contain;display:block;margin:0 auto 4px;filter:brightness(0.1) saturate(2);" />
         <div class="signature-line"></div>
         <div class="signature-title">Editor-in-Chief</div>
-        <div class="signature-subtitle">ScriptHive Publication</div>
+        <div class="signature-subtitle">ScriptHive LLP</div>
       </div>
       <div class="seal">
         <img src="${LOGO_B64}" style="width:90px;height:90px;object-fit:contain;" />
@@ -96,7 +96,7 @@ function buildCertBlock(d: CertificateData): string {
         <img src="${JYOTI_B64}" style="height:48px;max-width:130px;object-fit:contain;display:block;margin:0 auto 4px;filter:brightness(0.1) saturate(2);" />
         <div class="signature-line"></div>
         <div class="signature-title">Publisher</div>
-        <div class="signature-subtitle">ScriptHive Publication</div>
+        <div class="signature-subtitle">ScriptHive LLP</div>
       </div>
     </div>
     <div class="website">www.scripthive.org | Certificate issued for academic publication record</div>
@@ -112,7 +112,7 @@ function buildHtml(dataList: CertificateData[]): string {
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<title>ScriptHive Publication Certificate</title>
+<title>ScriptHive LLP Certificate</title>
 <style>${CERT_STYLES}</style>
 </head>
 <body>${pages}</body>
